@@ -50,6 +50,7 @@ public partial class BookStoreContext : DbContext
                 .Build();
 
             optionsBuilder.UseSqlServer(configuration.GetConnectionString("BookStoreDb"));
+            optionsBuilder.UseLazyLoadingProxies();
         }
     }
     protected override void OnModelCreating(ModelBuilder modelBuilder)
