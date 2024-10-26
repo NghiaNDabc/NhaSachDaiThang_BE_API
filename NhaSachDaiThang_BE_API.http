@@ -1,0 +1,6 @@
+@NhaSachDaiThang_BE_API_HostAddress = http://localhost:5030
+
+GET {{NhaSachDaiThang_BE_API_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###
