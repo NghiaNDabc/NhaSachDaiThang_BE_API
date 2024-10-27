@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using Microsoft.EntityFrameworkCore;
-using NhaSachDaiThang_BE_API.Models;
+using NhaSachDaiThang_BE_API.Models.Entities;
 
 namespace NhaSachDaiThang_BE_API.Data;
 
@@ -22,9 +22,7 @@ public partial class BookStoreContext : DbContext
 
     public virtual DbSet<Category> Categories { get; set; }
 
-    public virtual DbSet<Customer> Customers { get; set; }
-
-    public virtual DbSet<Employee> Employees { get; set; }
+    public virtual DbSet<User> Users { get; set; }
 
     public virtual DbSet<Order> Orders { get; set; }
 
@@ -137,20 +135,23 @@ public partial class BookStoreContext : DbContext
             entity.Property(e => e.Name).HasMaxLength(100);
         });
 
-        modelBuilder.Entity<Customer>(entity =>
+        modelBuilder.Entity<User>(entity =>
         {
-            entity.HasKey(e => e.CustomerId).HasName("PK__Customer__A4AE64B80DDF41BD");
+            entity.HasKey(e => e.UserId).HasName("PK__Customer__A4AE64B80DDF41BD");
 
             entity.HasIndex(e => e.Email, "UQ__Customer__A9D1053471732474").IsUnique();
 
-            entity.Property(e => e.CustomerId).HasColumnName("CustomerID");
+            entity.Property(e => e.UserId).HasColumnName("UserId");
             entity.Property(e => e.Address).HasMaxLength(255);
             entity.Property(e => e.CreatedBy).HasMaxLength(100);
             entity.Property(e => e.CreatedDate)
                 .HasDefaultValueSql("(getdate())")
                 .HasColumnType("datetime");
             entity.Property(e => e.Email).HasMaxLength(100);
-            entity.Property(e => e.FullName).HasMaxLength(100);
+            entity.Property(e => e.FirstName).HasMaxLength(100);
+            entity.Property(e => e.LastName).HasMaxLength(100);
+            entity.Property(e => e.OtpCode).HasMaxLength(10);
+            entity.Property(e => e.OtpExpiryTime).HasColumnType("datetime");
             entity.Property(e => e.ModifyBy).HasMaxLength(100);
             entity.Property(e => e.ModifyDate).HasColumnType("datetime");
             entity.Property(e => e.PasswordHash).HasMaxLength(255);
@@ -162,28 +163,6 @@ public partial class BookStoreContext : DbContext
                 .HasConstraintName("FK__Customers__RoleI__534D60F1");
         });
 
-        modelBuilder.Entity<Employee>(entity =>
-        {
-            entity.HasKey(e => e.EmployeeId).HasName("PK__Employee__7AD04FF1F64003B7");
-
-            entity.HasIndex(e => e.Email, "UQ__Employee__A9D10534FA126257").IsUnique();
-
-            entity.Property(e => e.EmployeeId).HasColumnName("EmployeeID");
-            entity.Property(e => e.CreatedBy).HasMaxLength(100);
-            entity.Property(e => e.CreatedDate)
-                .HasDefaultValueSql("(getdate())")
-                .HasColumnType("datetime");
-            entity.Property(e => e.Email).HasMaxLength(100);
-            entity.Property(e => e.FullName).HasMaxLength(100);
-            entity.Property(e => e.ModifyBy).HasMaxLength(100);
-            entity.Property(e => e.ModifyDate).HasColumnType("datetime");
-            entity.Property(e => e.PasswordHash).HasMaxLength(255);
-            entity.Property(e => e.RoleId).HasColumnName("RoleID");
-
-            entity.HasOne(d => d.Role).WithMany(p => p.Employees)
-                .HasForeignKey(d => d.RoleId)
-                .HasConstraintName("FK__Employees__RoleI__5812160E");
-        });
 
         modelBuilder.Entity<Order>(entity =>
         {

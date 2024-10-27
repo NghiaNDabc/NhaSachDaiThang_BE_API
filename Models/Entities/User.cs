@@ -19,6 +19,8 @@ public partial class User
     public string? Phone { get; set; }
 
     public string? Address { get; set; }
+    public string? OtpCode { get; set; }
+    public DateTime? OtpExpiryTime { get; set; }
 
     public DateTime? CreatedDate { get; set; }
 
