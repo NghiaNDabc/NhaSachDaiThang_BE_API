@@ -1,13 +1,16 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations.Schema;
 
-namespace NhaSachDaiThang_BE_API.Models;
-
-public partial class Customer
+namespace NhaSachDaiThang_BE_API.Models.Entities;
+[Table("User")]
+public partial class User
 {
-    public int CustomerId { get; set; }
+    public int UserId { get; set; }
 
-    public string? FullName { get; set; }
+    public string? FirstName { get; set; }
+    public string? LastName { get; set; }
+    public string? IdNumber { get; set; }
 
     public string? Email { get; set; }
 

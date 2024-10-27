@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 
-namespace NhaSachDaiThang_BE_API.Models;
+namespace NhaSachDaiThang_BE_API.Models.Entities;
 
 public partial class Order
 {
@@ -23,7 +23,7 @@ public partial class Order
 
     public string? ModifyBy { get; set; }
 
-    public virtual Customer? Customer { get; set; }
+    public virtual User? Customer { get; set; }
 
     public virtual ICollection<OrderDetail> OrderDetails { get; set; } = new List<OrderDetail>();
 
