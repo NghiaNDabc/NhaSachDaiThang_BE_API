@@ -5,7 +5,7 @@ using MimeKit;
 
 namespace NhaSachDaiThang_BE_API.Helper
 {
-    public class EmailService
+    public class EmailHelper
     {
         private readonly string _smtpServer = "smtp.gmail.com";
         private readonly int _smtpPort = 587;

@@ -6,49 +6,29 @@ using NhaSachDaiThang_BE_API.Services.IServices;
 
 namespace NhaSachDaiThang_BE_API.Services
 {
-    public class AccountService : IAccountService
+    public class AuthService : IAuthService
     {
         private readonly IUserRepository _userRepository;
         private readonly JwtHelper _jwtHelper;
-        public AccountService( IUserRepository userRepository, JwtHelper jwtHelper)
+        private readonly IOtpService _otpService;
+        public AuthService( IUserRepository userRepository, JwtHelper jwtHelper, IOtpService otpService)
         {
             _userRepository = userRepository;
             _jwtHelper = jwtHelper;
+            _otpService = otpService;
         }
 
-        public async Task<OperationResult> Register(RegisterModel model)
+        public async Task<OperationResult> SendOtp(string email)
         {
-            if (_userRepository.GetByEmail( model.Email) !=null)
-            {
-                return new OperationResult
-                {
-                    Success = false,
-                    Data = new { Message = "Email đã tồn tại" }
-                };
-            }
-
-            var passwordHash = BCrypt.Net.BCrypt.HashPassword(model.Password);
-
-            var customer = new User
-            {
-                FirstName = model.FullName,
-                Email = model.Email,
-                PasswordHash = passwordHash,
-                Phone = model.Phone,
-                Address = model.Address,
-                RoleId = model.RoleID
-            };
-
-             _userRepository.Add(customer);
-
-            return new OperationResult
-            {
-                Success = true,
-                Data = new { Message = "Đăng ký thành công." }
-            }; 
+            return await _otpService.SendRegistrationOtp(email);
         }
 
-        public async Task<OperationResult> Login(LoginModel model)
+        public  OperationResult Register(RegisterModel model)
+        {
+            return _otpService.VerifySendRegistrationOtp(model); 
+        }
+
+        public OperationResult Login(LoginModel model)
         {
             var user = _userRepository.GetByEmail( model.Email);
 
@@ -84,7 +64,7 @@ namespace NhaSachDaiThang_BE_API.Services
              
         }
 
-        public async Task<OperationResult> AdminLogin(LoginModel model)
+        public OperationResult AdminLogin(LoginModel model)
         {
             var user = _userRepository.GetByEmail(model.Email);
 

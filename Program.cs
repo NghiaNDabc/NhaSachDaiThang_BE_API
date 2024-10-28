@@ -14,14 +14,14 @@ builder.Services.AddJwtConfiguration(builder.Configuration);
 // Add DbContext configuration
 builder.Services.AddDbContextConfiguration(builder.Configuration);
 //service
-builder.Services.AddScoped<IAccountService, AccountService>();
-builder.Services.AddScoped<IOtpService, ForgotPasswordService>();
+builder.Services.AddScoped<IAuthService, AuthService>();
+builder.Services.AddScoped<IOtpService, OtpService>();
 //repository
 builder.Services.AddScoped<IUserRepository, UserRepository>();
 
 //helper
 builder.Services.AddScoped<JwtHelper>();
-builder.Services.AddScoped<EmailService>();
+builder.Services.AddScoped<EmailHelper>();
 builder.Services.AddMemoryCache();
 // Add services to the container.
 
