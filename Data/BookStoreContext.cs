@@ -160,7 +160,11 @@ public partial class BookStoreContext : DbContext
             entity.Property(e => e.CreatedDate)
                 .HasDefaultValueSql("(getdate())")
                 .HasColumnType("datetime");
-            entity.Property(e => e.CustomerId).HasColumnName("CustomerID");
+            entity.Property(e => e.UserId).HasColumnName("UserId");
+            entity.Property(e => e.Phone).HasColumnName("Phone").HasMaxLength(15);
+            entity.Property(e => e.ShippingAddress).HasColumnName("ShippingAddress").HasMaxLength(100);
+            entity.Property(e => e.PaymentMethod).HasColumnName("PaymentMethod").HasMaxLength(60);
+            entity.Property(e => e.Email).HasColumnName("Email").HasMaxLength(30);
             entity.Property(e => e.ModifyBy).HasMaxLength(100);
             entity.Property(e => e.ModifyDate).HasColumnType("datetime");
             entity.Property(e => e.OrderDate)
@@ -170,7 +174,7 @@ public partial class BookStoreContext : DbContext
             entity.Property(e => e.TotalAmount).HasColumnType("decimal(18, 2)");
 
             entity.HasOne(d => d.Customer).WithMany(p => p.Orders)
-                .HasForeignKey(d => d.CustomerId)
+                .HasForeignKey(d => d.UserId)
                 .HasConstraintName("FK__Orders__Customer__5DCAEF64");
 
             entity.HasMany(d => d.Vouchers).WithMany(p => p.Orders)
@@ -260,7 +264,7 @@ public partial class BookStoreContext : DbContext
             entity.Property(e => e.CreatedDate)
                 .HasDefaultValueSql("(getdate())")
                 .HasColumnType("datetime");
-            entity.Property(e => e.CustomerId).HasColumnName("CustomerID");
+            entity.Property(e => e.UserId).HasColumnName("UserId");
             entity.Property(e => e.ModifyBy).HasMaxLength(100);
             entity.Property(e => e.ModifyDate).HasColumnType("datetime");
             entity.Property(e => e.ReviewDate)
@@ -271,9 +275,9 @@ public partial class BookStoreContext : DbContext
                 .HasForeignKey(d => d.BookId)
                 .HasConstraintName("FK__Reviews__BookID__71D1E811");
 
-            entity.HasOne(d => d.Customer).WithMany(p => p.Reviews)
-                .HasForeignKey(d => d.CustomerId)
-                .HasConstraintName("FK__Reviews__Custome__70DDC3D8");
+            //entity.HasOne(d => d.Customer).WithMany(p => p.Reviews)
+            //    .HasForeignKey(d => d.UserId)
+            //    .HasConstraintName("FK__Reviews__Custome__70DDC3D8");
         });
 
         modelBuilder.Entity<Role>(entity =>

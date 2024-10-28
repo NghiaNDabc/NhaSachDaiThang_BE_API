@@ -232,7 +232,7 @@ namespace NhaSachDaiThang_BE_API.Migrations
                         .HasColumnType("datetime")
                         .HasDefaultValueSql("(getdate())");
 
-                    b.Property<int?>("CustomerId")
+                    b.Property<int?>("UserId")
                         .HasColumnType("int")
                         .HasColumnName("CustomerID");
 
@@ -258,7 +258,7 @@ namespace NhaSachDaiThang_BE_API.Migrations
                     b.HasKey("OrderId")
                         .HasName("PK__Orders__C3905BAF2225F30A");
 
-                    b.HasIndex("CustomerId");
+                    b.HasIndex("UserId");
 
                     b.ToTable("Orders");
                 });
@@ -415,7 +415,7 @@ namespace NhaSachDaiThang_BE_API.Migrations
                         .HasColumnType("datetime")
                         .HasDefaultValueSql("(getdate())");
 
-                    b.Property<int?>("CustomerId")
+                    b.Property<int?>("UserId")
                         .HasColumnType("int")
                         .HasColumnName("CustomerID");
 
@@ -439,7 +439,7 @@ namespace NhaSachDaiThang_BE_API.Migrations
 
                     b.HasIndex("BookId");
 
-                    b.HasIndex("CustomerId");
+                    b.HasIndex("UserId");
 
                     b.ToTable("Reviews");
                 });
@@ -641,7 +641,7 @@ namespace NhaSachDaiThang_BE_API.Migrations
                 {
                     b.HasOne("NhaSachDaiThang_BE_API.Models.Entities.User", "Customer")
                         .WithMany("Orders")
-                        .HasForeignKey("CustomerId")
+                        .HasForeignKey("UserId")
                         .HasConstraintName("FK__Orders__Customer__5DCAEF64");
 
                     b.Navigation("Customer");
@@ -683,7 +683,7 @@ namespace NhaSachDaiThang_BE_API.Migrations
 
                     b.HasOne("NhaSachDaiThang_BE_API.Models.Entities.User", "Customer")
                         .WithMany("Reviews")
-                        .HasForeignKey("CustomerId")
+                        .HasForeignKey("UserId")
                         .HasConstraintName("FK__Reviews__Custome__70DDC3D8");
 
                     b.Navigation("Book");

@@ -187,9 +187,10 @@ namespace NhaSachDaiThang_BE_API.Migrations
                         .HasColumnType("datetime")
                         .HasDefaultValueSql("(getdate())");
 
-                    b.Property<int?>("CustomerId")
-                        .HasColumnType("int")
-                        .HasColumnName("CustomerID");
+                    b.Property<string>("Email")
+                        .HasMaxLength(30)
+                        .HasColumnType("nvarchar(30)")
+                        .HasColumnName("Email");
 
                     b.Property<string>("ModifyBy")
                         .HasMaxLength(100)
@@ -203,6 +204,21 @@ namespace NhaSachDaiThang_BE_API.Migrations
                         .HasColumnType("datetime")
                         .HasDefaultValueSql("(getdate())");
 
+                    b.Property<string>("PaymentMethod")
+                        .HasMaxLength(60)
+                        .HasColumnType("nvarchar(60)")
+                        .HasColumnName("PaymentMethod");
+
+                    b.Property<string>("Phone")
+                        .HasMaxLength(15)
+                        .HasColumnType("nvarchar(15)")
+                        .HasColumnName("Phone");
+
+                    b.Property<string>("ShippingAddress")
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)")
+                        .HasColumnName("ShippingAddress");
+
                     b.Property<string>("Status")
                         .HasMaxLength(20)
                         .HasColumnType("nvarchar(20)");
@@ -210,10 +226,14 @@ namespace NhaSachDaiThang_BE_API.Migrations
                     b.Property<decimal?>("TotalAmount")
                         .HasColumnType("decimal(18, 2)");
 
+                    b.Property<int?>("UserId")
+                        .HasColumnType("int")
+                        .HasColumnName("UserId");
+
                     b.HasKey("OrderId")
                         .HasName("PK__Orders__C3905BAF2225F30A");
 
-                    b.HasIndex("CustomerId");
+                    b.HasIndex("UserId");
 
                     b.ToTable("Orders");
                 });
@@ -370,10 +390,6 @@ namespace NhaSachDaiThang_BE_API.Migrations
                         .HasColumnType("datetime")
                         .HasDefaultValueSql("(getdate())");
 
-                    b.Property<int?>("CustomerId")
-                        .HasColumnType("int")
-                        .HasColumnName("CustomerID");
-
                     b.Property<string>("ModifyBy")
                         .HasMaxLength(100)
                         .HasColumnType("nvarchar(100)");
@@ -389,12 +405,14 @@ namespace NhaSachDaiThang_BE_API.Migrations
                         .HasColumnType("datetime")
                         .HasDefaultValueSql("(getdate())");
 
+                    b.Property<int?>("UserId")
+                        .HasColumnType("int")
+                        .HasColumnName("UserId");
+
                     b.HasKey("ReviewId")
                         .HasName("PK__Reviews__74BC79AEC46D3806");
 
                     b.HasIndex("BookId");
-
-                    b.HasIndex("CustomerId");
 
                     b.ToTable("Reviews");
                 });
@@ -585,7 +603,7 @@ namespace NhaSachDaiThang_BE_API.Migrations
                 {
                     b.HasOne("NhaSachDaiThang_BE_API.Models.Entities.User", "Customer")
                         .WithMany("Orders")
-                        .HasForeignKey("CustomerId")
+                        .HasForeignKey("UserId")
                         .HasConstraintName("FK__Orders__Customer__5DCAEF64");
 
                     b.Navigation("Customer");
@@ -625,14 +643,7 @@ namespace NhaSachDaiThang_BE_API.Migrations
                         .HasForeignKey("BookId")
                         .HasConstraintName("FK__Reviews__BookID__71D1E811");
 
-                    b.HasOne("NhaSachDaiThang_BE_API.Models.Entities.User", "Customer")
-                        .WithMany("Reviews")
-                        .HasForeignKey("CustomerId")
-                        .HasConstraintName("FK__Reviews__Custome__70DDC3D8");
-
                     b.Navigation("Book");
-
-                    b.Navigation("Customer");
                 });
 
             modelBuilder.Entity("NhaSachDaiThang_BE_API.Models.Entities.User", b =>
@@ -687,8 +698,6 @@ namespace NhaSachDaiThang_BE_API.Migrations
             modelBuilder.Entity("NhaSachDaiThang_BE_API.Models.Entities.User", b =>
                 {
                     b.Navigation("Orders");
-
-                    b.Navigation("Reviews");
                 });
 #pragma warning restore 612, 618
         }

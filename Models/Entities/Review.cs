@@ -7,7 +7,7 @@ public partial class Review
 {
     public int ReviewId { get; set; }
 
-    public int? CustomerId { get; set; }
+    public int? UserId { get; set; }
 
     public int? BookId { get; set; }
 
@@ -27,5 +27,5 @@ public partial class Review
 
     public virtual Book? Book { get; set; }
 
-    public virtual User? Customer { get; set; }
+   // public virtual User? Customer { get; set; }
 }
