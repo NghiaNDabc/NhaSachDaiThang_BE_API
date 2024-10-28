@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using NhaSachDaiThang_BE_API.Data;
 
@@ -11,9 +12,11 @@ using NhaSachDaiThang_BE_API.Data;
 namespace NhaSachDaiThang_BE_API.Migrations
 {
     [DbContext(typeof(BookStoreContext))]
-    partial class BookStoreContextModelSnapshot : ModelSnapshot
+    [Migration("20241028165324_AddSupplierTable")]
+    partial class AddSupplierTable
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -93,6 +96,9 @@ namespace NhaSachDaiThang_BE_API.Migrations
                     b.Property<string>("Publisher")
                         .HasMaxLength(100)
                         .HasColumnType("nvarchar(100)");
+
+                    b.Property<decimal?>("PurchasePrice")
+                        .HasColumnType("decimal(18, 2)");
 
                     b.Property<int?>("Quantity")
                         .HasColumnType("int");
@@ -417,10 +423,6 @@ namespace NhaSachDaiThang_BE_API.Migrations
                         .HasColumnType("int")
                         .HasColumnName("BookID");
 
-                    b.Property<int>("Quanlity")
-                        .HasColumnType("int")
-                        .HasColumnName("Quantity");
-
                     b.Property<DateTime?>("SupplyDate")
                         .HasColumnType("datetime");
 
@@ -467,10 +469,6 @@ namespace NhaSachDaiThang_BE_API.Migrations
 
                     b.Property<string>("IdNumber")
                         .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("Image")
-                        .HasMaxLength(255)
-                        .HasColumnType("nvarchar(255)");
 
                     b.Property<string>("LastName")
                         .HasMaxLength(100)

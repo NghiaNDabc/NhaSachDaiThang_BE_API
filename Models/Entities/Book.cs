@@ -19,7 +19,7 @@ public partial class Book
     public decimal? Weight { get; set; }
     public decimal? Price { get; set; }
 
-    public decimal? PurchasePrice { get; set; }
+    //public decimal? PurchasePrice { get; set; }
 
     public int? Quantity { get; set; }
 
@@ -48,4 +48,5 @@ public partial class Book
     public virtual ICollection<OrderDetail> OrderDetails { get; set; } = new List<OrderDetail>();
 
     public virtual ICollection<Review> Reviews { get; set; } = new List<Review>();
+    public virtual ICollection<SupplierBook> SupplierBooks { get; set; } = new List<SupplierBook>();
 }

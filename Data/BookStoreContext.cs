@@ -69,10 +69,10 @@ public partial class BookStoreContext : DbContext
             entity.Property(e => e.Promotion).HasMaxLength(30)
               .IsRequired(false);
             entity.Property(e => e.Size)
-                .HasMaxLength(50) 
+                .HasMaxLength(50)
                 .IsRequired(false);
             entity.Property(e => e.Weight)
-                .HasColumnType("decimal(5, 2)") 
+                .HasColumnType("decimal(5, 2)")
                 .IsRequired(false);
             entity.Property(e => e.IsDel).HasDefaultValue(false);
             entity.Property(e => e.MainImage).HasMaxLength(255);
@@ -83,7 +83,7 @@ public partial class BookStoreContext : DbContext
             entity.Property(e => e.ModifyDate).HasColumnType("datetime");
             entity.Property(e => e.Price).HasColumnType("decimal(18, 2)");
             entity.Property(e => e.Publisher).HasMaxLength(100);
-            entity.Property(e => e.PurchasePrice).HasColumnType("decimal(18, 2)");
+
             entity.Property(e => e.Title).HasMaxLength(200);
 
             entity.HasOne(d => d.Category).WithMany(p => p.Books)
@@ -91,6 +91,38 @@ public partial class BookStoreContext : DbContext
                 .HasConstraintName("FK__Books__CategoryI__3E52440B");
         });
 
+        modelBuilder.Entity<SupplierBook>(
+            entity =>
+            {
+                entity.HasKey(sb => new { sb.SupplierId, sb.BookId }).HasName("PK__SupplierBook");
+
+                entity.Property(e => e.BookId).HasColumnName("BookID");
+                entity.Property(e => e.SupplyDate).HasColumnType("datetime").IsRequired(false);
+                entity.Property(e => e.SupplyPrice).HasColumnType("decimal(18, 2)").IsRequired(false);
+                entity.Property(e => e.Quanlity).HasColumnName("Quantity");
+                entity.HasOne(db => db.Supplier)
+                .WithMany(sb => sb.SupplierBooks)
+                .HasForeignKey(entity => entity.SupplierId).OnDelete(DeleteBehavior.Restrict);
+
+                entity.HasOne(db=> db.Book)
+                .WithMany(sb=> sb.SupplierBooks)
+                .HasForeignKey(sb=>sb.BookId).OnDelete(DeleteBehavior.Restrict);
+
+            }
+        );
+
+        modelBuilder.Entity<Supplier>(
+            entity =>
+            {
+                entity.HasKey(e => e.SupplierId).HasName("PK__Supplyer");
+                entity.Property(e => e.Name).HasMaxLength(50);
+                entity.Property(e => e.Email).HasMaxLength(50)
+                  .IsRequired(false);
+                entity.Property(e => e.Address).HasMaxLength(30).IsRequired(false);
+                entity.Property(e => e.Phone).HasMaxLength(15).IsRequired(false);
+
+            }
+         );
         modelBuilder.Entity<Category>(entity =>
         {
             entity.HasKey(e => e.CategoryId).HasName("PK__Categori__19093A2BE21B8E70");
@@ -119,6 +151,7 @@ public partial class BookStoreContext : DbContext
                 .HasDefaultValueSql("(getdate())")
                 .HasColumnType("datetime");
             entity.Property(e => e.Email).HasMaxLength(100);
+            entity.Property(e => e.Image).HasMaxLength(255);
             entity.Property(e => e.FirstName).HasMaxLength(100);
             entity.Property(e => e.LastName).HasMaxLength(100);
             entity.Property(e => e.UserName).HasMaxLength(100);
