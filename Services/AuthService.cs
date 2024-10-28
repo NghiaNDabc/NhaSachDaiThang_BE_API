@@ -30,7 +30,7 @@ namespace NhaSachDaiThang_BE_API.Services
 
         public OperationResult Login(LoginModel model)
         {
-            var user = _userRepository.GetByEmail( model.Email);
+            var user = _userRepository.GetByEmail( model.UserName);
 
             if (user == null || !BCrypt.Net.BCrypt.Verify(model.Password, user.PasswordHash))
             {
@@ -66,7 +66,7 @@ namespace NhaSachDaiThang_BE_API.Services
 
         public OperationResult AdminLogin(LoginModel model)
         {
-            var user = _userRepository.GetByEmail(model.Email);
+            var user = _userRepository.GetByEmail(model.UserName);
 
             if (user == null || !BCrypt.Net.BCrypt.Verify(model.Password, user.PasswordHash))
             {
