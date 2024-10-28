@@ -150,8 +150,7 @@ public partial class BookStoreContext : DbContext
             entity.Property(e => e.Email).HasMaxLength(100);
             entity.Property(e => e.FirstName).HasMaxLength(100);
             entity.Property(e => e.LastName).HasMaxLength(100);
-            entity.Property(e => e.OtpCode).HasMaxLength(10);
-            entity.Property(e => e.OtpExpiryTime).HasColumnType("datetime");
+            entity.Property(e => e.UserName).HasMaxLength(100);
             entity.Property(e => e.ModifyBy).HasMaxLength(100);
             entity.Property(e => e.ModifyDate).HasColumnType("datetime");
             entity.Property(e => e.PasswordHash).HasMaxLength(255);
