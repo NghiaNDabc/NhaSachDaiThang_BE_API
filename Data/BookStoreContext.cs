@@ -29,8 +29,6 @@ public partial class BookStoreContext : DbContext
 
     public virtual DbSet<Payment> Payments { get; set; }
 
-    public virtual DbSet<Promotion> Promotions { get; set; }
-
     public virtual DbSet<Review> Reviews { get; set; }
 
     public virtual DbSet<Role> Roles { get; set; }
@@ -91,25 +89,6 @@ public partial class BookStoreContext : DbContext
             entity.HasOne(d => d.Category).WithMany(p => p.Books)
                 .HasForeignKey(d => d.CategoryId)
                 .HasConstraintName("FK__Books__CategoryI__3E52440B");
-
-            entity.HasMany(d => d.Promotions).WithMany(p => p.Books)
-                .UsingEntity<Dictionary<string, object>>(
-                    "BookPromotion",
-                    r => r.HasOne<Promotion>().WithMany()
-                        .HasForeignKey("PromotionId")
-                        .OnDelete(DeleteBehavior.ClientSetNull)
-                        .HasConstraintName("FK__BookPromo__Promo__49C3F6B7"),
-                    l => l.HasOne<Book>().WithMany()
-                        .HasForeignKey("BookId")
-                        .OnDelete(DeleteBehavior.ClientSetNull)
-                        .HasConstraintName("FK__BookPromo__BookI__48CFD27E"),
-                    j =>
-                    {
-                        j.HasKey("BookId", "PromotionId").HasName("PK__BookProm__D8CC80D5FD16A69C");
-                        j.ToTable("BookPromotions");
-                        j.IndexerProperty<int>("BookId").HasColumnName("BookID");
-                        j.IndexerProperty<int>("PromotionId").HasColumnName("PromotionID");
-                    });
         });
 
         modelBuilder.Entity<Category>(entity =>
@@ -242,20 +221,6 @@ public partial class BookStoreContext : DbContext
                 .HasConstraintName("FK__Payments__OrderI__6B24EA82");
         });
 
-        modelBuilder.Entity<Promotion>(entity =>
-        {
-            entity.HasKey(e => e.PromotionId).HasName("PK__Promotio__52C42F2F433C3844");
-
-            entity.Property(e => e.PromotionId).HasColumnName("PromotionID");
-            entity.Property(e => e.CreatedBy).HasMaxLength(100);
-            entity.Property(e => e.CreatedDate)
-                .HasDefaultValueSql("(getdate())")
-                .HasColumnType("datetime");
-            entity.Property(e => e.Discount).HasColumnType("decimal(5, 2)");
-            entity.Property(e => e.ModifyBy).HasMaxLength(100);
-            entity.Property(e => e.ModifyDate).HasColumnType("datetime");
-            entity.Property(e => e.Name).HasMaxLength(100);
-        });
 
         modelBuilder.Entity<Review>(entity =>
         {
