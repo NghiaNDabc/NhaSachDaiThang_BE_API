@@ -63,8 +63,12 @@ public partial class BookStoreContext : DbContext
             entity.Property(e => e.CreatedDate)
                 .HasDefaultValueSql("(getdate())")
                 .HasColumnType("datetime");
+            entity.Property(e => e.PromotionEndDate)
+                .HasColumnType("datetime");
             entity.Property(e => e.Description).HasMaxLength(500);
             entity.Property(e => e.PageCount)
+              .IsRequired(false);
+            entity.Property(e => e.Promotion).HasMaxLength(30)
               .IsRequired(false);
             entity.Property(e => e.Size)
                 .HasMaxLength(50) 

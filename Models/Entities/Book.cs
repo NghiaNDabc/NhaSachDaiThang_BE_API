@@ -26,6 +26,8 @@ public partial class Book
     public int? CategoryId { get; set; }
 
     public string? Description { get; set; }
+    public string? Promotion { get; set; }
+    public DateTime? PromotionEndDate { get; set; }
 
     public bool? IsDel { get; set; }
 
