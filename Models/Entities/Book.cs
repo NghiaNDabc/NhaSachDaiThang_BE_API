@@ -40,7 +40,6 @@ public partial class Book
     public string? MainImage { get; set; }
     public string? AdditionalImages { get; set; } 
 
-    public virtual ICollection<BookImage> BookImages { get; set; } = new List<BookImage>();
 
     public virtual Category? Category { get; set; }
 

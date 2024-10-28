@@ -18,7 +18,6 @@ public partial class BookStoreContext : DbContext
 
     public virtual DbSet<Book> Books { get; set; }
 
-    public virtual DbSet<BookImage> BookImages { get; set; }
 
     public virtual DbSet<Category> Categories { get; set; }
 
@@ -107,28 +106,6 @@ public partial class BookStoreContext : DbContext
                         j.IndexerProperty<int>("BookId").HasColumnName("BookID");
                         j.IndexerProperty<int>("PromotionId").HasColumnName("PromotionID");
                     });
-        });
-
-        modelBuilder.Entity<BookImage>(entity =>
-        {
-            entity.HasKey(e => e.ImageId).HasName("PK__BookImag__7516F4EC1E8E4B20");
-
-            entity.Property(e => e.ImageId).HasColumnName("ImageID");
-            entity.Property(e => e.BookId).HasColumnName("BookID");
-            entity.Property(e => e.CreatedBy).HasMaxLength(100);
-            entity.Property(e => e.CreatedDate)
-                .HasDefaultValueSql("(getdate())")
-                .HasColumnType("datetime");
-            entity.Property(e => e.ImageUrl)
-                .HasMaxLength(255)
-                .HasColumnName("ImageURL");
-            entity.Property(e => e.ModifyBy).HasMaxLength(100);
-            entity.Property(e => e.ModifyDate).HasColumnType("datetime");
-
-            entity.HasOne(d => d.Book).WithMany(p => p.BookImages)
-                .HasForeignKey(d => d.BookId)
-                .OnDelete(DeleteBehavior.ClientSetNull)
-                .HasConstraintName("FK__BookImage__BookI__4222D4EF");
         });
 
         modelBuilder.Entity<Category>(entity =>
