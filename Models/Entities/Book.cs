@@ -14,7 +14,9 @@ public partial class Book
     public string? Publisher { get; set; }
 
     public DateOnly? PublishDate { get; set; }
-
+    public int? PageCount { get; set; } 
+    public string? Size { get; set; }
+    public decimal? Weight { get; set; }
     public decimal? Price { get; set; }
 
     public decimal? PurchasePrice { get; set; }
@@ -36,6 +38,7 @@ public partial class Book
     public string? ModifyBy { get; set; }
 
     public string? MainImage { get; set; }
+    public string? AdditionalImages { get; set; } 
 
     public virtual ICollection<BookImage> BookImages { get; set; } = new List<BookImage>();
 

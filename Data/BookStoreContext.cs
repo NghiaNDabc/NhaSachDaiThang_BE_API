@@ -65,8 +65,19 @@ public partial class BookStoreContext : DbContext
                 .HasDefaultValueSql("(getdate())")
                 .HasColumnType("datetime");
             entity.Property(e => e.Description).HasMaxLength(500);
+            entity.Property(e => e.PageCount)
+              .IsRequired(false);
+            entity.Property(e => e.Size)
+                .HasMaxLength(50) 
+                .IsRequired(false);
+            entity.Property(e => e.Weight)
+                .HasColumnType("decimal(5, 2)") 
+                .IsRequired(false);
             entity.Property(e => e.IsDel).HasDefaultValue(false);
             entity.Property(e => e.MainImage).HasMaxLength(255);
+            entity.Property(e => e.AdditionalImages)
+                .HasColumnType("nvarchar(max)")
+                .IsRequired(false);
             entity.Property(e => e.ModifyBy).HasMaxLength(100);
             entity.Property(e => e.ModifyDate).HasColumnType("datetime");
             entity.Property(e => e.Price).HasColumnType("decimal(18, 2)");
