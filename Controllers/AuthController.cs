@@ -17,50 +17,32 @@ namespace NhaSachDaiThang_BE_API.Controllers
         }
 
         [HttpPost("register")]
-        public  IActionResult Register(RegisterModel model)
+        public async Task<IActionResult> Register(RegisterModel model)
         {
-            var result =  _accountService.Register(model);
-            if (result.Success)
-            {
-                return Ok(result);
-            } 
-             return BadRequest(result);
+            var result = await _accountService.Register(model);
+            return StatusCode(result.StatusCode, result.ApiResult);
         }
         [HttpPost("otp")]
         public async Task<IActionResult> Otp(string email)
         {
             var result = await _accountService.SendOtp(email);
-            if (result.Success)
-            {
-                return Ok(result);
-            }
-            return BadRequest(result);
+            return StatusCode(result.StatusCode, result.ApiResult);
         }
 
         [HttpPost("login")]
-        public IActionResult Login(LoginModel model)
+        public async Task<IActionResult> Login(LoginModel model)
         {
-            var result =  _accountService.Login(model);
+            var result = await _accountService.Login(model);
 
-            if (result.Success == false)
-            {
-                return Unauthorized(result);
-            }
-
-            return Ok(result);
+            return StatusCode(result.StatusCode, result.ApiResult);
         }
 
         [HttpPost("admin/login")]
         public async Task<IActionResult> AdminLogin([FromBody] LoginModel model)
         {
-            var result =  _accountService.Login(model);
+            var result = await _accountService.Login(model);
 
-            if (result.Success == false)
-            {
-                return Unauthorized(result);
-            }
-
-            return Ok(result);
+            return StatusCode(result.StatusCode, result.ApiResult);
         }
 
     }

@@ -23,22 +23,14 @@ namespace NhaSachDaiThang_BE_API.Controllers
         public async Task<IActionResult> SendOtp([FromBody] string email)
         {
             var result = await _forgotPasswordService.SendPasswordResetOtp(email);
-            if (result.Success ==false)
-            {
-                return BadRequest(result);
-            }
-            return Ok(result);
+            return StatusCode(result.StatusCode, result.ApiResult);
         }
 
         [HttpPost("verify")]
-        public IActionResult VerifyOTP([FromBody] ForgotPassDTO forgotPassDTO)
+        public async Task<IActionResult> VerifyOTP([FromBody] ForgotPassDTO forgotPassDTO)
         {
-            var result = _forgotPasswordService.VerifyPasswordResetOtp(forgotPassDTO.email, forgotPassDTO.otpCode, forgotPassDTO.newPass);
-            if (result.Success == false)
-            {
-                return BadRequest(result);
-            }
-            return Ok(result);
+            var result =await _forgotPasswordService.VerifyPasswordResetOtp(forgotPassDTO.email, forgotPassDTO.otpCode, forgotPassDTO.newPass);
+            return StatusCode(result.StatusCode, result.ApiResult);
         }
     }
 }

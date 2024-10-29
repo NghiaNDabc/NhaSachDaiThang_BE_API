@@ -3,8 +3,7 @@ using NhaSachDaiThang_BE_API.Repositories.CommonInterface;
 
 namespace NhaSachDaiThang_BE_API.Repositories.IRepositories
 {
-    public interface IUserRepository :ICrudRepository<User>
+    public interface ICategoryRepository : ICrudRepository<Category>, ISoftDelete, IGetActive<Category>, IGetByName<Category>, IAny<Category>
     {
-        Task<User> GetByEmail(string email);
     }
 }

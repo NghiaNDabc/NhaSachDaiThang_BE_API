@@ -5,6 +5,7 @@ using NhaSachDaiThang_BE_API.Helper;
 using NhaSachDaiThang_BE_API.Services.IServices;
 using NhaSachDaiThang_BE_API.Repositories.IRepositories;
 using NhaSachDaiThang_BE_API.Repositories;
+using NhaSachDaiThang_BE_API.UnitOfWork;
 
 
 var builder = WebApplication.CreateBuilder(args);
@@ -15,9 +16,14 @@ builder.Services.AddJwtConfiguration(builder.Configuration);
 builder.Services.AddDbContextConfiguration(builder.Configuration);
 //service
 builder.Services.AddScoped<IAuthService, AuthService>();
+builder.Services.AddScoped<ICategoryService, CategoryService>();
 builder.Services.AddScoped<IOtpService, OtpService>();
 //repository
 builder.Services.AddScoped<IUserRepository, UserRepository>();
+builder.Services.AddScoped<ICategoryRepository, CategoryRepository>();
+
+//unit of work
+builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
 
 //helper
 builder.Services.AddScoped<JwtHelper>();

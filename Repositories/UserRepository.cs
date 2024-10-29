@@ -16,47 +16,45 @@ namespace NhaSachDaiThang_BE_API.Repositories
             _users = bookStoreContext.Users;
         }
 
-        public void Add(User entity)
+        public async Task AddAsync(User entity)
         {
-            _users.AddAsync(entity);
-            _bookStoreContext.SaveChanges();
+            await _users.AddAsync(entity);
         }
 
-        public void Delete(int id)
+        public async Task DeleteAsync(int id)
         {
-            var user = _users.Find(id);
+            var user =await _users.FindAsync(id);
             if (user != null)
             {
                 _users.Remove(user);
-                _bookStoreContext.SaveChanges();
             }
         }
 
-        public IEnumerable<User> GetAll()
+        public async Task<IEnumerable<User>> GetAllAsync()
         {
-            return _users;
+            return await _users.ToListAsync();
         }
 
-        public User GetById(int id)
+        public Task<User> GetByIdAsync(int id)
         {
-            var user = _users.Where(u => u.UserId == id).FirstOrDefault();
+            var user = _users.Where(u => u.UserId == id).FirstOrDefaultAsync();
             return user;
         }
 
-        public IEnumerable<User> GetPagedAsync(int pageNumber, int pageSize)
+        public async Task<IEnumerable<User>> GetPagedAsync(int pageNumber, int pageSize)
         {
-            return _users.OrderBy(e => e.UserId).Skip(pageSize * (pageNumber - 1)).Take(pageSize);
+            return await _users.OrderBy(e => e.UserId).Skip(pageSize * (pageNumber - 1)).Take(pageSize).ToListAsync();
         }
 
-        public void Update(User entity)
+        public async Task UpdateAsync(User entity)
         {
-            _users.Update(entity);
-            _bookStoreContext.SaveChangesAsync();
+            if(await _users.FirstOrDefaultAsync(u=> u.UserId ==  entity.UserId) !=null)
+                 _users.Update(entity);
         }
 
-        public User GetByEmail(string email)
+        public async Task<User> GetByEmail(string email)
         {
-            return _users.FirstOrDefault(u => u.Email == email);
+            return await _users.FirstOrDefaultAsync(u => u.Email == email) ;
         }
     }
 }

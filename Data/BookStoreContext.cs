@@ -128,6 +128,7 @@ public partial class BookStoreContext : DbContext
             entity.HasKey(e => e.CategoryId).HasName("PK__Categori__19093A2BE21B8E70");
 
             entity.Property(e => e.CategoryId).HasColumnName("CategoryID");
+            entity.Property(e => e.IsDel).HasDefaultValue(false);
             entity.Property(e => e.CreatedBy).HasMaxLength(100);
             entity.Property(e => e.CreatedDate)
                 .HasDefaultValueSql("(getdate())")

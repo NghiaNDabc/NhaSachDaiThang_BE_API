@@ -4,9 +4,9 @@ namespace NhaSachDaiThang_BE_API.Services.IServices
 {
     public interface IOtpService
     {
-        Task<OperationResult> SendPasswordResetOtp(string email);
-        Task<OperationResult> SendRegistrationOtp(string email);
-        OperationResult VerifyPasswordResetOtp(string email, string otpCode, string newPass);
-        OperationResult VerifySendRegistrationOtp(RegisterModel model);
+        Task<ServiceResult> SendPasswordResetOtp(string email);
+        Task<ServiceResult> SendRegistrationOtp(string email);
+        Task<ServiceResult> VerifyPasswordResetOtp(string email, string otpCode, string newPass);
+        Task<ServiceResult> VerifySendRegistrationOtp(RegisterModel model);
     }
 }

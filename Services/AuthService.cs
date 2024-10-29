@@ -3,96 +3,109 @@ using NhaSachDaiThang_BE_API.Models.Dtos;
 using NhaSachDaiThang_BE_API.Models.Entities;
 using NhaSachDaiThang_BE_API.Repositories.IRepositories;
 using NhaSachDaiThang_BE_API.Services.IServices;
+using NhaSachDaiThang_BE_API.UnitOfWork;
 
 namespace NhaSachDaiThang_BE_API.Services
 {
     public class AuthService : IAuthService
     {
-        private readonly IUserRepository _userRepository;
+        private readonly IUnitOfWork _unitOfWork;
         private readonly JwtHelper _jwtHelper;
         private readonly IOtpService _otpService;
-        public AuthService( IUserRepository userRepository, JwtHelper jwtHelper, IOtpService otpService)
+        public AuthService(IUnitOfWork unitOfWork, JwtHelper jwtHelper, IOtpService otpService)
         {
-            _userRepository = userRepository;
+            _unitOfWork = unitOfWork;
             _jwtHelper = jwtHelper;
             _otpService = otpService;
         }
 
-        public async Task<OperationResult> SendOtp(string email)
+        public async Task<ServiceResult> SendOtp(string email)
         {
             return await _otpService.SendRegistrationOtp(email);
         }
 
-        public  OperationResult Register(RegisterModel model)
+        public async  Task<ServiceResult> Register(RegisterModel model)
         {
-            return _otpService.VerifySendRegistrationOtp(model); 
+            return await _otpService.VerifySendRegistrationOtp(model); 
         }
 
-        public OperationResult Login(LoginModel model)
+        public async Task<ServiceResult> Login(LoginModel model)
         {
-            var user = _userRepository.GetByEmail( model.UserName);
+            User user = await _unitOfWork.UserRepository.GetByEmail(model.UserName);
 
             if (user == null || !BCrypt.Net.BCrypt.Verify(model.Password, user.PasswordHash))
             {
-                return new OperationResult
+                return new ServiceResult
                 {
-                    Success = false,
-                    Data = new
+                    StatusCode = 400,
+                    ApiResult = new ApiResult
                     {
-                        Message= "Tên đăng nhập hoặc mật khẩu không đúng"
+                        Success = false,
+                        ErrMessage = "Tên đăng nhập hoặc mật khẩu không đúng"
                     }
                 };
             }
             var token = _jwtHelper.GenerateJwtToken(user);
-            return new OperationResult
+
+
+            return new ServiceResult
             {
-                Success = true,
-                Data = new
+                StatusCode = 200,
+                ApiResult = new ApiResult
                 {
-                    User = new UserDTO
+                    Success = true,
+                    Data = new
                     {
-                        FirstName = user.FirstName,
-                        LastName = user.LastName,
-                        Email = user.Email,
-                        Phone = user.Phone,
-                        Address = user.Address,
-                        RoleName = user.Role.RoleName
-                    },
-                    Token = token
+                        User = new UserDTO
+                        {
+                            FirstName = user.FirstName,
+                            LastName = user.LastName,
+                            Email = user.Email,
+                            Phone = user.Phone,
+                            Address = user.Address,
+                            RoleName = user.Role.RoleName
+                        },
+                        Token = token
+                    }
                 }
             };
              
         }
 
-        public OperationResult AdminLogin(LoginModel model)
+        public async Task<ServiceResult> AdminLogin(LoginModel model)
         {
-            var user = _userRepository.GetByEmail(model.UserName);
+            var user = await _unitOfWork.UserRepository.GetByEmail(model.UserName);
 
             if (user == null || !BCrypt.Net.BCrypt.Verify(model.Password, user.PasswordHash))
             {
-                return new OperationResult
+                return new ServiceResult
                 {
-                    Success = false,
-                    Data = new
+                    StatusCode = 400,
+                    ApiResult = new ApiResult
                     {
-                        Message = "Tên đăng nhập hoặc mật khẩu không đúng"
+                        Success = false,
+                        ErrMessage = "Tên đăng nhập hoặc mật khẩu không đúng"
                     }
                 };
             }
 
-            return new OperationResult
+            return new ServiceResult
             {
-                Success = true,
-                Data = new
+                StatusCode = 200,
+                ApiResult = new ApiResult
                 {
-                    user = new UserDTO
+                    Success = true,
+                    Data = new
                     {
-                        FirstName = user.FirstName,
-                        LastName = user.LastName,
-                        Email = user.Email,
-                        Phone = user.Phone,
-                        Address = user.Address,
-                        RoleName = user.Role.RoleName
+                        user = new UserDTO
+                        {
+                            FirstName = user.FirstName,
+                            LastName = user.LastName,
+                            Email = user.Email,
+                            Phone = user.Phone,
+                            Address = user.Address,
+                            RoleName = user.Role.RoleName
+                        }
                     }
                 }
             };
