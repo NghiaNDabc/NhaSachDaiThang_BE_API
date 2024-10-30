@@ -24,6 +24,8 @@ builder.Services.AddScoped<ICategoryRepository, CategoryRepository>();
 
 //unit of work
 builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
+//mapper
+builder.Services.AddAutoMapper(typeof(AutoMapperProfile));
 
 //helper
 builder.Services.AddScoped<JwtHelper>();

@@ -1,9 +1,11 @@
-﻿using NhaSachDaiThang_BE_API.Data;
+﻿using AutoMapper;
+using NhaSachDaiThang_BE_API.Data;
 using NhaSachDaiThang_BE_API.Models.Dtos;
 using NhaSachDaiThang_BE_API.Models.Entities;
 using NhaSachDaiThang_BE_API.Repositories.IRepositories;
 using NhaSachDaiThang_BE_API.Services.IServices;
 using NhaSachDaiThang_BE_API.UnitOfWork;
+using NuGet.Common;
 
 namespace NhaSachDaiThang_BE_API.Services
 {
@@ -12,11 +14,13 @@ namespace NhaSachDaiThang_BE_API.Services
         private readonly IUnitOfWork _unitOfWork;
         private readonly JwtHelper _jwtHelper;
         private readonly IOtpService _otpService;
-        public AuthService(IUnitOfWork unitOfWork, JwtHelper jwtHelper, IOtpService otpService)
+        private readonly IMapper _mapper;
+        public AuthService(IUnitOfWork unitOfWork, JwtHelper jwtHelper, IOtpService otpService, IMapper mapper)
         {
             _unitOfWork = unitOfWork;
             _jwtHelper = jwtHelper;
             _otpService = otpService;
+            _mapper = mapper;
         }
 
         public async Task<ServiceResult> SendOtp(string email)
@@ -56,15 +60,7 @@ namespace NhaSachDaiThang_BE_API.Services
                     Success = true,
                     Data = new
                     {
-                        User = new UserDTO
-                        {
-                            FirstName = user.FirstName,
-                            LastName = user.LastName,
-                            Email = user.Email,
-                            Phone = user.Phone,
-                            Address = user.Address,
-                            RoleName = user.Role.RoleName
-                        },
+                        User = _mapper.Map<UserDTO>(user),
                         Token = token
                     }
                 }
@@ -89,6 +85,7 @@ namespace NhaSachDaiThang_BE_API.Services
                 };
             }
 
+            var token = _jwtHelper.GenerateJwtToken(user);
             return new ServiceResult
             {
                 StatusCode = 200,
@@ -97,15 +94,8 @@ namespace NhaSachDaiThang_BE_API.Services
                     Success = true,
                     Data = new
                     {
-                        user = new UserDTO
-                        {
-                            FirstName = user.FirstName,
-                            LastName = user.LastName,
-                            Email = user.Email,
-                            Phone = user.Phone,
-                            Address = user.Address,
-                            RoleName = user.Role.RoleName
-                        }
+                        User = _mapper.Map<UserDTO>(user),
+                        Token = token
                     }
                 }
             };
