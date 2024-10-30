@@ -7,6 +7,13 @@
         public string? Phone { get; set; }
         public string? Email { get; set; }   
         public string? Address { get; set; }
+        public DateTime? CreatedDate { get; set; }
+
+        public string? CreatedBy { get; set; }
+
+        public DateTime? ModifyDate { get; set; }
+
+        public string? ModifyBy { get; set; }
         public virtual ICollection<SupplierBook> SupplierBooks { get; set; } = new List<SupplierBook>();
     }
 }

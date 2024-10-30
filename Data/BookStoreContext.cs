@@ -100,6 +100,12 @@ public partial class BookStoreContext : DbContext
                 entity.Property(e => e.SupplyDate).HasColumnType("datetime").IsRequired(false);
                 entity.Property(e => e.SupplyPrice).HasColumnType("decimal(18, 2)").IsRequired(false);
                 entity.Property(e => e.Quanlity).HasColumnName("Quantity");
+                entity.Property(e => e.ModifyBy).HasMaxLength(100);
+                entity.Property(e => e.ModifyDate).HasColumnType("datetime");
+                entity.Property(e => e.CreatedBy).HasMaxLength(100);
+                entity.Property(e => e.CreatedDate)
+                    .HasDefaultValueSql("(getdate())")
+                    .HasColumnType("datetime");
                 entity.HasOne(db => db.Supplier)
                 .WithMany(sb => sb.SupplierBooks)
                 .HasForeignKey(entity => entity.SupplierId).OnDelete(DeleteBehavior.Restrict);
@@ -120,6 +126,13 @@ public partial class BookStoreContext : DbContext
                   .IsRequired(false);
                 entity.Property(e => e.Address).HasMaxLength(30).IsRequired(false);
                 entity.Property(e => e.Phone).HasMaxLength(15).IsRequired(false);
+
+                entity.Property(e => e.ModifyBy).HasMaxLength(100);
+                entity.Property(e => e.ModifyDate).HasColumnType("datetime");
+                entity.Property(e => e.CreatedBy).HasMaxLength(100);
+                entity.Property(e => e.CreatedDate)
+                    .HasDefaultValueSql("(getdate())")
+                    .HasColumnType("datetime");
 
             }
          );
@@ -263,16 +276,16 @@ public partial class BookStoreContext : DbContext
             entity.Property(e => e.ReviewId).HasColumnName("ReviewID");
             entity.Property(e => e.BookId).HasColumnName("BookID");
             entity.Property(e => e.Comment).HasMaxLength(500);
-            entity.Property(e => e.CreatedBy).HasMaxLength(100);
+            //entity.Property(e => e.CreatedBy).HasMaxLength(100);
             entity.Property(e => e.CreatedDate)
                 .HasDefaultValueSql("(getdate())")
                 .HasColumnType("datetime");
             entity.Property(e => e.UserId).HasColumnName("UserId");
-            entity.Property(e => e.ModifyBy).HasMaxLength(100);
+            //entity.Property(e => e.ModifyBy).HasMaxLength(100);
             entity.Property(e => e.ModifyDate).HasColumnType("datetime");
-            entity.Property(e => e.ReviewDate)
-                .HasDefaultValueSql("(getdate())")
-                .HasColumnType("datetime");
+            //entity.Property(e => e.ReviewDate)
+                //.HasDefaultValueSql("(getdate())")
+                //.HasColumnType("datetime");
 
             entity.HasOne(d => d.Book).WithMany(p => p.Reviews)
                 .HasForeignKey(d => d.BookId)
