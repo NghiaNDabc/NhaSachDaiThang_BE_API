@@ -160,9 +160,12 @@ public partial class BookStoreContext : DbContext
 
             entity.Property(e => e.UserId).HasColumnName("UserId");
             entity.Property(e => e.Address).HasMaxLength(255);
+            entity.Property(e => e.RefreshToken).HasMaxLength(255);
             entity.Property(e => e.CreatedBy).HasMaxLength(100);
             entity.Property(e => e.CreatedDate)
                 .HasDefaultValueSql("(getdate())")
+                .HasColumnType("datetime");
+            entity.Property(e => e.RefreshTokenExpiryTime)
                 .HasColumnType("datetime");
             entity.Property(e => e.Email).HasMaxLength(100);
             entity.Property(e => e.Image).HasMaxLength(255);

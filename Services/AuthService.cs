@@ -50,8 +50,9 @@ namespace NhaSachDaiThang_BE_API.Services
                 };
             }
             var token = _jwtHelper.GenerateJwtToken(user);
-
-
+            var refreshToken = _jwtHelper.GenerateRefreshToken();
+            await _unitOfWork.UserRepository.UpdateAsync(user);
+            await _unitOfWork.SaveChangeAsync();
             return new ServiceResult
             {
                 StatusCode = 200,
@@ -61,7 +62,8 @@ namespace NhaSachDaiThang_BE_API.Services
                     Data = new
                     {
                         User = _mapper.Map<UserDTO>(user),
-                        Token = token
+                        Token = token,
+                        RefreshToken = refreshToken
                     }
                 }
             };

@@ -27,6 +27,8 @@ public partial class User
     public DateTime? ModifyDate { get; set; }
 
     public string? ModifyBy { get; set; }
+    public string? RefreshToken { get; set; }
+    public DateTime? RefreshTokenExpiryTime { get; set; }
 
     public int? RoleId { get; set; }
 
