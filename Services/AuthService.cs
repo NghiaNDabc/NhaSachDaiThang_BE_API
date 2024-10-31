@@ -108,5 +108,44 @@ namespace NhaSachDaiThang_BE_API.Services
             throw new NotImplementedException();
         }
 
+        public async Task<ServiceResult> GetTokenByRefreshToken(string refreshToken)
+        {
+            User user = await _unitOfWork.UserRepository.GetByRefreshToken(refreshToken);
+
+            if (user == null)
+            {
+                return new ServiceResult
+                {
+                    StatusCode = 400,
+                    ApiResult = new ApiResult
+                    {
+                        Success = false,
+                        ErrMessage = "Refresh token không hợp lệ hoặc đã hết hạn"
+                    }
+                };
+            }
+
+            var newToken = _jwtHelper.GenerateJwtToken(user);
+            //var newRefreshToken = _jwtHelper.GenerateRefreshToken();
+
+            //user.RefreshToken = newRefreshToken;
+            //user.RefreshTokenExpiryTime = DateTime.Now.AddDays(7); // Hoặc bất kỳ thời gian hết hạn nào bạn muốn
+            //await _unitOfWork.UserRepository.UpdateAsync(user);
+            //await _unitOfWork.SaveChangeAsync();
+
+            return new ServiceResult
+            {
+                StatusCode = 200,
+                ApiResult = new ApiResult
+                {
+                    Success = true,
+                    Data = new
+                    {
+                        Token = newToken
+                    }
+                }
+            };
+        }
+
     }
 }

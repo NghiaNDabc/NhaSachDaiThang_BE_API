@@ -9,6 +9,7 @@ namespace NhaSachDaiThang_BE_API.Services.IServices
         Task<ServiceResult> Login(LoginModel model);
         Task<ServiceResult> AdminLogin(LoginModel model);
         Task<ServiceResult> SendOtp(string email);
+        Task<ServiceResult> GetTokenByRefreshToken(string refreshToken);
         Task<User> GetCustomerByLoginModel(LoginModel model);
     }
 }

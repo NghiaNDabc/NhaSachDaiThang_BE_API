@@ -2,6 +2,6 @@
 {
     public interface IGetByName< T> where T : class
     {
-        Task<T> GetByNameAsync(string name);
+        Task<IEnumerable<T>> GetByNameAsync(string name);
     }
 }

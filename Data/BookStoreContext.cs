@@ -150,6 +150,7 @@ public partial class BookStoreContext : DbContext
             entity.Property(e => e.ModifyBy).HasMaxLength(100);
             entity.Property(e => e.ModifyDate).HasColumnType("datetime");
             entity.Property(e => e.Name).HasMaxLength(100);
+            entity.HasOne(c=>c.ParentCategory).WithMany(c=> c.SubCategories).HasForeignKey(c=>c.CategoryId).OnDelete(DeleteBehavior.Restrict);
         });
 
         modelBuilder.Entity<User>(entity =>

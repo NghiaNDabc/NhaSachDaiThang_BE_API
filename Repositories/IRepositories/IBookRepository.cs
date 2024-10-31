@@ -3,9 +3,7 @@ using NhaSachDaiThang_BE_API.Repositories.CommonInterface;
 
 namespace NhaSachDaiThang_BE_API.Repositories.IRepositories
 {
-    public interface IUserRepository :ICrudRepository<User>
+    public interface IBookRepository : ICrudRepository<Book>, IGetActive<Book>, IGetByName<Book>, ISoftDelete
     {
-        Task<User> GetByEmail(string email);
-        Task<User> GetByRefreshToken(string refreshToken);
     }
 }

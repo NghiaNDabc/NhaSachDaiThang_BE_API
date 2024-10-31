@@ -10,12 +10,13 @@ namespace NhaSachDaiThang_BE_API.UnitOfWork
         public IUserRepository UserRepository { get; }
 
         public ICategoryRepository CategoryRepository { get; }
-
+        public IBookRepository BookRepository { get; }
         public UnitOfWork(BookStoreContext bookStoreContext)
         {
             _bookStoreContext = bookStoreContext;
             UserRepository = new UserRepository(_bookStoreContext);
             CategoryRepository = new CategoryRepository(_bookStoreContext);
+            BookRepository = new BookRepository(_bookStoreContext); 
         }
 
         public void Dispose()

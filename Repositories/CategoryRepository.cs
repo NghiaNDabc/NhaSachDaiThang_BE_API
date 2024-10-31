@@ -60,9 +60,9 @@ namespace NhaSachDaiThang_BE_API.Repositories
             }
         }
 
-        public async Task<Category> GetByNameAsync(string name)
+        public async Task<IEnumerable<Category>> GetByNameAsync(string name)
         {
-            return await _categories.FirstOrDefaultAsync(e => e.Name == name);
+            return await _categories.Where(e => e.Name == name).ToListAsync();
         }
 
         public async Task<bool> AnyAsync(Expression<Func<Category, bool>> predicate)

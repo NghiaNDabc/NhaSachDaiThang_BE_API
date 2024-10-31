@@ -1,4 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.VisualStudio.Web.CodeGenerators.Mvc.Templates.BlazorIdentity.Pages.Manage;
 using NhaSachDaiThang_BE_API.Data;
 using NhaSachDaiThang_BE_API.Models.Entities;
 using NhaSachDaiThang_BE_API.Repositories.IRepositories;
@@ -55,6 +56,11 @@ namespace NhaSachDaiThang_BE_API.Repositories
         public async Task<User> GetByEmail(string email)
         {
             return await _users.FirstOrDefaultAsync(u => u.Email == email) ;
+        }
+
+        public async Task<User> GetByRefreshToken(string refreshToken)
+        {
+            return await _users.FirstOrDefaultAsync(u => u.RefreshToken == refreshToken && u.RefreshTokenExpiryTime > DateTime.Now);
         }
     }
 }

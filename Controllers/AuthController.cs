@@ -44,6 +44,12 @@ namespace NhaSachDaiThang_BE_API.Controllers
 
             return StatusCode(result.StatusCode, result.ApiResult);
         }
+        [HttpPost("refresh-token")]
+        public async Task<IActionResult> RefreshToken([FromBody] string refreshToken)
+        {
+            var result = await _accountService.GetTokenByRefreshToken(refreshToken);
+            return StatusCode(result.StatusCode, result.ApiResult);
+        }
 
     }
 

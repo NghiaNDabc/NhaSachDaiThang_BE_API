@@ -6,6 +6,7 @@ namespace NhaSachDaiThang_BE_API.UnitOfWork
     {
         IUserRepository UserRepository { get; }
         ICategoryRepository CategoryRepository { get; }
+        IBookRepository BookRepository { get; }
 
         Task<int> SaveChangeAsync();
     }
