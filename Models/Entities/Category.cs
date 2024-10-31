@@ -18,6 +18,8 @@ public partial class Category
     public DateTime? ModifyDate { get; set; }
 
     public string? ModifyBy { get; set; }
-
+    public int? ParentCategoryID { get; set; }
+    public virtual Category? ParentCategory { get; set; }
+    public virtual ICollection<Category> SubCategories { get; set; } = new List<Category>();
     public virtual ICollection<Book> Books { get; set; } = new List<Book>();
 }
