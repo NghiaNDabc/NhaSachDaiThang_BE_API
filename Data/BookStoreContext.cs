@@ -16,24 +16,24 @@ public partial class BookStoreContext : DbContext
     {
     }
 
-    public virtual DbSet<Book> Books { get; set; }
+    public virtual DbSet<Book> Book { get; set; }
 
 
-    public virtual DbSet<Category> Categories { get; set; }
+    public virtual DbSet<Category> Category { get; set; }
 
-    public virtual DbSet<User> Users { get; set; }
+    public virtual DbSet<User> User { get; set; }
 
-    public virtual DbSet<Order> Orders { get; set; }
+    public virtual DbSet<Order> Order { get; set; }
 
-    public virtual DbSet<OrderDetail> OrderDetails { get; set; }
+    public virtual DbSet<OrderDetail> OrderDetail { get; set; }
 
-    public virtual DbSet<Payment> Payments { get; set; }
+    public virtual DbSet<Payment> Payment { get; set; }
 
-    public virtual DbSet<Review> Reviews { get; set; }
+    public virtual DbSet<Review> Review { get; set; }
 
-    public virtual DbSet<Role> Roles { get; set; }
+    public virtual DbSet<Role> Role { get; set; }
 
-    public virtual DbSet<Voucher> Vouchers { get; set; }
+    public virtual DbSet<Voucher> Voucher { get; set; }
 
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
     {
