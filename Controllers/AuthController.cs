@@ -1,11 +1,15 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using NhaSachDaiThang_BE_API.Models.Dtos;
+using NhaSachDaiThang_BE_API.Models.Entities;
+using NhaSachDaiThang_BE_API.Services;
 using NhaSachDaiThang_BE_API.Services.IServices;
+using Swashbuckle.AspNetCore.Annotations;
 
 
 namespace NhaSachDaiThang_BE_API.Controllers
 {
-    [Route("api/[controller]")]
+    [Route("api/v1/[controller]")]
     [ApiController]
     public class AuthController : ControllerBase
     {
@@ -15,20 +19,21 @@ namespace NhaSachDaiThang_BE_API.Controllers
         {
             _accountService = accountService;
         }
-
+        [SwaggerOperation(Summary = "Đăng ký")]
         [HttpPost("register")]
         public async Task<IActionResult> Register(RegisterModel model)
         {
             var result = await _accountService.Register(model);
             return StatusCode(result.StatusCode, result.ApiResult);
         }
+        [SwaggerOperation(Summary = "Gửi OTP đăng ký")]
         [HttpPost("otp")]
         public async Task<IActionResult> Otp(string email)
         {
             var result = await _accountService.SendOtp(email);
             return StatusCode(result.StatusCode, result.ApiResult);
         }
-
+        [SwaggerOperation(Summary = "Đăng nhập")]
         [HttpPost("login")]
         public async Task<IActionResult> Login(LoginModel model)
         {
@@ -36,7 +41,7 @@ namespace NhaSachDaiThang_BE_API.Controllers
 
             return StatusCode(result.StatusCode, result.ApiResult);
         }
-
+        [SwaggerOperation(Summary = "Đăng nhập admin")]
         [HttpPost("admin/login")]
         public async Task<IActionResult> AdminLogin([FromBody] LoginModel model)
         {
@@ -44,6 +49,7 @@ namespace NhaSachDaiThang_BE_API.Controllers
 
             return StatusCode(result.StatusCode, result.ApiResult);
         }
+        [SwaggerOperation(Summary = "Lấy accesstoken từ refresh token")]
         [HttpPost("refresh-token")]
         public async Task<IActionResult> RefreshToken([FromBody] string refreshToken)
         {

@@ -6,10 +6,11 @@ using NhaSachDaiThang_BE_API.Models.Entities;
 using NhaSachDaiThang_BE_API.Models.Dtos;
 using NhaSachDaiThang_BE_API.Repositories.IRepositories;
 using NhaSachDaiThang_BE_API.Services.IServices;
+using Swashbuckle.AspNetCore.Annotations;
 
 namespace NhaSachDaiThang_BE_API.Controllers
 {
-    [Route("api/[controller]")]
+    [Route("api/v1/[controller]")]
     [ApiController]
     public class ForgotPasswordController : ControllerBase
     {
@@ -18,13 +19,14 @@ namespace NhaSachDaiThang_BE_API.Controllers
         {
             _forgotPasswordService = forgotPasswordService;
         }
-
+        [SwaggerOperation(Summary = "Gửi OTP quên mật khẩu")]
         [HttpPost("otp")]
         public async Task<IActionResult> SendOtp([FromBody] string email)
         {
             var result = await _forgotPasswordService.SendPasswordResetOtp(email);
             return StatusCode(result.StatusCode, result.ApiResult);
         }
+
 
         [HttpPost("verify")]
         public async Task<IActionResult> VerifyOTP([FromBody] ForgotPassDTO forgotPassDTO)

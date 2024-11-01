@@ -1,4 +1,6 @@
-﻿namespace NhaSachDaiThang_BE_API.Models.Dtos
+﻿using NhaSachDaiThang_BE_API.Models.Entities;
+
+namespace NhaSachDaiThang_BE_API.Models.Dtos
 {
     public class CategoryDto
     {
@@ -15,5 +17,7 @@
         public DateTime? ModifyDate { get; set; }
 
         public string? ModifyBy { get; set; }
+        public int? ParentCategoryID { get; set; }
+        public List<CategoryDto> SubCategories { get; set; } = new List<CategoryDto>();
     }
 }

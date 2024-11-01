@@ -12,7 +12,7 @@ namespace NhaSachDaiThang_BE_API.Repositories
         public BookRepository(BookStoreContext context)
         {
             _context = context;
-            _books = _context.Books;
+            _books = _context.Book;
         }
         public async Task AddAsync(Book entity)
         {

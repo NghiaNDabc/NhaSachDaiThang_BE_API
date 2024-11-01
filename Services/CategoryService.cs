@@ -1,4 +1,5 @@
-﻿using NhaSachDaiThang_BE_API.Models.Dtos;
+﻿using AutoMapper;
+using NhaSachDaiThang_BE_API.Models.Dtos;
 using NhaSachDaiThang_BE_API.Models.Entities;
 using NhaSachDaiThang_BE_API.Services.IServices;
 using NhaSachDaiThang_BE_API.UnitOfWork;
@@ -8,15 +9,17 @@ namespace NhaSachDaiThang_BE_API.Services
     public class CategoryService : ICategoryService
     {
         private readonly IUnitOfWork _unitOfWork;
-
-        public CategoryService(IUnitOfWork unitOfWork)
+        private readonly IMapper _mapper;
+        public CategoryService(IUnitOfWork unitOfWork, IMapper mapper)
         {
+            _mapper = mapper;
             _unitOfWork = unitOfWork;
         }
-        public async Task<ServiceResult> Add(Category model)
+        public async Task<ServiceResult> Add(CategoryDto model)
         {
             if ( await _unitOfWork.CategoryRepository.GetByNameAsync(model.Name) != null)
             {
+               
                 return new ServiceResult
                 {
                     StatusCode = 400,
@@ -27,7 +30,8 @@ namespace NhaSachDaiThang_BE_API.Services
                     }
                 };
             }
-            await _unitOfWork.CategoryRepository.AddAsync(model);
+            var category = _mapper.Map<Category>(model);
+            await _unitOfWork.CategoryRepository.AddAsync(category);
             await _unitOfWork.SaveChangeAsync();
             return new ServiceResult
             {
@@ -70,7 +74,7 @@ namespace NhaSachDaiThang_BE_API.Services
 
         public async Task<ServiceResult> GetAll()
         {
-            var  categories = await _unitOfWork.CategoryRepository.GetAllAsync();
+            var  categories = await _unitOfWork.CategoryRepository.GetCategoriesByLevel();
 
             return new ServiceResult
             {
@@ -85,7 +89,7 @@ namespace NhaSachDaiThang_BE_API.Services
 
         public async Task<ServiceResult> GetAllActive()
         {
-            var categories = await _unitOfWork.CategoryRepository.GetActiveAsync();
+            var categories =  await _unitOfWork.CategoryRepository.GetCategoriesByLevelActive();
 
             return new ServiceResult
             {
@@ -114,7 +118,7 @@ namespace NhaSachDaiThang_BE_API.Services
                 ApiResult = new ApiResult
                 {
                     Success = success,
-                    Data = categorie
+                    Data = _mapper.Map<CategoryDto>(categorie)
                 }
             };
         }
@@ -146,7 +150,7 @@ namespace NhaSachDaiThang_BE_API.Services
             };
         }
 
-        public async Task<ServiceResult> Update(Category model)
+        public async Task<ServiceResult> Update(CategoryDto model)
         {
             var cate = await _unitOfWork.CategoryRepository.GetByIdAsync(model.CategoryId);
             if (cate == null)

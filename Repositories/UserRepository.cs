@@ -14,7 +14,7 @@ namespace NhaSachDaiThang_BE_API.Repositories
         public UserRepository(BookStoreContext bookStoreContext)
         {
             _bookStoreContext = bookStoreContext;
-            _users = bookStoreContext.Users;
+            _users = bookStoreContext.User;
         }
 
         public async Task AddAsync(User entity)

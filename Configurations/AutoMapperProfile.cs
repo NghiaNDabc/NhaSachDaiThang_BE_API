@@ -7,6 +7,7 @@ namespace NhaSachDaiThang_BE_API.Configurations
     {
         public AutoMapperProfile() {
             CreateMap<Category, CategoryDto>();
+            CreateMap<CategoryDto, Category>();
             CreateMap<User, UserDTO>()
             .ForMember(dest => dest.RoleName, opt => opt.MapFrom(src => src.Role.RoleName));
         }

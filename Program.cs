@@ -36,7 +36,22 @@ builder.Services.AddMemoryCache();
 builder.Services.AddControllers();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen();
+builder.Services.AddSwaggerGen(c =>
+{
+    c.SwaggerDoc("v1", new Microsoft.OpenApi.Models.OpenApiInfo
+    {
+        Title = "Nha Sach Dai Thang API",
+        Version = "v1",
+        Description = "API cho ứng dụng quản lý nhà sách",
+        Contact = new Microsoft.OpenApi.Models.OpenApiContact
+        {
+            Name = "Nhà phát triển",
+            Email = "nhasachdaithang@gmail.com", // Thay đổi với email thật
+            Url = new Uri("https://example.com") // Thay đổi với URL thật
+        }
+    });
+    c.EnableAnnotations();
+});
 
 var app = builder.Build();
 
@@ -45,7 +60,10 @@ var app = builder.Build();
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
-    app.UseSwaggerUI();
+    app.UseSwaggerUI(c =>
+    {
+        c.SwaggerEndpoint("/swagger/v1/swagger.json", "Your API V1");
+    });
 }
 
 app.UseHttpsRedirection();
