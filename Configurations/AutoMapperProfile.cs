@@ -8,6 +8,8 @@ namespace NhaSachDaiThang_BE_API.Configurations
         public AutoMapperProfile() {
             CreateMap<Category, CategoryDto>();
             CreateMap<CategoryDto, Category>();
+            CreateMap<BookDto, Book>();
+            CreateMap<Book, BookDto>();
             CreateMap<User, UserDTO>()
             .ForMember(dest => dest.RoleName, opt => opt.MapFrom(src => src.Role.RoleName));
         }
