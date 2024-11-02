@@ -9,7 +9,16 @@ using NhaSachDaiThang_BE_API.UnitOfWork;
 
 
 var builder = WebApplication.CreateBuilder(args);
-
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("NhaSachDaiThang", builder =>
+    {
+        builder.WithOrigins("http://localhost:3000")
+               .AllowAnyMethod()
+               .AllowAnyHeader();
+    });
+});
+builder.Services.AddHttpContextAccessor();
 builder.Services.AddJwtConfiguration(builder.Configuration);
 
 // Add DbContext configuration
@@ -18,6 +27,7 @@ builder.Services.AddDbContextConfiguration(builder.Configuration);
 builder.Services.AddScoped<IAuthService, AuthService>();
 builder.Services.AddScoped<ICategoryService, CategoryService>();
 builder.Services.AddScoped<IOtpService, OtpService>();
+builder.Services.AddScoped< BookService>();
 //repository
 builder.Services.AddScoped<IUserRepository, UserRepository>();
 builder.Services.AddScoped<ICategoryRepository, CategoryRepository>();
@@ -46,8 +56,9 @@ builder.Services.AddSwaggerGen(c =>
         Contact = new Microsoft.OpenApi.Models.OpenApiContact
         {
             Name = "Nhà phát triển",
-            Email = "nhasachdaithang@gmail.com", // Thay đổi với email thật
-            Url = new Uri("https://example.com") // Thay đổi với URL thật
+            Email = "nhasachdaithang@gmail.com"
+            //, // Thay đổi với email thật
+            //Url = new Uri("https://example.com") // Thay đổi với URL thật
         }
     });
     c.EnableAnnotations();
@@ -55,7 +66,7 @@ builder.Services.AddSwaggerGen(c =>
 
 var app = builder.Build();
 
-
+app.UseStaticFiles();
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {
@@ -68,6 +79,7 @@ if (app.Environment.IsDevelopment())
 
 app.UseHttpsRedirection();
 
+app.UseCors("NhaSachDaiThang");
 app.UseAuthentication();
 app.UseAuthorization();
 
