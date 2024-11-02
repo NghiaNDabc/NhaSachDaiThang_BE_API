@@ -63,7 +63,7 @@ namespace NhaSachDaiThang_BE_API.Services
 
             return new ServiceResult
             {
-                StatusCode = 200,
+                StatusCode = 201,
                 ApiResult = new ApiResult
                 {
                     Success = true,
@@ -306,11 +306,11 @@ namespace NhaSachDaiThang_BE_API.Services
             {
                 return new ServiceResult
                 {
-                    StatusCode = 400,
+                    StatusCode = 404,
                     ApiResult = new ApiResult
                     {
                         Success = false,
-                        ErrMessage = "Không tìm thấy sahcs"
+                        ErrMessage = "Không tìm thấy sach"
                     }
                 };
             }
@@ -389,7 +389,7 @@ namespace NhaSachDaiThang_BE_API.Services
             bookDto.MainImage = $"{baseUrl}/images/{bookDto.MainImage}";
             return new ServiceResult
             {
-                StatusCode = 404,
+                StatusCode = 200,
                 ApiResult = new ApiResult
                 {
                     Success = false,
@@ -419,7 +419,7 @@ namespace NhaSachDaiThang_BE_API.Services
             bookDto.MainImage = $"{baseUrl}/images/{bookDto.MainImage}";
             return new ServiceResult
             {
-                StatusCode = 404,
+                StatusCode = 200,
                 ApiResult = new ApiResult
                 {
                     Success = false,
