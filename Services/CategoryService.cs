@@ -72,6 +72,48 @@ namespace NhaSachDaiThang_BE_API.Services
             };
         }
 
+        public async Task<ServiceResult> GetActiveById(int id)
+        {
+            var categorie = await _unitOfWork.CategoryRepository.GetActiveByIdAsync(id);
+            int statusCode = 200;
+            bool success = true;
+            if (categorie == null)
+            {
+                statusCode = 404;
+                success = false;
+            }
+            return new ServiceResult
+            {
+                StatusCode = statusCode,
+                ApiResult = new ApiResult
+                {
+                    Success = success,
+                    Data = _mapper.Map<CategoryDto>(categorie)
+                }
+            };
+        }
+
+        public async Task<ServiceResult> GetActiveByName(string name)
+        {
+            var categorie = await _unitOfWork.CategoryRepository.GetActiveByNameAsync(name);
+            int statusCode = 200;
+            bool success = true;
+            if (categorie == null)
+            {
+                statusCode = 404;
+                success = false;
+            }
+            return new ServiceResult
+            {
+                StatusCode = statusCode,
+                ApiResult = new ApiResult
+                {
+                    Success = success,
+                    Data = _mapper.Map<CategoryDto>(categorie)
+                }
+            };
+        }
+
         public async Task<ServiceResult> GetAll()
         {
             var  categories = await _unitOfWork.CategoryRepository.GetCategoriesByLevel();
