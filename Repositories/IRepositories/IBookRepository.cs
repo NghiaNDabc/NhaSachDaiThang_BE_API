@@ -5,5 +5,6 @@ namespace NhaSachDaiThang_BE_API.Repositories.IRepositories
 {
     public interface IBookRepository : ICrudRepository<Book>, IGetActive<Book>, IGetByName<Book>, ISoftDelete
     {
+        Task<IEnumerable<Book>> GetBooksByCategoryId(int categoryid);
     }
 }

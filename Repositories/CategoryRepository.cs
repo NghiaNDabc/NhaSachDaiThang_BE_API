@@ -45,7 +45,7 @@ namespace NhaSachDaiThang_BE_API.Repositories
         {
             return await _categories.ToListAsync();
         }
-        public async Task<IEnumerable<Category>> GetActiveAsync()
+        public async Task<IEnumerable<Category>> GetAllActiveAsync()
         {
             return  await _categories.Where(e=>e.IsDel==false).ToListAsync();
         }
@@ -115,6 +115,16 @@ namespace NhaSachDaiThang_BE_API.Repositories
         public async Task<bool> AnyAsync(Expression<Func<Category, bool>> predicate)
         {
             return await _categories.AnyAsync(predicate);
+        }
+
+        public async Task<Category> GetActiveByIdAsync(int id)
+        {
+            return await _categories.Where(e => e.CategoryId == id).FirstOrDefaultAsync();
+        }
+
+        public async Task<IEnumerable<Category>> GetActiveByNameAsync(string name)
+        {
+            return await _categories.Where(b => b.Name.Contains(name) && b.IsDel== false).ToListAsync();
         }
     }
 }

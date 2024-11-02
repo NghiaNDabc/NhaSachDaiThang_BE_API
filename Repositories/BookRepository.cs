@@ -26,9 +26,14 @@ namespace NhaSachDaiThang_BE_API.Repositories
              _books.Remove(book);
         }
 
-        public async Task<IEnumerable<Book>> GetActiveAsync()
+        public async Task<IEnumerable<Book>> GetAllActiveAsync()
         {
             return await _books.Where(b => b.IsDel == false).ToListAsync();
+        }
+
+        public async Task<Book> GetActiveByIdAsync(int id)
+        {
+            return await _books.Where(b => b.BookId == id).FirstOrDefaultAsync();
         }
 
         public async Task<IEnumerable<Book>> GetAllAsync()
@@ -36,9 +41,15 @@ namespace NhaSachDaiThang_BE_API.Repositories
             return await _books.ToListAsync();
         }
 
+        public async Task<IEnumerable<Book>> GetBooksByCategoryId(int id)
+        {
+            return await _books.Where(b=> b.CategoryId == id).ToListAsync();    
+        }
+
         public async Task<Book> GetByIdAsync(int id)
         {
-            return await _books.FirstOrDefaultAsync(book=>book.BookId==id);
+            var rs =  await _books.FirstOrDefaultAsync(book=>book.BookId==id);
+            return rs;
         }
 
         public async Task<IEnumerable<Book>> GetByNameAsync(string name)
@@ -61,6 +72,11 @@ namespace NhaSachDaiThang_BE_API.Repositories
         {
             if( await _books.AnyAsync(b=>b.BookId == entity.BookId))
                 _books.Update(entity);
+        }
+
+        public async Task<IEnumerable<Book>> GetActiveByNameAsync(string name)
+        {
+            return await _books.Where(b => b.Title.Contains(name) && b.IsDel == false).ToListAsync();
         }
     }
 }
