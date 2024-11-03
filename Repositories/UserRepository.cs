@@ -35,7 +35,18 @@ namespace NhaSachDaiThang_BE_API.Repositories
         {
             return await _users.ToListAsync();
         }
-
+        public async Task<IEnumerable<User>> GetAllEmployeesAsync()
+        {
+            return await _users.Where(u=>u.RoleId==3).ToListAsync();
+        }
+        public async Task<IEnumerable<User>> GetAllUsersAsync()
+        {
+            return await _users.Where(u => u.RoleId == 2).ToListAsync();
+        }
+        public async Task<IEnumerable<User>> GetAllAdminAsync()
+        {
+            return await _users.Where(u => u.RoleId == 1).ToListAsync();
+        }
         public Task<User> GetByIdAsync(int id)
         {
             var user = _users.Where(u => u.UserId == id).FirstOrDefaultAsync();
@@ -61,6 +72,11 @@ namespace NhaSachDaiThang_BE_API.Repositories
         public async Task<User> GetByRefreshToken(string refreshToken)
         {
             return await _users.FirstOrDefaultAsync(u => u.RefreshToken == refreshToken && u.RefreshTokenExpiryTime > DateTime.Now);
+        }
+
+        public async Task<IEnumerable<User>> GetByNameAsync(string name)
+        {
+            return await _users.Where(b => (b.FirstName + " " + b.LastName).Contains(name)).ToListAsync();
         }
     }
 }

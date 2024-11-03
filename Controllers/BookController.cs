@@ -46,14 +46,14 @@ namespace NhaSachDaiThang_BE_API.Controllers
             return StatusCode(result.StatusCode, result.ApiResult);
         }
 
-        [HttpDelete("{id}")]
-        public async Task<IActionResult> DeleteCategory(int id)
+        [HttpPut("deactivate")]
+        public async Task<IActionResult> DeactiveCategory(int id)
         {
             var rs = await _bookService.SoftDelete(id);
             return StatusCode(rs.StatusCode, rs.ApiResult);
         }
 
-        [HttpDelete("hard/{id}")]
+        [HttpDelete("{id}")]
         public async Task<IActionResult> HardDeleteCategory(int id)
         {
             var rs = await _bookService.Delete(id);
@@ -61,9 +61,10 @@ namespace NhaSachDaiThang_BE_API.Controllers
         }
 
         [HttpPut]
-        public async Task<IActionResult> PutBook(BookDto book)
+        public async Task<IActionResult> PutBook([FromForm] BookDto book, [FromForm] List<IFormFile> formFiles)
         {
-            throw new NotImplementedException();
+            var rs = await _bookService.Update(book, formFiles);
+            return StatusCode(rs.StatusCode, rs.ApiResult);
         }
     }
 }

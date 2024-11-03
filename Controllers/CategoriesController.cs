@@ -75,15 +75,15 @@ namespace NhaSachDaiThang_BE_API.Controllers
         // DELETE: api/Categories/5
         [SwaggerOperation(Summary = "Xóa mềm danh mục", Tags = new[] { "Categories" })]
         [Authorize(Roles = "Admin,Employee")]
-        [HttpDelete("{id}")]
-        public async Task<IActionResult> DeleteCategory(int id)
+        [HttpPut("deactivate")]
+        public async Task<IActionResult> DeactiveCategory(int id)
         {
             var rs = await _categoryService.SoftDelete(id);
             return StatusCode(rs.StatusCode, rs.ApiResult);
         }
         [SwaggerOperation(Summary = "Xóa cứng", Tags = new[] { "Categories" })]
         [Authorize(Roles = "Admin")]
-        [HttpDelete("hard/{id}")]
+        [HttpDelete("{id}")]
         public async Task<IActionResult> HardDeleteCategory(int id)
         {
             var rs = await _categoryService.Delete(id);

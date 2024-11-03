@@ -235,7 +235,8 @@ namespace NhaSachDaiThang_BE_API.Services
             var passwordHash = BCrypt.Net.BCrypt.HashPassword(model.Password);
             var customer = new User
             {
-                FirstName = model.FullName,
+                FirstName = model.FirstName,
+                LastName = model.LastName,
                 UserName = model.Email,
                 Email = model.Email,
                 PasswordHash = passwordHash,
