@@ -26,7 +26,8 @@ public partial class BookStoreContext : DbContext
     public virtual DbSet<Order> Order { get; set; }
 
     public virtual DbSet<OrderDetail> OrderDetail { get; set; }
-
+    public virtual DbSet<Supplier> Supplier { get; set; }
+    public virtual DbSet<SupplierBook> SupplierBook { get; set; }
     public virtual DbSet<Payment> Payment { get; set; }
 
     public virtual DbSet<Review> Review { get; set; }
@@ -126,7 +127,7 @@ public partial class BookStoreContext : DbContext
                   .IsRequired(false);
                 entity.Property(e => e.Address).HasMaxLength(30).IsRequired(false);
                 entity.Property(e => e.Phone).HasMaxLength(15).IsRequired(false);
-
+                entity.Property(e => e.IsDel).HasDefaultValue(false);
                 entity.Property(e => e.ModifyBy).HasMaxLength(100);
                 entity.Property(e => e.ModifyDate).HasColumnType("datetime");
                 entity.Property(e => e.CreatedBy).HasMaxLength(100);
