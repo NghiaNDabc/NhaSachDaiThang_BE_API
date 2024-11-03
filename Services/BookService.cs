@@ -121,9 +121,9 @@ namespace NhaSachDaiThang_BE_API.Services
             };
         }
 
-        public async Task<ServiceResult> GetAll()
+        public async Task<ServiceResult> GetAll(int? pageNumber = null, int? pageSize = null)
         {
-            var books = await _unitOfWork.BookRepository.GetAllAsync();
+            var books = await _unitOfWork.BookRepository.GetAllAsync(pageNumber,pageSize);
 
             if (books == null || !books.Any())
             {
@@ -148,9 +148,9 @@ namespace NhaSachDaiThang_BE_API.Services
             };
         }
 
-        public async Task<ServiceResult> GetAllActive()
+        public async Task<ServiceResult> GetAllActive(int? pageNumber = null, int? pageSize = null)
         {
-            var books = await _unitOfWork.BookRepository.GetAllActiveAsync();
+            var books = await _unitOfWork.BookRepository.GetAllActiveAsync(pageNumber, pageSize);
 
             if (books == null || !books.Any())
             {
@@ -205,9 +205,9 @@ namespace NhaSachDaiThang_BE_API.Services
             };
         }
 
-        public async Task<ServiceResult> GetByNameAsync(string name)
+        public async Task<ServiceResult> GetByNameAsync(string name, int? pageNumber = null, int? pageSize = null)
         {
-            var books = await _unitOfWork.BookRepository.GetByNameAsync(name);
+            var books = await _unitOfWork.BookRepository.GetByNameAsync(name, pageNumber, pageSize);
 
             if (books == null || !books.Any())
             {
@@ -436,9 +436,9 @@ namespace NhaSachDaiThang_BE_API.Services
             };
         }
 
-        public async Task<ServiceResult> GetActiveByName(string name)
+        public async Task<ServiceResult> GetActiveByName(string name, int? pageNumber = null, int? pageSize = null)
         {
-            var book = await _unitOfWork.BookRepository.GetActiveByNameAsync(name);
+            var book = await _unitOfWork.BookRepository.GetActiveByNameAsync(name,pageNumber, pageSize);
             if (book == null || book.Count() <= 0)
                 return new ServiceResult
                 {

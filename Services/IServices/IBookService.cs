@@ -6,7 +6,6 @@ namespace NhaSachDaiThang_BE_API.Services.IServices
 {
     public interface IBookService :ICrudService<BookDto>, IActiveService, IGetByNameService
     {
-        Task<ServiceResult> GetAllActive();
         Task<ServiceResult> GetBooksByCategoryId(int id);
         Task<ServiceResult> Update(BookDto model, List<IFormFile> imageFiles);
         Task<ServiceResult> Add(BookDto model, List<IFormFile> imageFiles);

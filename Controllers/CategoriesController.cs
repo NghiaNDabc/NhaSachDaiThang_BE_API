@@ -20,35 +20,55 @@ namespace NhaSachDaiThang_BE_API.Controllers
         }
 
         // GET: api/Categories
-        [Authorize(Roles ="Admin,Employee")]
+        [Authorize(Roles = "Admin,Employee")]
         [HttpGet]
         [SwaggerOperation(Summary = "Lấy danh sách tất cả các danh mục", Tags = new[] { "Categories" })]
         //public async Task<ActionResult<IEnumerable<Category>>> GetCategories()
-        public async Task<ActionResult> GetCategories()
+        public async Task<ActionResult> GetCategories(int? id = null, string? name = null, int? pageNumber = null, int? pageSize = null)
         {
-            var result = await _categoryService.GetAll();
+            ServiceResult result;
+            if (id.HasValue)
+            {
+                result = await _categoryService.GetById(id.Value);
+            }
+            else if (!string.IsNullOrEmpty(name))
+            {
+                result = await _categoryService.GetByNameAsync(name);
+            }
+            else result = await _categoryService.GetAll(pageNumber, pageSize);
             return StatusCode(result.StatusCode, result.ApiResult);
+
+
         }
         [SwaggerOperation(Summary = "Lấy danh sách tất cả các danh mục đang được active", Tags = new[] { "Categories" })]
         [HttpGet("active")]
-       // public async Task<ActionResult<IEnumerable<Category>>> GetActiveCategories()
-        public async Task<ActionResult> GetActiveCategories()
+        // public async Task<ActionResult<IEnumerable<Category>>> GetActiveCategories()
+        public async Task<ActionResult> GetActiveCategories(int? id = null, string? name = null, int? pageNumber = null, int? pageSize = null)
         {
-            var result = await _categoryService.GetAllActive();
+            ServiceResult result;
+            if (id.HasValue)
+            {
+                result = await _categoryService.GetActiveById(id.Value);
+            }
+            else if (!string.IsNullOrEmpty(name))
+            {
+                result = await _categoryService.GetActiveByName(name);
+            }
+            else result = await _categoryService.GetAllActive(pageNumber, pageSize);
             return StatusCode(result.StatusCode, result.ApiResult);
         }
 
 
-        // GET: api/Categories/5
-        [SwaggerOperation(Summary = "Lấy danh sách tất cả các danh mục theo id", Tags = new[] { "Categories" })]
-        [HttpGet("{id}")]
-        //public async Task<ActionResult<Category>> GetCategory(int id)
-        public async Task<ActionResult> GetCategory(int id)
-        {
-            var result = await _categoryService.GetById(id);
+        //// GET: api/Categories/5
+        //[SwaggerOperation(Summary = "Lấy danh sách tất cả các danh mục theo id", Tags = new[] { "Categories" })]
+        //[HttpGet("{id}")]
+        ////public async Task<ActionResult<Category>> GetCategory(int id)
+        //public async Task<ActionResult> GetCategory(int id)
+        //{
+        //    var result = await _categoryService.GetById(id);
 
-            return  StatusCode(result.StatusCode, result.ApiResult);
-        }
+        //    return StatusCode(result.StatusCode, result.ApiResult);
+        //}
 
         [SwaggerOperation(Summary = "Sửa danh mục", Tags = new[] { "Categories" })]
         [Authorize(Roles = "Admin,Employee")]

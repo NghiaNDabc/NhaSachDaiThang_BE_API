@@ -93,9 +93,9 @@ namespace NhaSachDaiThang_BE_API.Services
             };
         }
 
-        public async Task<ServiceResult> GetActiveByName(string name)
+        public async Task<ServiceResult> GetActiveByName(string name, int? pageNumber = null, int? pageSize = null)
         {
-            var categorie = await _unitOfWork.CategoryRepository.GetActiveByNameAsync(name);
+            var categorie = await _unitOfWork.CategoryRepository.GetActiveByNameAsync(name, pageNumber, pageSize);
             int statusCode = 200;
             bool success = true;
             if (categorie == null)
@@ -114,7 +114,7 @@ namespace NhaSachDaiThang_BE_API.Services
             };
         }
 
-        public async Task<ServiceResult> GetAll()
+        public async Task<ServiceResult> GetAll(int? pageNumber = null, int? pageSize=null)
         {
             var  categories = await _unitOfWork.CategoryRepository.GetCategoriesByLevel();
 
@@ -129,7 +129,7 @@ namespace NhaSachDaiThang_BE_API.Services
             };
         }
 
-        public async Task<ServiceResult> GetAllActive()
+        public async Task<ServiceResult> GetAllActive(int? pageNumber = null, int? pageSize = null)
         {
             var categories =  await _unitOfWork.CategoryRepository.GetCategoriesByLevelActive();
 
@@ -161,6 +161,33 @@ namespace NhaSachDaiThang_BE_API.Services
                 {
                     Success = success,
                     Data = _mapper.Map<CategoryDto>(categorie)
+                }
+            };
+        }
+
+        public  async Task<ServiceResult> GetByNameAsync(string name, int? pageNumber = null, int? pageSize = null)
+        {
+            var cates = await _unitOfWork.CategoryRepository.GetByNameAsync(name, pageNumber, pageSize);
+
+            if (cates == null || !cates.Any())
+            {
+                return new ServiceResult
+                {
+                    StatusCode = 404,
+                    ApiResult = new ApiResult { Success = false, Message = "No books found." }
+                };
+            }
+
+            // Chuyển đổi dữ liệu sách sang DTO
+            var catesDtos = cates.Select(x=> _mapper.Map<CategoryDto>(x)).ToList();
+
+            return new ServiceResult
+            {
+                StatusCode = 200,
+                ApiResult = new ApiResult
+                {
+                    Success = true,
+                    Data = catesDtos
                 }
             };
         }

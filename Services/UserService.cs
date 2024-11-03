@@ -91,14 +91,39 @@ namespace NhaSachDaiThang_BE_API.Services
             throw new NotImplementedException();
         }
 
-        public Task<ServiceResult> GetActiveByName(string name)
+        public Task<ServiceResult> GetActiveByName(string name, int? pageNumber = null, int? pageSize = null)
         {
             throw new NotImplementedException();
         }
+        //public async Task<ServiceResult> GetAll(AccountType accountType, int? pageNumber = null, int? pageSize = null)
+        //{
+        //    var users = await _unitOfWork.UserRepository.GetAllAsync(accountType, pageNumber, pageSize);
 
-        public async Task<ServiceResult> GetAll()
+        //    if (users == null || !users.Any())
+        //    {
+        //        return new ServiceResult
+        //        {
+        //            StatusCode = 404,
+        //            ApiResult = new ApiResult { Success = false, Message = "No user found." }
+        //        };
+        //    }
+
+        //    // Chuyển đổi dữ liệu sách sang DTO
+        //    var userDtos = MapList(users);
+
+        //    return new ServiceResult
+        //    {
+        //        StatusCode = 200,
+        //        ApiResult = new ApiResult
+        //        {
+        //            Success = true,
+        //            Data = userDtos
+        //        }
+        //    };
+        //}
+        public async Task<ServiceResult> GetAll(int? pageNumber = null, int? pageSize = null)
         {
-            var users = await _unitOfWork.UserRepository.GetAllAsync();
+            var users = await _unitOfWork.UserRepository.GetAllAsync(pageNumber, pageSize);
 
             if (users == null || !users.Any())
             {
@@ -122,20 +147,11 @@ namespace NhaSachDaiThang_BE_API.Services
                 }
             };
         }
-        public async Task<ServiceResult> GetAll(AccountType accountType)
+        public async Task<ServiceResult> GetAll(AccountType accountType, int? pageNumber = null, int? pageSize = null)
         {
             IEnumerable<User> users;
-            if(accountType == AccountType.Admin)
-            {
-                users =  await _unitOfWork.UserRepository.GetAllAdminAsync();
-            }else if(accountType == AccountType.Employee)
-            {
-                users = await _unitOfWork.UserRepository.GetAllEmployeesAsync();
-            }
-            else
-            {
-                users = await _unitOfWork.UserRepository.GetAllUsersAsync();
-            }
+                users =  await _unitOfWork.UserRepository.GetAllAsync(accountType, pageNumber, pageSize);
+           
 
             if (users == null || !users.Any())
             {
@@ -160,7 +176,7 @@ namespace NhaSachDaiThang_BE_API.Services
             };
         }
 
-        public Task<ServiceResult> GetAllActive()
+        public Task<ServiceResult> GetAllActive(int? pageNumber = null, int? pageSize = null)
         {
             throw new NotImplementedException();
         }
@@ -215,9 +231,34 @@ namespace NhaSachDaiThang_BE_API.Services
             userDto.Image = $"{baseUrl}/{GlobalConst.UserImageRelativePath}/{userDto.Image}";
             return userDto; 
         }
-        public async Task<ServiceResult> GetByNameAsync(string name)
+        public async Task<ServiceResult> GetByNameAsync(string name, int? pageNumber = null, int? pageSize = null)
         {
-            var users = await _unitOfWork.UserRepository.GetByNameAsync(name);
+            var users = await _unitOfWork.UserRepository.GetByNameAsync(name, pageNumber, pageSize);
+            if (users == null || !users.Any())
+            {
+                return new ServiceResult
+                {
+                    StatusCode = 404,
+                    ApiResult = new ApiResult { Success = false, Message = "No user found." }
+                };
+            }
+
+            // Chuyển đổi dữ liệu sách sang DTO
+            var userDtos = MapList(users);
+
+            return new ServiceResult
+            {
+                StatusCode = 200,
+                ApiResult = new ApiResult
+                {
+                    Success = true,
+                    Data = userDtos
+                }
+            };
+        }
+        public async Task<ServiceResult> GetByNameAsync(string name, AccountType accountType, int? pageNumber = null, int? pageSize = null)
+        {
+            var users = await _unitOfWork.UserRepository.GetByName(name,accountType, pageNumber, pageSize);
             if (users == null || !users.Any())
             {
                 return new ServiceResult

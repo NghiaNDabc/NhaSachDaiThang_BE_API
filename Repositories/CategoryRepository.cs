@@ -1,10 +1,12 @@
 ﻿using AutoMapper;
 using Microsoft.EntityFrameworkCore;
 using NhaSachDaiThang_BE_API.Data;
+using NhaSachDaiThang_BE_API.Helper;
 using NhaSachDaiThang_BE_API.Models.Dtos;
 using NhaSachDaiThang_BE_API.Models.Entities;
 using NhaSachDaiThang_BE_API.Repositories.IRepositories;
 using System.Linq.Expressions;
+using static Microsoft.EntityFrameworkCore.DbLoggerCategory;
 
 namespace NhaSachDaiThang_BE_API.Repositories
 {
@@ -13,7 +15,7 @@ namespace NhaSachDaiThang_BE_API.Repositories
         private readonly BookStoreContext _bookStoreContext;
         private readonly DbSet<Category> _categories;
         private readonly IMapper _mapper;
-        public  CategoryRepository(BookStoreContext bookStoreContext, IMapper mapper)
+        public CategoryRepository(BookStoreContext bookStoreContext, IMapper mapper)
         {
             _bookStoreContext = bookStoreContext;
             _categories = _bookStoreContext.Category;
@@ -22,12 +24,13 @@ namespace NhaSachDaiThang_BE_API.Repositories
 
         public async Task AddAsync(Category entity)
         {
-            await _categories.AddAsync(entity);       }
+            await _categories.AddAsync(entity);
+        }
 
         public async Task DeleteAsync(int id)
         {
-            var category = await _categories.FirstOrDefaultAsync(e=>e.CategoryId == id);
-            if(category!=null)
+            var category = await _categories.FirstOrDefaultAsync(e => e.CategoryId == id);
+            if (category != null)
             {
                 _categories.Remove(category);
             }
@@ -41,13 +44,15 @@ namespace NhaSachDaiThang_BE_API.Repositories
             }
         }
 
-        public async Task<IEnumerable<Category>> GetAllAsync()
+        public async Task<IEnumerable<Category>> GetAllAsync(int? pageNumber = null, int? pageSize = null)
         {
-            return await _categories.ToListAsync();
+            var query = _categories;
+            return await PaginationHelper.PaginateAsync(query, pageNumber, pageSize);
         }
-        public async Task<IEnumerable<Category>> GetAllActiveAsync()
+        public async Task<IEnumerable<Category>> GetAllActiveAsync(int? pageNumber = null, int? pageSize = null)
         {
-            return  await _categories.Where(e=>e.IsDel==false).ToListAsync();
+            var query =  _categories.Where(e => e.IsDel == false);
+            return await PaginationHelper.PaginateAsync(query, pageNumber, pageSize);
         }
         public async Task<Category> GetByIdAsync(int id)
         {
@@ -57,19 +62,19 @@ namespace NhaSachDaiThang_BE_API.Repositories
 
         public async Task UpdateAsync(Category entity)
         {
-            if(await _categories.FirstOrDefaultAsync(e => e.CategoryId == entity.CategoryId) != null)
+            if (await _categories.FirstOrDefaultAsync(e => e.CategoryId == entity.CategoryId) != null)
             {
                 _categories.Update(entity);
             }
         }
         public async Task<IEnumerable<CategoryDto>> GetCategoriesByLevel(int? parentId = null)
         {
-            // Tìm tất cả các Category có ParentCategoryID là parentId
+
             var categories = await _categories
                 .Where(c => c.ParentCategoryID == parentId)
                 .ToListAsync();
 
-            // Ánh xạ từ Category sang CategoryDto, bao gồm cả các danh mục con
+
             var categoryDtos = new List<CategoryDto>();
 
             foreach (var category in categories)
@@ -85,12 +90,12 @@ namespace NhaSachDaiThang_BE_API.Repositories
 
         public async Task<IEnumerable<CategoryDto>> GetCategoriesByLevelActive(int? parentId = null)
         {
-            // Tìm tất cả các Category có ParentCategoryID là parentId
+
             var categories = await _categories
                 .Where(c => c.ParentCategoryID == parentId && c.IsDel == false)
                 .ToListAsync();
 
-            // Ánh xạ từ Category sang CategoryDto, bao gồm cả các danh mục con
+
             var categoryDtos = new List<CategoryDto>();
 
             foreach (var category in categories)
@@ -107,9 +112,11 @@ namespace NhaSachDaiThang_BE_API.Repositories
 
 
 
-        public async Task<IEnumerable<Category>> GetByNameAsync(string name)
+        public async Task<IEnumerable<Category>> GetByNameAsync(string name, int? pageNumber = null, int? pageSize = null)
         {
-            return await _categories.Where(e => e.Name == name).ToListAsync();
+            var query = _categories.Where(e => e.Name == name);
+            return await PaginationHelper.PaginateAsync(query, pageNumber, pageSize);
+
         }
 
         public async Task<bool> AnyAsync(Expression<Func<Category, bool>> predicate)
@@ -122,9 +129,10 @@ namespace NhaSachDaiThang_BE_API.Repositories
             return await _categories.Where(e => e.CategoryId == id).FirstOrDefaultAsync();
         }
 
-        public async Task<IEnumerable<Category>> GetActiveByNameAsync(string name)
+        public async Task<IEnumerable<Category>> GetActiveByNameAsync(string name, int? pageNumber = null, int? pageSize = null)
         {
-            return await _categories.Where(b => b.Name.Contains(name) && b.IsDel== false).ToListAsync();
+            var query =  _categories.Where(b => b.Name.Contains(name) && b.IsDel == false);
+            return await PaginationHelper.PaginateAsync(query, pageNumber, pageSize);
         }
     }
 }

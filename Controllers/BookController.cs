@@ -19,21 +19,29 @@ namespace NhaSachDaiThang_BE_API.Controllers
         }
 
         [HttpGet]
-        public async Task<IActionResult> GetBook(int? id = null)
+        public async Task<IActionResult> GetBook(int? id = null,string? name=null, int? pageNumber = null, int? pageSize = null)
         {
             ServiceResult result;
             if (id.HasValue)
                 result = await _bookService.GetById(id.Value);
+            else if (!string.IsNullOrEmpty(name))
+            {
+                result = await _bookService.GetByNameAsync(name, pageNumber, pageSize);
+            }
             else
-                result = await _bookService.GetAll();
+                result = await _bookService.GetAll(pageNumber, pageSize);
             return StatusCode(result.StatusCode, result.ApiResult);
         }
         [HttpGet("active")]
-        public async Task<IActionResult> GetAllActive(int? id = null)
+        public async Task<IActionResult> GetAllActive(int? id = null, string? name = null, int? pageNumber = null, int? pageSize = null)
         {
             ServiceResult result;
             if (id.HasValue)
                 result = await _bookService.GetActiveById(id.Value);
+            else if (!string.IsNullOrEmpty(name))
+            {
+                result = await _bookService.GetActiveByName(name, pageNumber, pageSize);
+            }
             else
                 result = await _bookService.GetAllActive();
             return StatusCode(result.StatusCode, result.ApiResult);
