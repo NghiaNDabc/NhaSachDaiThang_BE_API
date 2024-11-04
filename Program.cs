@@ -30,10 +30,14 @@ builder.Services.AddScoped<IOtpService, OtpService>();
 builder.Services.AddScoped<IBookService, BookService>();
 builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.AddScoped<IUploadFile, UploadFile>();
+builder.Services.AddScoped<ISupplierService, SupplierService>();
+builder.Services.AddScoped<ISupplierBookService, SupplierBookService>();
 //repository
 builder.Services.AddScoped<IUserRepository, UserRepository>();
 builder.Services.AddScoped<ICategoryRepository, CategoryRepository>();
 builder.Services.AddScoped<IBookRepository, BookRepository>();
+builder.Services.AddScoped<ISupplierRepository, SupplierRepository>();
+builder.Services.AddScoped<ISupplierBookRepository, SupplierBookRepository>();
 
 //unit of work
 builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();

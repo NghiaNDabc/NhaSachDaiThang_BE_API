@@ -25,6 +25,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Folder Include="Models\Dtos\NewFolder\" />
     <Folder Include="wwwroot\images\employees\" />
     <Folder Include="wwwroot\images\users\" />
   </ItemGroup>

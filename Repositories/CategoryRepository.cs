@@ -59,7 +59,6 @@ namespace NhaSachDaiThang_BE_API.Repositories
             return await _categories.FirstOrDefaultAsync(e => e.CategoryId == id);
         }
 
-
         public async Task UpdateAsync(Category entity)
         {
             if (await _categories.FirstOrDefaultAsync(e => e.CategoryId == entity.CategoryId) != null)

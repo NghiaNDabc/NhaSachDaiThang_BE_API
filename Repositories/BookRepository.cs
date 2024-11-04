@@ -1,6 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using NhaSachDaiThang_BE_API.Data;
 using NhaSachDaiThang_BE_API.Helper;
+using NhaSachDaiThang_BE_API.Models.Dtos;
 using NhaSachDaiThang_BE_API.Models.Entities;
 using NhaSachDaiThang_BE_API.Repositories.IRepositories;
 
@@ -43,23 +44,12 @@ namespace NhaSachDaiThang_BE_API.Repositories
             return await PaginationHelper.PaginateAsync(query, pageNumber, pageSize);
         }
 
-        public async Task<IEnumerable<Book>> GetBooksByCategoryId(int id)
-        {
-            return await _books.Where(b => b.CategoryId == id).ToListAsync();
-        }
-
         public async Task<Book> GetByIdAsync(int id)
         {
             var rs = await _books.FirstOrDefaultAsync(book => book.BookId == id);
             return rs;
         }
 
-        public async Task<IEnumerable<Book>> GetByNameAsync(string name, int? pageNumber = null, int? pageSize = null)
-        {
-            var query = _books.Where(b => b.Title.Contains(name));
-            return await PaginationHelper.PaginateAsync(query, pageNumber, pageSize);
-
-        }
 
         public async Task SoftDelete(int id)
         {
@@ -78,12 +68,32 @@ namespace NhaSachDaiThang_BE_API.Repositories
                 _books.Update(entity);
         }
 
-        public async Task<IEnumerable<Book>> GetActiveByNameAsync(string name, int? pageNumber = null, int? pageSize = null)
+
+        public async Task<IEnumerable<Book>> GetByNameAndCategoryIdAsync(int? categoryid = null, string? name = null, int? pageNumber = null, int? pageSize = null)
         {
-
-            var query= _books.Where(b => b.Title.Contains(name) && b.IsDel == false);
+            IQueryable<Book> query = _books;
+            if(name != null)
+            {
+                query = query.Where(b => b.Title.Contains(name));
+            }
+            if (categoryid.HasValue)
+            {
+                query = query.Where(b => b.CategoryId ==  categoryid);
+            }
             return await PaginationHelper.PaginateAsync(query, pageNumber, pageSize);
-
+        }
+        public async Task<IEnumerable<Book>> GetActiveByNameAndCategoryIdAsync(int? categoryid = null, string? name = null, int? pageNumber = null, int? pageSize = null)
+        {
+            IQueryable<Book> query = _books.Where(b=>b.IsDel == false);
+            if (name != null)
+            {
+                query = query.Where(b => b.Title.Contains(name));
+            }
+            if (categoryid.HasValue)
+            {
+                query = query.Where(b => b.CategoryId == categoryid);
+            }
+            return await PaginationHelper.PaginateAsync(query, pageNumber, pageSize);
         }
     }
 }

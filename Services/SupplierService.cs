@@ -22,7 +22,8 @@ namespace NhaSachDaiThang_BE_API.Services
 
         public async Task<ServiceResult> Add(SupplierDto model)
         {
-            if (await _unitOfWork.SupplierRepository.GetByNameAsync(model.Name) != null)
+            var find = await _unitOfWork.SupplierRepository.GetByNameAsync(model.Name);
+            if (find.Count() > 0)
             {
 
                 return new ServiceResult
@@ -51,7 +52,8 @@ namespace NhaSachDaiThang_BE_API.Services
 
         public async Task<ServiceResult> Delete(int id)
         {
-            if (await _unitOfWork.SupplierRepository.GetByIdAsync(id) != null)
+            var find = await _unitOfWork.SupplierRepository.GetByIdAsync(id);
+            if ( find== null )
             {
                 return new ServiceResult
                 {
@@ -75,7 +77,7 @@ namespace NhaSachDaiThang_BE_API.Services
                 }
             };
         }
-     
+
 
         public async Task<ServiceResult> GetAll(int? pageNumber = null, int? pageSize = null)
         {
@@ -89,7 +91,7 @@ namespace NhaSachDaiThang_BE_API.Services
                     ApiResult = new ApiResult { Success = false, Message = "No books found." }
                 };
             }
-            var supplierDtos = suppliers.Select(s =>  _mapper.Map<SupplierDto>(s)).ToList();
+            var supplierDtos = suppliers.Select(s => _mapper.Map<SupplierDto>(s)).ToList();
 
             return new ServiceResult
             {
@@ -133,14 +135,14 @@ namespace NhaSachDaiThang_BE_API.Services
 
         public async Task<ServiceResult> GetByNameAsync(string name, int? pageNumber = null, int? pageSize = null)
         {
-            var suppliers = await _unitOfWork.SupplierRepository.GetByNameAsync(name);
+            var suppliers = await _unitOfWork.SupplierRepository.GetByNameAsync(name, pageNumber, pageSize);
 
             if (suppliers == null || !suppliers.Any())
             {
                 return new ServiceResult
                 {
                     StatusCode = 404,
-                    ApiResult = new ApiResult { Success = false, Message = "No books found." }
+                    ApiResult = new ApiResult { Success = false, Message = "No supplier found." }
                 };
             }
 
@@ -180,25 +182,55 @@ namespace NhaSachDaiThang_BE_API.Services
                 {
                     Success = true,
                     Message = "Ẩn nhà cung cấp thành công!",
-              
+
                 }
             };
         }
-        public Task<ServiceResult> GetAllActive(int? pageNumber = null, int? pageSize = null)
+        public async Task<ServiceResult> Update(SupplierDto model)
         {
-            throw new NotImplementedException();
+            var supplier = await _unitOfWork.SupplierRepository.GetByIdAsync(model.SupplierId);
+            if (supplier == null)
+            {
+                return new ServiceResult
+                {
+                    StatusCode = 400,
+                    ApiResult = new ApiResult
+                    {
+                        Success = false,
+                        ErrMessage = "Không tìm thấy nhà cung cấp cần update"
+                    }
+                };
+            }
+            UpdateSupplierFromDto(supplier, model);
+            await _unitOfWork.SupplierRepository.UpdateAsync(supplier);
+            await _unitOfWork.SaveChangeAsync();
+            return new ServiceResult
+            {
+                StatusCode = 200,
+                ApiResult = new ApiResult
+                {
+                    Success = true,
+                    Message = "Update nhà cung cấp thành công!",
+                    Data = model
+                }
+            };
         }
-        public Task<ServiceResult> Update(SupplierDto model)
+        void UpdateSupplierFromDto(Supplier supplier, SupplierDto supplierDto)
         {
-            throw new NotImplementedException();
-        }
-        public Task<ServiceResult> GetActiveById(int id)
-        {
-            throw new NotImplementedException();
-        }
-        public Task<ServiceResult> GetActiveByName(string name, int? pageNumber = null, int? pageSize=null)
-        {
-            throw new NotImplementedException();
+            var properties = typeof(SupplierDto).GetProperties();
+            foreach (var property in properties)
+            {
+                if (property.Name == "SupplierId") continue;
+                var value = property.GetValue(supplierDto);
+                if (value != null)
+                {
+                    var supplierProperty = typeof(Supplier).GetProperty(property.Name);
+                    if (supplierProperty != null)
+                    {
+                        supplierProperty.SetValue(supplier, value);
+                    }
+                }
+            }
         }
     }
 }

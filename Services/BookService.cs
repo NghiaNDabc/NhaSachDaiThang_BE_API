@@ -205,32 +205,7 @@ namespace NhaSachDaiThang_BE_API.Services
             };
         }
 
-        public async Task<ServiceResult> GetByNameAsync(string name, int? pageNumber = null, int? pageSize = null)
-        {
-            var books = await _unitOfWork.BookRepository.GetByNameAsync(name, pageNumber, pageSize);
-
-            if (books == null || !books.Any())
-            {
-                return new ServiceResult
-                {
-                    StatusCode = 404,
-                    ApiResult = new ApiResult { Success = false, Message = "No books found." }
-                };
-            }
-
-            // Chuyển đổi dữ liệu sách sang DTO
-            var bookDtos = MapList(books);
-
-            return new ServiceResult
-            {
-                StatusCode = 200,
-                ApiResult = new ApiResult
-                {
-                    Success = true,
-                    Data = bookDtos
-                }
-            };
-        }
+   
 
         public async Task<ServiceResult> SoftDelete(int id)
         {
@@ -383,31 +358,7 @@ namespace NhaSachDaiThang_BE_API.Services
             }
             return bookDto;
         }
-        public async Task<ServiceResult> GetBooksByCategoryId(int id)
-        {
-            var books = await _unitOfWork.BookRepository.GetBooksByCategoryId(id);
-            if (books == null || !books.Any())
-            {
-                return new ServiceResult
-                {
-                    StatusCode = 404,
-                    ApiResult = new ApiResult { Success = false, Message = "No books found." }
-                };
-            }
-
-            // Chuyển đổi dữ liệu sách sang DTO
-            var bookDtos = MapList(books);
-
-            return new ServiceResult
-            {
-                StatusCode = 200,
-                ApiResult = new ApiResult
-                {
-                    Success = true,
-                    Data = bookDtos
-                }
-            };
-        }
+       
 
         public async Task<ServiceResult> GetActiveById(int id)
         {
@@ -436,9 +387,36 @@ namespace NhaSachDaiThang_BE_API.Services
             };
         }
 
-        public async Task<ServiceResult> GetActiveByName(string name, int? pageNumber = null, int? pageSize = null)
+
+        public async Task<ServiceResult> GetByNameAndCategoryIdAsync(int? categoryId = null, string? name = null, int? pageNumber = null, int? pageSize = null)
         {
-            var book = await _unitOfWork.BookRepository.GetActiveByNameAsync(name,pageNumber, pageSize);
+            var book = await _unitOfWork.BookRepository.GetByNameAndCategoryIdAsync(categoryId, name, pageNumber, pageSize);
+            if (book == null || book.Count() <= 0)
+                return new ServiceResult
+                {
+                    StatusCode = 404,
+                    ApiResult = new ApiResult
+                    {
+                        Success = false,
+                        ErrMessage = "Không tìm thấy sách có tên: " + name
+
+                    }
+                };
+            var bookDto = MapList(book);
+            return new ServiceResult
+            {
+                StatusCode = 200,
+                ApiResult = new ApiResult
+                {
+                    Success = false,
+                    Data = bookDto
+
+                }
+            };
+        }
+        public async Task<ServiceResult> GetActiveByNameAndCategoryIdAsync(int? categoryId = null, string? name = null, int? pageNumber = null, int? pageSize = null)
+        {
+            var book = await _unitOfWork.BookRepository.GetActiveByNameAndCategoryIdAsync(categoryId, name, pageNumber, pageSize);
             if (book == null || book.Count() <= 0)
                 return new ServiceResult
                 {

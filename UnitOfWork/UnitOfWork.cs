@@ -15,6 +15,7 @@ namespace NhaSachDaiThang_BE_API.UnitOfWork
         public IBookRepository BookRepository { get; }
 
         public ISupplierRepository SupplierRepository {  get; }
+        public ISupplierBookRepository SupplierBookRepository { get; }
         public UnitOfWork(BookStoreContext bookStoreContext, IMapper mapper)
         {
             _mapper = mapper;
@@ -23,6 +24,7 @@ namespace NhaSachDaiThang_BE_API.UnitOfWork
             CategoryRepository = new CategoryRepository(_bookStoreContext, _mapper);
             BookRepository = new BookRepository(_bookStoreContext);
             SupplierRepository =  new SupplierRepository(_bookStoreContext);
+            SupplierBookRepository = new SupplierBookRepository(_bookStoreContext);
         }
 
         public void Dispose()

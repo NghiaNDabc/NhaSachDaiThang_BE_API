@@ -12,35 +12,35 @@ namespace NhaSachDaiThang_BE_API.Controllers
     [ApiController]
     public class BookController : ControllerBase
     {
-        BookService _bookService;
-        public BookController(BookService bookService)
+        IBookService _bookService;
+        public BookController(IBookService bookService)
         {
             _bookService = bookService;
         }
 
         [HttpGet]
-        public async Task<IActionResult> GetBook(int? id = null,string? name=null, int? pageNumber = null, int? pageSize = null)
+        public async Task<IActionResult> GetBook(int? id = null,int?categoryId=null,string? name=null, int? pageNumber = null, int? pageSize = null)
         {
             ServiceResult result;
             if (id.HasValue)
                 result = await _bookService.GetById(id.Value);
             else if (!string.IsNullOrEmpty(name))
             {
-                result = await _bookService.GetByNameAsync(name, pageNumber, pageSize);
+                result = await _bookService.GetByNameAndCategoryIdAsync(categoryId,name, pageNumber, pageSize);
             }
             else
                 result = await _bookService.GetAll(pageNumber, pageSize);
             return StatusCode(result.StatusCode, result.ApiResult);
         }
         [HttpGet("active")]
-        public async Task<IActionResult> GetAllActive(int? id = null, string? name = null, int? pageNumber = null, int? pageSize = null)
+        public async Task<IActionResult> GetAllActive(int? id = null, int? categoryId = null, string? name = null, int? pageNumber = null, int? pageSize = null)
         {
             ServiceResult result;
             if (id.HasValue)
                 result = await _bookService.GetActiveById(id.Value);
             else if (!string.IsNullOrEmpty(name))
             {
-                result = await _bookService.GetActiveByName(name, pageNumber, pageSize);
+                result = await _bookService.GetActiveByNameAndCategoryIdAsync(categoryId,name, pageNumber, pageSize);
             }
             else
                 result = await _bookService.GetAllActive();

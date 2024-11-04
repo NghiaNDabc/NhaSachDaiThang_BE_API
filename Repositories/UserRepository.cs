@@ -36,29 +36,7 @@ namespace NhaSachDaiThang_BE_API.Repositories
 
         public async Task<IEnumerable<User>> GetAllAsync(int? pageNumber = null, int? pageSize = null)
         {
-            if (pageNumber == null || pageNumber == 0)
-                return await _users.ToListAsync();
-            int defaultPageSize = 10;
-            int pageNum = pageNumber ?? 1;
-            int size = pageSize ?? defaultPageSize;
-
-            if (pageNum <= 0)
-            {
-                pageNum = 1;
-            }
-            int skip = (pageNum - 1) * size;
-            if (size > 0)
-            {
-                return await _users
-                    .Skip(skip)
-                    .Take(size)
-                    .ToListAsync();
-            }
-            else
-            {
-
-                return await _users.ToListAsync();
-            }
+            return await PaginationHelper.PaginateAsync(_users, pageNumber, pageSize);
         }
         public async Task<IEnumerable<User>> GetAllAsync(AccountType accountType,int? pageNumber = null, int? pageSize = null)
         {
@@ -80,11 +58,6 @@ namespace NhaSachDaiThang_BE_API.Repositories
         {
             var user = _users.Where(u => u.UserId == id).FirstOrDefaultAsync();
             return user;
-        }
-
-        public async Task<IEnumerable<User>> GetPagedAsync(int pageNumber, int pageSize)
-        {
-            return await _users.OrderBy(e => e.UserId).Skip(pageSize * (pageNumber - 1)).Take(pageSize).ToListAsync();
         }
 
         public async Task UpdateAsync(User entity)

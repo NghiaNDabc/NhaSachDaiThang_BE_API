@@ -12,6 +12,8 @@ namespace NhaSachDaiThang_BE_API.Configurations
             CreateMap<Book, BookDto>();
             CreateMap<Supplier, SupplierDto>();
             CreateMap<SupplierDto, Supplier>();
+            CreateMap<SupplierBookDto, SupplierBook>();
+            CreateMap<SupplierBook, SupplierBookDto>();
             CreateMap<User, UserDTO>()
             .ForMember(dest => dest.RoleName, opt => opt.MapFrom(src => src.Role.RoleName));
         }
