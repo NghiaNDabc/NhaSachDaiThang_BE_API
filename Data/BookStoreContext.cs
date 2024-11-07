@@ -95,7 +95,10 @@ public partial class BookStoreContext : DbContext
         modelBuilder.Entity<SupplierBook>(
             entity =>
             {
-                entity.HasKey(sb => new { sb.SupplierId, sb.BookId }).HasName("PK__SupplierBook");
+                entity.HasKey(sb => sb.SupplierBookId).HasName("PK__SupplierBook");
+
+                // Cấu hình các thuộc tính
+                entity.Property(e => e.SupplierBookId).HasColumnName("SupplierBookID").ValueGeneratedOnAdd();
 
                 entity.Property(e => e.BookId).HasColumnName("BookID");
                 entity.Property(e => e.SupplyDate).HasColumnType("datetime").IsRequired(false);
@@ -189,6 +192,7 @@ public partial class BookStoreContext : DbContext
         modelBuilder.Entity<Order>(entity =>
         {
             entity.HasKey(e => e.OrderId).HasName("PK__Orders__C3905BAF2225F30A");
+            entity.Property(e => e.OrderId).ValueGeneratedOnAdd();
 
             entity.Property(e => e.OrderId).HasColumnName("OrderID");
             entity.Property(e => e.CreatedBy).HasMaxLength(100);
@@ -202,6 +206,7 @@ public partial class BookStoreContext : DbContext
             entity.Property(e => e.Email).HasColumnName("Email").HasMaxLength(30);
             entity.Property(e => e.ModifyBy).HasMaxLength(100);
             entity.Property(e => e.ModifyDate).HasColumnType("datetime");
+            entity.Property(e => e.DeliveredDate).HasColumnType("datetime");
             entity.Property(e => e.OrderDate)
                 .HasDefaultValueSql("(getdate())")
                 .HasColumnType("datetime");
@@ -247,6 +252,7 @@ public partial class BookStoreContext : DbContext
 
             entity.HasOne(d => d.Order).WithMany(p => p.OrderDetails)
                 .HasForeignKey(d => d.OrderId)
+                //.OnDelete(DeleteBehavior.Cascade)
                 .HasConstraintName("FK__OrderDeta__Order__60A75C0F");
         });
 

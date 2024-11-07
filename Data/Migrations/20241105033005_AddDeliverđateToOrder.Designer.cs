@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using NhaSachDaiThang_BE_API.Data;
 
@@ -11,9 +12,11 @@ using NhaSachDaiThang_BE_API.Data;
 namespace NhaSachDaiThang_BE_API.Migrations
 {
     [DbContext(typeof(BookStoreContext))]
-    partial class BookStoreContextModelSnapshot : ModelSnapshot
+    [Migration("20241105033005_AddDeliverđateToOrder")]
+    partial class AddDeliverđateToOrder
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -429,12 +432,8 @@ namespace NhaSachDaiThang_BE_API.Migrations
 
             modelBuilder.Entity("NhaSachDaiThang_BE_API.Models.Entities.SupplierBook", b =>
                 {
-                    b.Property<int>("SupplierBookId")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int")
-                        .HasColumnName("SupplierBookID");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("SupplierBookId"));
+                    b.Property<int>("SupplierId")
+                        .HasColumnType("int");
 
                     b.Property<int>("BookId")
                         .HasColumnType("int")
@@ -460,21 +459,16 @@ namespace NhaSachDaiThang_BE_API.Migrations
                         .HasColumnType("int")
                         .HasColumnName("Quantity");
 
-                    b.Property<int>("SupplierId")
-                        .HasColumnType("int");
-
                     b.Property<DateTime?>("SupplyDate")
                         .HasColumnType("datetime");
 
                     b.Property<decimal?>("SupplyPrice")
                         .HasColumnType("decimal(18, 2)");
 
-                    b.HasKey("SupplierBookId")
+                    b.HasKey("SupplierId", "BookId")
                         .HasName("PK__SupplierBook");
 
                     b.HasIndex("BookId");
-
-                    b.HasIndex("SupplierId");
 
                     b.ToTable("SupplierBook");
                 });
