@@ -2,6 +2,7 @@
 {
     public partial class SupplierBook
     {
+        public int SupplierBookId { get; set; }
         public int SupplierId { get; set; }
         public int BookId { get; set; }
         public int Quanlity { get; set; }

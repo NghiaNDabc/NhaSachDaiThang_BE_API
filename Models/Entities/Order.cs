@@ -18,7 +18,7 @@ public partial class Order
     public string? ShippingAddress { get; set; }
     public string? Phone { get; set; }
     public string? Email { get; set; }
-
+    public DateTime? DeliveredDate { get; set; }
     public DateTime? CreatedDate { get; set; }
 
     public string? CreatedBy { get; set; }

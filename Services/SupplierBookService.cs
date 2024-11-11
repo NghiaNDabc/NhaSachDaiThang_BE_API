@@ -53,20 +53,38 @@ namespace NhaSachDaiThang_BE_API.Services
                     }
                 };
             }
-            await _unitOfWork.SupplierRepository.DeleteAsync(id);
-            var book = await _unitOfWork.BookRepository.GetByIdAsync(item.BookId);
-            book.Quantity -= item.Quanlity;
-            await _unitOfWork.BookRepository.UpdateAsync(book);
-            await _unitOfWork.SaveChangeAsync();
-            return new ServiceResult
-            {
-                StatusCode = 200,
-                ApiResult = new ApiResult
+            using (var transaction =await _unitOfWork.BeginTransactionAsync()) {
+                try
                 {
-                    Success = true,
-                    Message = "Xóa nhà cung cấp thành công!"
+                    await _unitOfWork.SupplierRepository.DeleteAsync(id);
+                    var book = await _unitOfWork.BookRepository.GetByIdAsync(item.BookId);
+                    book.Quantity -= item.Quanlity;
+                    await _unitOfWork.BookRepository.UpdateAsync(book);
+                    await _unitOfWork.SaveChangeAsync();
+                    await transaction.CommitAsync();
+                    return new ServiceResult
+                    {
+                        StatusCode = 200,
+                        ApiResult = new ApiResult
+                        {
+                            Success = true,
+                            Message = "Xóa nhà cung cấp thành công!"
+                        }
+                    };
                 }
-            };
+                catch (Exception ex) {
+                    await transaction.RollbackAsync();
+                    return new ServiceResult
+                    {
+                        StatusCode = 500,
+                        ApiResult = new ApiResult
+                        {
+                            Success = false,
+                            ErrMessage = "Lỗi khi xóa đơn nhập hàng: " + ex.Message
+                        }
+                    };
+                }
+            }
         }
 
         public async Task<ServiceResult> GetAll(int? pageNumber = null, int? pageSize = null)

@@ -1,7 +1,7 @@
 ﻿using AutoMapper;
 using Microsoft.AspNetCore.Http;
-using NhaSachDaiThang_BE_API.Helper;
 using NhaSachDaiThang_BE_API.Helper.Enum;
+using NhaSachDaiThang_BE_API.Helper.GlobalVar;
 using NhaSachDaiThang_BE_API.Models.Dtos;
 using NhaSachDaiThang_BE_API.Models.Entities;
 using NhaSachDaiThang_BE_API.Repositories.IRepositories;

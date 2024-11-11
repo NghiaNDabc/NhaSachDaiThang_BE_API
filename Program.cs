@@ -9,6 +9,11 @@ using NhaSachDaiThang_BE_API.UnitOfWork;
 
 
 var builder = WebApplication.CreateBuilder(args);
+//
+builder.Logging.ClearProviders();
+builder.Logging.AddConsole();
+builder.Logging.AddDebug();
+builder.Logging.AddEventSourceLogger();
 builder.Services.AddCors(options =>
 {
     options.AddPolicy("NhaSachDaiThang", builder =>
@@ -32,12 +37,16 @@ builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.AddScoped<IUploadFile, UploadFile>();
 builder.Services.AddScoped<ISupplierService, SupplierService>();
 builder.Services.AddScoped<ISupplierBookService, SupplierBookService>();
+builder.Services.AddScoped<IOrderService, OrderService>();
+//builder.Services.AddScoped<ISupplierBookService, SupplierBookService>();
 //repository
 builder.Services.AddScoped<IUserRepository, UserRepository>();
 builder.Services.AddScoped<ICategoryRepository, CategoryRepository>();
 builder.Services.AddScoped<IBookRepository, BookRepository>();
 builder.Services.AddScoped<ISupplierRepository, SupplierRepository>();
 builder.Services.AddScoped<ISupplierBookRepository, SupplierBookRepository>();
+builder.Services.AddScoped<IOrderRepository, OrderRepository>();
+builder.Services.AddScoped<IOrderDetailRepository, OrderDetailRepository>();
 
 //unit of work
 builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
@@ -84,7 +93,7 @@ if (app.Environment.IsDevelopment())
         c.SwaggerEndpoint("/swagger/v1/swagger.json", "Your API V1");
     });
 }
-
+app.UseMiddleware<AuthorizationMiddleware>();
 app.UseHttpsRedirection();
 
 app.UseCors("NhaSachDaiThang");
