@@ -6,11 +6,11 @@ namespace NhaSachDaiThang_BE_API.Services.IServices
 {
     public interface IBookService
     {
-        Task<ServiceResult> Add(BookDto model, List<IFormFile> imageFiles);
-        Task<ServiceResult> Add(BookDto model);
+        Task<ServiceResult> AddAsync(BookDto model, List<IFormFile> imageFiles);
+        Task<ServiceResult> AddAsync(BookDto model);
         Task<ServiceResult> Delete(int id);
         Task<ServiceResult> GetAll(int? pageNumber = null, int? pageSize = null);
-        Task<ServiceResult> GetAllActive(int? pageNumber = null, int? pageSize = null);
+        Task<ServiceResult> GetAllActiveAsync(int? pageNumber = null, int? pageSize = null);
         Task<ServiceResult> GetById(int id);
         Task<ServiceResult> SoftDelete(int id);
         Task<ServiceResult> Update(BookDto model);

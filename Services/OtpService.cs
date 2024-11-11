@@ -6,6 +6,7 @@ using NhaSachDaiThang_BE_API.Models.Dtos;
 using NhaSachDaiThang_BE_API.Models.Entities;
 using NhaSachDaiThang_BE_API.Services.IServices;
 using NhaSachDaiThang_BE_API.UnitOfWork;
+using System.Text.RegularExpressions;
 namespace NhaSachDaiThang_BE_API.Services
 {
     public class OtpService :IOtpService
@@ -20,8 +21,7 @@ namespace NhaSachDaiThang_BE_API.Services
             _unitOfWork = userRepository;
 
         }
-
-        public async Task<ServiceResult> SendPasswordResetOtp( string email)
+       public static ServiceResult ValidEmail(string email) 
         {
             if (string.IsNullOrWhiteSpace(email))
             {
@@ -35,7 +35,42 @@ namespace NhaSachDaiThang_BE_API.Services
                     }
                 };
             }
+            string emailPattern = @"^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$";
 
+            if (!Regex.IsMatch(email, emailPattern)) {
+                return new ServiceResult
+                {
+                    StatusCode = 400,
+                    ApiResult = new ApiResult
+                    {
+                        Success = false,
+                        ErrMessage = "Địa chỉ email không hợp lệ"
+                    }
+                };
+            }
+            if (string.IsNullOrWhiteSpace(email))
+            {
+                return new ServiceResult
+                {
+                    StatusCode = 400,
+                    ApiResult = new ApiResult
+                    {
+                        Success = false,
+                        ErrMessage = "Email không được để trống!"
+                    }
+                };
+            }
+            return new ServiceResult
+            {
+                StatusCode = 200
+            };
+
+        }
+        public async Task<ServiceResult> SendPasswordResetOtpAsync( string email)
+        {
+            
+            var check = ValidEmail(email);
+            if (check.StatusCode == 400) return check;
             var user = _unitOfWork.UserRepository.GetByEmail(email); 
             if (user == null)
             {
@@ -73,21 +108,10 @@ namespace NhaSachDaiThang_BE_API.Services
             };
         }
 
-        public async Task<ServiceResult> SendRegistrationOtp(string email)
+        public async Task<ServiceResult> SendRegistrationOtpAsync(string email)
         {
-            if (string.IsNullOrWhiteSpace(email))
-            {
-                return new ServiceResult
-                {
-                    StatusCode = 400,
-                    ApiResult = new ApiResult
-                    {
-                        Success = false,
-                        ErrMessage = "Email không được để trống!"
-                    }
-                };
-
-            }
+            var check = ValidEmail(email);
+            if (check.StatusCode == 400) return check;
 
             var user = _unitOfWork.UserRepository.GetByEmail(email);
             if (user != null)
@@ -127,21 +151,10 @@ namespace NhaSachDaiThang_BE_API.Services
             };
         }
 
-        public async Task<ServiceResult> VerifyPasswordResetOtp( string email, string otpCode, string newPass)
+        public async Task<ServiceResult> VerifyPasswordResetOtpAsync( string email, string otpCode, string newPass)
         {
-            if (string.IsNullOrWhiteSpace(email))
-            {
-                
-                    return new ServiceResult
-                    {
-                        StatusCode = 400,
-                        ApiResult = new ApiResult
-                        {
-                            Success = false,
-                            ErrMessage = "Email không được để trống!"
-                        }
-                    };
-            }
+            var check = ValidEmail(email);
+            if (check.StatusCode == 400) return check;
 
             var  user = await _unitOfWork.UserRepository.GetByEmail(email);
             if (user == null)
@@ -167,7 +180,7 @@ namespace NhaSachDaiThang_BE_API.Services
                     ApiResult = new ApiResult
                     {
                         Success = false,
-                        ErrMessage = "Email không thuộc người dùng nào"
+                        ErrMessage = "Mã OTP sai hoặc hết hạn"
                     }
                 };
             }
@@ -176,7 +189,7 @@ namespace NhaSachDaiThang_BE_API.Services
             user.ModifyDate = DateTime.Now;
             user.ModifyBy = "User";
             await _unitOfWork.UserRepository.UpdateAsync(user);
-            _unitOfWork.SaveChangeAsync();
+            await _unitOfWork.SaveChangeAsync();
             return new ServiceResult
             {
                 StatusCode = 200,
@@ -188,7 +201,7 @@ namespace NhaSachDaiThang_BE_API.Services
             };
 
         }
-        public async Task<ServiceResult> VerifySendRegistrationOtp(RegisterModel model)
+        public async Task<ServiceResult> VerifySendRegistrationOtpAsycn(RegisterModel model)
         {
             if (string.IsNullOrWhiteSpace(model.Email))
             {

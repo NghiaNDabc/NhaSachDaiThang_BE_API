@@ -45,7 +45,7 @@ namespace NhaSachDaiThang_BE_API.Controllers
         [HttpPost("admin/login")]
         public async Task<IActionResult> AdminLogin([FromBody] LoginModel model)
         {
-            var result = await _accountService.Login(model);
+            var result = await _accountService.AdminLogin(model);
 
             return StatusCode(result.StatusCode, result.ApiResult);
         }

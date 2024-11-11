@@ -25,19 +25,19 @@ namespace NhaSachDaiThang_BE_API.Services
 
         public async Task<ServiceResult> SendOtp(string email)
         {
-            return await _otpService.SendRegistrationOtp(email);
+            return await _otpService.SendRegistrationOtpAsync(email);
         }
 
         public async  Task<ServiceResult> Register(RegisterModel model)
         {
-            return await _otpService.VerifySendRegistrationOtp(model); 
+            return await _otpService.VerifySendRegistrationOtpAsycn(model); 
         }
 
         public async Task<ServiceResult> Login(LoginModel model)
         {
             User user = await _unitOfWork.UserRepository.GetByEmail(model.UserName);
 
-            if (user == null || !BCrypt.Net.BCrypt.Verify(model.Password, user.PasswordHash))
+            if (user == null || !BCrypt.Net.BCrypt.Verify(model.Password, user.PasswordHash) || user.RoleId != 3)
             {
                 return new ServiceResult
                 {
@@ -74,7 +74,7 @@ namespace NhaSachDaiThang_BE_API.Services
         {
             var user = await _unitOfWork.UserRepository.GetByEmail(model.UserName);
 
-            if (user == null || !BCrypt.Net.BCrypt.Verify(model.Password, user.PasswordHash))
+            if (user == null || !BCrypt.Net.BCrypt.Verify(model.Password, user.PasswordHash) )
             {
                 return new ServiceResult
                 {
@@ -88,6 +88,7 @@ namespace NhaSachDaiThang_BE_API.Services
             }
 
             var token = _jwtHelper.GenerateJwtToken(user);
+            var refreshToken = _jwtHelper.GenerateRefreshToken();
             return new ServiceResult
             {
                 StatusCode = 200,
@@ -97,7 +98,8 @@ namespace NhaSachDaiThang_BE_API.Services
                     Data = new
                     {
                         User = _mapper.Map<UserDTO>(user),
-                        Token = token
+                        Token = token,
+                        RefreshToken = refreshToken
                     }
                 }
             };
@@ -107,7 +109,40 @@ namespace NhaSachDaiThang_BE_API.Services
         {
             throw new NotImplementedException();
         }
+        public async Task<ServiceResult> Logout(string refreshToken)
+        {
+            // Retrieve the user by refresh token
+            User user = await _unitOfWork.UserRepository.GetByRefreshToken(refreshToken);
 
+            if (user == null)
+            {
+                return new ServiceResult
+                {
+                    StatusCode = 400,
+                    ApiResult = new ApiResult
+                    {
+                        Success = false,
+                        ErrMessage = "Refresh token không hợp lệ hoặc đã hết hạn"
+                    }
+                };
+            }
+
+            user.RefreshToken = null;
+            user.RefreshTokenExpiryTime = null;
+
+            await _unitOfWork.UserRepository.UpdateAsync(user);
+            await _unitOfWork.SaveChangeAsync();
+
+            return new ServiceResult
+            {
+                StatusCode = 200,
+                ApiResult = new ApiResult
+                {
+                    Success = true,
+                    Message = "Đăng xuất thành công"
+                }
+            };
+        }
         public async Task<ServiceResult> GetTokenByRefreshToken(string refreshToken)
         {
             User user = await _unitOfWork.UserRepository.GetByRefreshToken(refreshToken);
@@ -129,7 +164,7 @@ namespace NhaSachDaiThang_BE_API.Services
             //var newRefreshToken = _jwtHelper.GenerateRefreshToken();
 
             //user.RefreshToken = newRefreshToken;
-            //user.RefreshTokenExpiryTime = DateTime.Now.AddDays(7); // Hoặc bất kỳ thời gian hết hạn nào bạn muốn
+            //user.RefreshTokenExpiryTime = DateTime.Now.AddDays(7); 
             //await _unitOfWork.UserRepository.UpdateAsync(user);
             //await _unitOfWork.SaveChangeAsync();
 

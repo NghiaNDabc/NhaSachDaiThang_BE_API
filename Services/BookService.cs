@@ -1,5 +1,5 @@
 ﻿using AutoMapper;
-using NhaSachDaiThang_BE_API.Helper;
+using NhaSachDaiThang_BE_API.Helper.GlobalVar;
 using NhaSachDaiThang_BE_API.Models.Dtos;
 using NhaSachDaiThang_BE_API.Models.Entities;
 using NhaSachDaiThang_BE_API.Services.IServices;
@@ -20,7 +20,7 @@ namespace NhaSachDaiThang_BE_API.Services
             _httpContextAccessor = httpContextAccessor;
             _uploadFile = uploadFile;
         }
-        public async Task<ServiceResult> Add(BookDto model, List<IFormFile> imageFiles)
+        public async Task<ServiceResult> AddAsync(BookDto model, List<IFormFile> imageFiles)
         {
 
             //if (imageFiles == null || imageFiles.Count == 0)
@@ -77,7 +77,7 @@ namespace NhaSachDaiThang_BE_API.Services
 
 
 
-        public async Task<ServiceResult> Add(BookDto model)
+        public async Task<ServiceResult> AddAsync(BookDto model)
         {
             var book = _mapper.Map<Book>(model);
             await _unitOfWork.BookRepository.AddAsync(book);
@@ -148,7 +148,7 @@ namespace NhaSachDaiThang_BE_API.Services
             };
         }
 
-        public async Task<ServiceResult> GetAllActive(int? pageNumber = null, int? pageSize = null)
+        public async Task<ServiceResult> GetAllActiveAsync(int? pageNumber = null, int? pageSize = null)
         {
             var books = await _unitOfWork.BookRepository.GetAllActiveAsync(pageNumber, pageSize);
 

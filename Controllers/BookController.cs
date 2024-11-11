@@ -43,14 +43,14 @@ namespace NhaSachDaiThang_BE_API.Controllers
                 result = await _bookService.GetActiveByNameAndCategoryIdAsync(categoryId,name, pageNumber, pageSize);
             }
             else
-                result = await _bookService.GetAllActive();
+                result = await _bookService.GetAllActiveAsync();
             return StatusCode(result.StatusCode, result.ApiResult);
         }
 
         [HttpPost]
         public async Task<ActionResult<ServiceResult>> PostBook([FromForm] BookDto bookDto, [FromForm] List<IFormFile> imageFiles)
         {
-            var result = await _bookService.Add(bookDto, imageFiles);
+            var result = await _bookService.AddAsync(bookDto, imageFiles);
             return StatusCode(result.StatusCode, result.ApiResult);
         }
 

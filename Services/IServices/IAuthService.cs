@@ -11,5 +11,6 @@ namespace NhaSachDaiThang_BE_API.Services.IServices
         Task<ServiceResult> SendOtp(string email);
         Task<ServiceResult> GetTokenByRefreshToken(string refreshToken);
         Task<User> GetCustomerByLoginModel(LoginModel model);
+        Task<ServiceResult> Logout(string refreshToken);
     }
 }

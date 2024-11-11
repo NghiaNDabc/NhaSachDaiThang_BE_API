@@ -12,7 +12,7 @@ namespace NhaSachDaiThang_BE_API.Repositories
     public class UserRepository : IUserRepository
     {
         private BookStoreContext _bookStoreContext;
-        private DbSet<User> _users;
+        private DbSet<User>? _users;
 
         public UserRepository(BookStoreContext bookStoreContext)
         {
@@ -56,7 +56,7 @@ namespace NhaSachDaiThang_BE_API.Repositories
         }
         public Task<User> GetByIdAsync(int id)
         {
-            var user = _users.Where(u => u.UserId == id).FirstOrDefaultAsync();
+            var user = _users?.Where(u => u.UserId == id).FirstOrDefaultAsync();
             return user;
         }
 
@@ -68,7 +68,7 @@ namespace NhaSachDaiThang_BE_API.Repositories
 
         public async Task<User> GetByEmail(string email)
         {
-            return await _users.FirstOrDefaultAsync(u => u.Email == email);
+            return await _users?.FirstOrDefaultAsync(u => u.Email == email);
         }
 
         public async Task<User> GetByRefreshToken(string refreshToken)

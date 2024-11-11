@@ -23,7 +23,7 @@ namespace NhaSachDaiThang_BE_API.Controllers
         [HttpPost("otp")]
         public async Task<IActionResult> SendOtp([FromBody] string email)
         {
-            var result = await _forgotPasswordService.SendPasswordResetOtp(email);
+            var result = await _forgotPasswordService.SendPasswordResetOtpAsync(email);
             return StatusCode(result.StatusCode, result.ApiResult);
         }
 
@@ -31,7 +31,7 @@ namespace NhaSachDaiThang_BE_API.Controllers
         [HttpPost("verify")]
         public async Task<IActionResult> VerifyOTP([FromBody] ForgotPassDTO forgotPassDTO)
         {
-            var result =await _forgotPasswordService.VerifyPasswordResetOtp(forgotPassDTO.email, forgotPassDTO.otpCode, forgotPassDTO.newPass);
+            var result =await _forgotPasswordService.VerifyPasswordResetOtpAsync(forgotPassDTO.email, forgotPassDTO.otpCode, forgotPassDTO.newPass);
             return StatusCode(result.StatusCode, result.ApiResult);
         }
     }
