@@ -19,6 +19,7 @@ builder.Services.AddCors(options =>
     options.AddPolicy("NhaSachDaiThang", builder =>
     {
         builder.WithOrigins("http://localhost:3000")
+        .AllowCredentials()
                .AllowAnyMethod()
                .AllowAnyHeader();
     });

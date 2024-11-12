@@ -43,22 +43,23 @@ namespace NhaSachDaiThang_BE_API.Services
         }
         public string GenerateRefreshToken()
         {
-            var randomNumber = new byte[32]; 
+            var randomNumber = new byte[32];
             using (var rng = RandomNumberGenerator.Create())
             {
-                rng.GetBytes(randomNumber); 
+                rng.GetBytes(randomNumber);
             }
 
-            return Convert.ToBase64String(randomNumber); 
+            return Convert.ToBase64String(randomNumber);
         }
         public string GenerateJwtToken(User user)
         {
             var claims = new[]
-            {
-                new Claim(JwtRegisteredClaimNames.Sub, user.FirstName),
-                new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
-                new Claim(ClaimTypes.Role, user.Role.RoleName) // Thêm claim vai trò
-            };
+                {
+                    new Claim(JwtRegisteredClaimNames.Sub, user.UserId.ToString()),
+                    new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
+                    new Claim(ClaimTypes.Name, user.FirstName),
+                    new Claim(ClaimTypes.Role, user.Role.RoleName)
+                };
 
             var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration["JwtSettings:SecretKey"]));
             var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);

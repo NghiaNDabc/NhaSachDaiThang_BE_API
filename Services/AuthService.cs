@@ -51,6 +51,8 @@ namespace NhaSachDaiThang_BE_API.Services
             }
             var token = _jwtHelper.GenerateJwtToken(user);
             var refreshToken = _jwtHelper.GenerateRefreshToken();
+            user.RefreshToken = refreshToken;
+            user.RefreshTokenExpiryTime = DateTime.Now.AddDays(7);
             await _unitOfWork.UserRepository.UpdateAsync(user);
             await _unitOfWork.SaveChangeAsync();
             return new ServiceResult
@@ -89,6 +91,10 @@ namespace NhaSachDaiThang_BE_API.Services
 
             var token = _jwtHelper.GenerateJwtToken(user);
             var refreshToken = _jwtHelper.GenerateRefreshToken();
+            user.RefreshToken = refreshToken;
+            user.RefreshTokenExpiryTime = DateTime.Now.AddDays(7);
+            await _unitOfWork.UserRepository.UpdateAsync(user);
+            await _unitOfWork.SaveChangeAsync();
             return new ServiceResult
             {
                 StatusCode = 200,
