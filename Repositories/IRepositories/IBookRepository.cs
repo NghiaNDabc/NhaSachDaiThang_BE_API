@@ -8,6 +8,9 @@ namespace NhaSachDaiThang_BE_API.Repositories.IRepositories
     {
         Task AddAsync(Book entity);
         Task DeleteAsync(int id);
+        Task <int> CountActive();
+        Task <int> CountDeactive();
+
         Task<IEnumerable<Book>> GetAllActiveAsync(int? pageNumber = null, int? pageSize = null);
         Task<Book> GetActiveByIdAsync(int id);
         Task<IEnumerable<Book>> GetAllAsync(int? pageNumber = null, int? pageSize = null);

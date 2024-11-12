@@ -15,6 +15,7 @@ namespace NhaSachDaiThang_BE_API.Services.IServices
         Task<ServiceResult> SoftDelete(int id);
         Task<ServiceResult> Update(BookDto model);
         Task<ServiceResult> Update(BookDto model, List<IFormFile> imageFiles);
+        Task<ServiceResult> Count();
         Task<ServiceResult> GetActiveById(int id);
         Task<ServiceResult> GetByNameAndCategoryIdAsync(int? categoryId = null, string? name = null, int? pageNumber = null, int? pageSize = null);
         Task<ServiceResult> GetActiveByNameAndCategoryIdAsync(int? categoryId = null, string? name = null, int? pageNumber = null, int? pageSize = null);

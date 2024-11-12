@@ -19,6 +19,7 @@ namespace NhaSachDaiThang_BE_API.Controllers
         }
 
         [HttpGet]
+        [Authorize(Roles ="Admin")]
         public async Task<IActionResult> GetBook(int? id = null,int?categoryId=null,string? name=null, int? pageNumber = null, int? pageSize = null)
         {
             ServiceResult result;
@@ -31,6 +32,14 @@ namespace NhaSachDaiThang_BE_API.Controllers
             else
                 result = await _bookService.GetAll(pageNumber, pageSize);
             return StatusCode(result.StatusCode, result.ApiResult);
+        }
+        [HttpGet("count")]
+        public async Task<IActionResult> Sum()
+        {
+            ServiceResult result = await _bookService.Count();
+            return StatusCode(result.StatusCode, result.ApiResult);
+            
+            
         }
         [HttpGet("active")]
         public async Task<IActionResult> GetAllActive(int? id = null, int? categoryId = null, string? name = null, int? pageNumber = null, int? pageSize = null)
@@ -54,7 +63,7 @@ namespace NhaSachDaiThang_BE_API.Controllers
             return StatusCode(result.StatusCode, result.ApiResult);
         }
 
-        [HttpPut("deactivate")]
+        [HttpPut("changeStatus")]
         public async Task<IActionResult> DeactiveCategory(int id)
         {
             var rs = await _bookService.SoftDelete(id);

@@ -56,7 +56,7 @@ namespace NhaSachDaiThang_BE_API.Repositories
             var book = await _books.FirstOrDefaultAsync(x => x.BookId == id);
             if (book != null)
             {
-                book.IsDel = true;
+                book.IsDel = !book.IsDel;
                 await UpdateAsync(book);
             }
 
@@ -94,6 +94,16 @@ namespace NhaSachDaiThang_BE_API.Repositories
                 query = query.Where(b => b.CategoryId == categoryid);
             }
             return await PaginationHelper.PaginateAsync(query, pageNumber, pageSize);
+        }
+
+        public Task<int> CountActive()
+        {
+            return _books.CountAsync(x=> x.IsDel == false);
+        }
+
+        public Task<int> CountDeactive()
+        {
+            return _books.CountAsync(x => x.IsDel == true);
         }
     }
 }

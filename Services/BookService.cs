@@ -195,7 +195,7 @@ namespace NhaSachDaiThang_BE_API.Services
 
             return new ServiceResult
             {
-                StatusCode = 404,
+                StatusCode = 200,
                 ApiResult = new ApiResult
                 {
                     Success = false,
@@ -322,7 +322,7 @@ namespace NhaSachDaiThang_BE_API.Services
             return books.Select(book =>
             {
                 var bookDto = _mapper.Map<BookDto>(book);
-
+                bookDto.CategoryName = book.Category?.Name;
                 // Lấy base URL từ HttpContext
                 var request = _httpContextAccessor.HttpContext?.Request;
                 var baseUrl = $"{request?.Scheme}://{request?.Host}";
@@ -437,6 +437,22 @@ namespace NhaSachDaiThang_BE_API.Services
                     Success = false,
                     Data = bookDto
 
+                }
+            };
+        }
+
+        public async Task<ServiceResult> Count()
+        {
+            return new ServiceResult
+            {
+                StatusCode = 200,
+                ApiResult = new ApiResult
+                {
+                    Data = new
+                    {
+                        ActiveBook = await _unitOfWork.BookRepository.CountActive(),
+                        DeactiveBook = await _unitOfWork.BookRepository.CountDeactive()
+                    }
                 }
             };
         }
