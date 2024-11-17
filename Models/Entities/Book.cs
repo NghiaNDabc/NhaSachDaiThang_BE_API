@@ -40,8 +40,12 @@ public partial class Book
     public string? ModifyBy { get; set; }
 
     public string? MainImage { get; set; }
-    public string? AdditionalImages { get; set; } 
+    public string? AdditionalImages { get; set; }
+    public int? BookCoverTypeId { get; set; }
+    public int? LanguageId { get; set; }
 
+    public virtual BookCoverType? BookCoverType { get; set; }
+    public virtual Language? Language { get; set; }
 
     public virtual Category? Category { get; set; }
 

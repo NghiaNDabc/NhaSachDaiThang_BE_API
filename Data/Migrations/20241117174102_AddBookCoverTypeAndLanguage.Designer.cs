@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using NhaSachDaiThang_BE_API.Data;
 
@@ -11,9 +12,11 @@ using NhaSachDaiThang_BE_API.Data;
 namespace NhaSachDaiThang_BE_API.Migrations
 {
     [DbContext(typeof(BookStoreContext))]
-    partial class BookStoreContextModelSnapshot : ModelSnapshot
+    [Migration("20241117174102_AddBookCoverTypeAndLanguage2")]
+    partial class AddBookCoverTypeAndLanguage2
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -41,7 +44,7 @@ namespace NhaSachDaiThang_BE_API.Migrations
                         .HasMaxLength(100)
                         .HasColumnType("nvarchar(100)");
 
-                    b.Property<int?>("BookCoverTypeId")
+                    b.Property<int>("BookCoverTypeId")
                         .HasColumnType("int");
 
                     b.Property<int?>("CategoryId")
@@ -66,7 +69,7 @@ namespace NhaSachDaiThang_BE_API.Migrations
                         .HasColumnType("bit")
                         .HasDefaultValue(false);
 
-                    b.Property<int?>("LanguageId")
+                    b.Property<int>("LanguageId")
                         .HasColumnType("int");
 
                     b.Property<string>("MainImage")
@@ -681,7 +684,8 @@ namespace NhaSachDaiThang_BE_API.Migrations
                     b.HasOne("NhaSachDaiThang_BE_API.Models.Entities.BookCoverType", "BookCoverType")
                         .WithMany("Books")
                         .HasForeignKey("BookCoverTypeId")
-                        .OnDelete(DeleteBehavior.Restrict);
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
 
                     b.HasOne("NhaSachDaiThang_BE_API.Models.Entities.Category", "Category")
                         .WithMany("Books")
@@ -691,7 +695,8 @@ namespace NhaSachDaiThang_BE_API.Migrations
                     b.HasOne("NhaSachDaiThang_BE_API.Models.Entities.Language", "Language")
                         .WithMany("Books")
                         .HasForeignKey("LanguageId")
-                        .OnDelete(DeleteBehavior.Restrict);
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
 
                     b.Navigation("BookCoverType");
 

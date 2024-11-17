@@ -35,6 +35,8 @@ public partial class BookStoreContext : DbContext
     public virtual DbSet<Role> Role { get; set; }
 
     public virtual DbSet<Voucher> Voucher { get; set; }
+    public DbSet<BookCoverType> BookCoverType { get; set; }
+    public DbSet<Language> Language { get; set; }
 
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
     {
@@ -114,9 +116,9 @@ public partial class BookStoreContext : DbContext
                 .WithMany(sb => sb.SupplierBooks)
                 .HasForeignKey(entity => entity.SupplierId).OnDelete(DeleteBehavior.Restrict);
 
-                entity.HasOne(db=> db.Book)
-                .WithMany(sb=> sb.SupplierBooks)
-                .HasForeignKey(sb=>sb.BookId).OnDelete(DeleteBehavior.Restrict);
+                entity.HasOne(db => db.Book)
+                .WithMany(sb => sb.SupplierBooks)
+                .HasForeignKey(sb => sb.BookId).OnDelete(DeleteBehavior.Restrict);
 
             }
         );
@@ -154,7 +156,7 @@ public partial class BookStoreContext : DbContext
             entity.Property(e => e.ModifyBy).HasMaxLength(100);
             entity.Property(e => e.ModifyDate).HasColumnType("datetime");
             entity.Property(e => e.Name).HasMaxLength(100);
-            entity.HasOne(c=>c.ParentCategory).WithMany(c=> c.SubCategories).HasForeignKey(c=>c.CategoryId).OnDelete(DeleteBehavior.Restrict);
+            entity.HasOne(c => c.ParentCategory).WithMany(c => c.SubCategories).HasForeignKey(c => c.CategoryId).OnDelete(DeleteBehavior.Restrict);
         });
 
         modelBuilder.Entity<User>(entity =>
@@ -295,8 +297,8 @@ public partial class BookStoreContext : DbContext
             //entity.Property(e => e.ModifyBy).HasMaxLength(100);
             entity.Property(e => e.ModifyDate).HasColumnType("datetime");
             //entity.Property(e => e.ReviewDate)
-                //.HasDefaultValueSql("(getdate())")
-                //.HasColumnType("datetime");
+            //.HasDefaultValueSql("(getdate())")
+            //.HasColumnType("datetime");
 
             entity.HasOne(d => d.Book).WithMany(p => p.Reviews)
                 .HasForeignKey(d => d.BookId)
@@ -332,9 +334,34 @@ public partial class BookStoreContext : DbContext
             entity.Property(e => e.ModifyBy).HasMaxLength(100);
             entity.Property(e => e.ModifyDate).HasColumnType("datetime");
         });
+        modelBuilder.Entity<BookCoverType>(entity =>
+        {
+            entity.HasKey(e => e.BookCoverTypeId).HasName("PK_BookCoverType");
+            entity.Property(e => e.Name)
+             .HasMaxLength(100)
+             .IsRequired();
+            entity.HasMany(bct => bct.Books)
+            .WithOne(b => b.BookCoverType)
+            .HasForeignKey(b => b.BookCoverTypeId)
+          .OnDelete(DeleteBehavior.Restrict);
+        });
 
         OnModelCreatingPartial(modelBuilder);
+        modelBuilder.Entity<Language>(entity =>
+        {
+            entity.HasKey(e => e.LanguageId).HasName("PK_Language");
+
+            entity.Property(e => e.Name)
+                  .HasMaxLength(100)
+                  .IsRequired();
+
+            entity.HasMany(l => l.Books)
+                  .WithOne(b => b.Language)
+                  .HasForeignKey(b => b.LanguageId)
+                  .OnDelete(DeleteBehavior.Restrict);
+        });
     }
+
 
     partial void OnModelCreatingPartial(ModelBuilder modelBuilder);
 }
