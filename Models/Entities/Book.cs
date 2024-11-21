@@ -13,7 +13,7 @@ public partial class Book
 
     public string? Publisher { get; set; }
 
-    public DateOnly? PublishDate { get; set; }
+    public int? PublishYear { get; set; }
     public int? PageCount { get; set; } 
     public string? Size { get; set; }
     public decimal? Weight { get; set; }

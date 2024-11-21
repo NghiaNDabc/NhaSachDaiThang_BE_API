@@ -6,6 +6,7 @@
         public int SupplierId { get; set; }
         public int BookId { get; set; }
         public int Quanlity { get; set; }
+        public string? Note { get; set; }   
         public DateTime? SupplyDate { get; set; } // Ngày cung cấp
 
         public decimal? SupplyPrice { get; set; } // Giá cung cấp

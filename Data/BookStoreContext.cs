@@ -86,7 +86,7 @@ public partial class BookStoreContext : DbContext
             entity.Property(e => e.ModifyDate).HasColumnType("datetime");
             entity.Property(e => e.Price).HasColumnType("decimal(18, 2)");
             entity.Property(e => e.Publisher).HasMaxLength(100);
-
+            entity.Property(e => e.PublishYear);
             entity.Property(e => e.Title).HasMaxLength(200);
 
             entity.HasOne(d => d.Category).WithMany(p => p.Books)
@@ -106,6 +106,7 @@ public partial class BookStoreContext : DbContext
                 entity.Property(e => e.SupplyDate).HasColumnType("datetime").IsRequired(false);
                 entity.Property(e => e.SupplyPrice).HasColumnType("decimal(18, 2)").IsRequired(false);
                 entity.Property(e => e.Quanlity).HasColumnName("Quantity");
+                entity.Property(e => e.Note).HasColumnName("Note").HasColumnType("nvarchar(max)");
                 entity.Property(e => e.ModifyBy).HasMaxLength(100);
                 entity.Property(e => e.ModifyDate).HasColumnType("datetime");
                 entity.Property(e => e.CreatedBy).HasMaxLength(100);
@@ -132,9 +133,7 @@ public partial class BookStoreContext : DbContext
                   .IsRequired(false);
                 entity.Property(e => e.Address).HasMaxLength(30).IsRequired(false);
                 entity.Property(e => e.Phone).HasMaxLength(15).IsRequired(false);
-                entity.Property(e => e.IsDel).HasDefaultValue(false);
-                entity.Property(e => e.ModifyBy).HasMaxLength(100);
-                entity.Property(e => e.ModifyDate).HasColumnType("datetime");
+                entity.Property(e => e.Note).HasColumnName("Note").HasColumnType("nvarchar(max)");
                 entity.Property(e => e.CreatedBy).HasMaxLength(100);
                 entity.Property(e => e.CreatedDate)
                     .HasDefaultValueSql("(getdate())")
@@ -184,6 +183,7 @@ public partial class BookStoreContext : DbContext
             entity.Property(e => e.PasswordHash).HasMaxLength(255);
             entity.Property(e => e.Phone).HasMaxLength(15);
             entity.Property(e => e.RoleId).HasColumnName("RoleID");
+            entity.Property(e => e.IsDel).HasDefaultValue(false);
 
             entity.HasOne(d => d.Role).WithMany(p => p.Customers)
                 .HasForeignKey(d => d.RoleId)
@@ -202,6 +202,7 @@ public partial class BookStoreContext : DbContext
                 .HasDefaultValueSql("(getdate())")
                 .HasColumnType("datetime");
             entity.Property(e => e.UserId).HasColumnName("UserId");
+            entity.Property(e => e.RecipientName).HasMaxLength(50);
             entity.Property(e => e.Phone).HasColumnName("Phone").HasMaxLength(15);
             entity.Property(e => e.ShippingAddress).HasColumnName("ShippingAddress").HasMaxLength(100);
             entity.Property(e => e.PaymentMethod).HasColumnName("PaymentMethod").HasMaxLength(60);
