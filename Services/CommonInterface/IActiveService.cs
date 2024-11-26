@@ -6,7 +6,7 @@ namespace NhaSachDaiThang_BE_API.Services.CommonInterface
     {
         Task<ServiceResult> GetAllActive(int? pageNumber = null, int? pageSize = null);
         Task<ServiceResult> GetActiveById(int id);
-        Task<ServiceResult> SoftDelete(int id);
+        Task<ServiceResult> ChangStatus(int id);
         Task<ServiceResult> GetActiveByName(string name, int? pageNumber = null, int? pageSize = null);
     }
 }

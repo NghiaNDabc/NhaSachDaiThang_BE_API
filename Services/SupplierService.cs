@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using NhaSachDaiThang_BE_API.Helper;
 using NhaSachDaiThang_BE_API.Models.Dtos;
 using NhaSachDaiThang_BE_API.Models.Entities;
 using NhaSachDaiThang_BE_API.Services.IServices;
@@ -22,7 +23,7 @@ namespace NhaSachDaiThang_BE_API.Services
 
         public async Task<ServiceResult> Add(SupplierDto model)
         {
-            var find = await _unitOfWork.SupplierRepository.GetByNameAsync(model.Name);
+            var find = await _unitOfWork.SupplierRepository.GetByFilterAsync(model.Name);
             if (find.Count() > 0)
             {
 
@@ -39,15 +40,7 @@ namespace NhaSachDaiThang_BE_API.Services
             var supplier = _mapper.Map<Supplier>(model);
             await _unitOfWork.SupplierRepository.AddAsync(supplier);
             await _unitOfWork.SaveChangeAsync();
-            return new ServiceResult
-            {
-                StatusCode = 200,
-                ApiResult = new ApiResult
-                {
-                    Success = true,
-                    Message = "Thêm nhà cung cấp mới thành công!"
-                }
-            };
+            return ServiceResultFactory.Created("Thêm nhà cung cấp mới thành công!");
         }
 
         public async Task<ServiceResult> Delete(int id)
@@ -133,9 +126,9 @@ namespace NhaSachDaiThang_BE_API.Services
             };
         }
 
-        public async Task<ServiceResult> GetByNameAsync(string name, int? pageNumber = null, int? pageSize = null)
+        public async Task<ServiceResult> GetByFilterAsync(string name, bool? isDel = null, int? pageNumber = null, int? pageSize = null)
         {
-            var suppliers = await _unitOfWork.SupplierRepository.GetByNameAsync(name, pageNumber, pageSize);
+            var suppliers = await _unitOfWork.SupplierRepository.GetByFilterAsync(name, isDel, pageNumber, pageSize);
 
             if (suppliers == null || !suppliers.Any())
             {
@@ -159,7 +152,7 @@ namespace NhaSachDaiThang_BE_API.Services
             };
         }
 
-        public async Task<ServiceResult> SoftDelete(int id)
+        public async Task<ServiceResult> ChangeStatus(int id)
         {
             if (await _unitOfWork.SupplierRepository.GetByIdAsync(id) != null)
             {
@@ -173,7 +166,7 @@ namespace NhaSachDaiThang_BE_API.Services
                     }
                 };
             }
-            await _unitOfWork.SupplierRepository.SoftDelete(id);
+            await _unitOfWork.SupplierRepository.ChangeStatusAsync(id);
             await _unitOfWork.SaveChangeAsync();
             return new ServiceResult
             {
@@ -191,29 +184,14 @@ namespace NhaSachDaiThang_BE_API.Services
             var supplier = await _unitOfWork.SupplierRepository.GetByIdAsync(model.SupplierId);
             if (supplier == null)
             {
-                return new ServiceResult
-                {
-                    StatusCode = 400,
-                    ApiResult = new ApiResult
-                    {
-                        Success = false,
-                        ErrMessage = "Không tìm thấy nhà cung cấp cần update"
-                    }
-                };
+                return ServiceResultFactory.NotFound("Không tìm thấy nhà cung cấp cần update");
+                
             }
             UpdateSupplierFromDto(supplier, model);
+            supplier.ModifyDate =  DateTime.Now;
             await _unitOfWork.SupplierRepository.UpdateAsync(supplier);
             await _unitOfWork.SaveChangeAsync();
-            return new ServiceResult
-            {
-                StatusCode = 200,
-                ApiResult = new ApiResult
-                {
-                    Success = true,
-                    Message = "Update nhà cung cấp thành công!",
-                    Data = model
-                }
-            };
+            return ServiceResultFactory.Ok("\"Update nhà cung cấp thành công!\"");
         }
         void UpdateSupplierFromDto(Supplier supplier, SupplierDto supplierDto)
         {

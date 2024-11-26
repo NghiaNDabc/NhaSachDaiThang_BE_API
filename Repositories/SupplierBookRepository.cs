@@ -27,30 +27,27 @@ namespace NhaSachDaiThang_BE_API.Repositories
                 _supplierBooks.Remove(item);
             }
         }
-        public async Task<IEnumerable<SupplierBook>> GetByIdAsync(int? supplierid=null, int? bookid=null)
+        public async Task<IEnumerable<SupplierBook>> GetByIdAsync(int supplierId)
         {
-            IQueryable<SupplierBook> query = _supplierBooks;
-            if (supplierid != null)
-            {
-                query = query.Where(x=>x.SupplierId == supplierid);
-            }
-            if (bookid != null)
-            {
-                query = query.Where(x => x.BookId == bookid);
-            }
-
-            return await query.ToListAsync() ;
+            return await _supplierBooks.Where(x=>x.SupplierId== supplierId).ToListAsync();
         }
-        public async Task<IEnumerable<SupplierBook>> GetAllAsync(int? pageNumber = null, int? pageSize = null)
+        public async Task<IEnumerable<SupplierBook>> GetAllAsync()
         {
             var query = _supplierBooks;
-            return await PaginationHelper.PaginateAsync(query, pageNumber, pageSize);
+            return query;
         }
 
-        public async Task<IEnumerable<SupplierBook>> GetByNameAsync(string bookName = null, string supplierName = null, int? pageNumber = null, int? pageSize = null)
+        public async Task<IEnumerable<SupplierBook>> GetByFilterAsync(int? bookId = null, int? supplierId = null, string? bookName = null, string? supplierName = null, DateTime? minDate = null, DateTime? maxDate = null)
         {
             IQueryable<SupplierBook> query = _supplierBooks;
-
+            if (bookId.HasValue)
+            {
+                query = query.Where(x => x.BookId == bookId.Value);
+            }
+            if (supplierId.HasValue)
+            {
+                query = query.Where(x => x.SupplierId == supplierId.Value);
+            }
             if (!string.IsNullOrEmpty(bookName))
             {
                 query = query.Where(x => x.Book.Title.Contains(bookName));
@@ -60,8 +57,15 @@ namespace NhaSachDaiThang_BE_API.Repositories
             {
                 query = query.Where(x => x.Supplier.Name.Contains(supplierName));
             }
-
-            return await PaginationHelper.PaginateAsync(query, pageNumber, pageSize);
+            if (minDate.HasValue)
+            {
+                query = query.Where(x => x.SupplyDate.Value >= minDate.Value);
+            }
+            if (maxDate.HasValue)
+            {
+                query = query.Where(x => x.SupplyDate.Value <= maxDate.Value);
+            }
+            return query;
         }
 
 
@@ -71,6 +75,13 @@ namespace NhaSachDaiThang_BE_API.Repositories
             {
                 _supplierBooks.Update(entity);
             }
+        }
+
+        public async Task<int> GetNextSupplierBookIdAsync()
+        {
+            var maxSupplierBookId = await _supplierBooks.MaxAsync(sb => (int?)sb.SupplierBookId) ?? 0;
+            return maxSupplierBookId+1;
+
         }
     }
 }

@@ -75,7 +75,7 @@ namespace NhaSachDaiThang_BE_API.Services
             }
         }
 
-        public async Task<ServiceResult> Delete(int id)
+        public async Task<ServiceResult> DeleteAsync(int id)
         {
             var order = await _unitOfWork.OrderRepository.GetByIdAsync(id);
             if (order != null)
@@ -94,27 +94,9 @@ namespace NhaSachDaiThang_BE_API.Services
 
                 await _unitOfWork.OrderRepository.DeleteAsync(id);
                 await _unitOfWork.SaveChangeAsync();
-                return new ServiceResult
-                {
-                    StatusCode = 200,
-                    ApiResult = new ApiResult
-                    {
-                        Success = true,
-                        Message = "Xóa đơn hàng thành công",
-                        Data = order
-                    }
-                };
+                return ServiceResultFactory.Ok("Xóa đơn hàng thành công");
             }
-            return new ServiceResult
-            {
-                StatusCode = 404,
-                ApiResult = new ApiResult
-                {
-                    Success = false,
-                    ErrMessage = "Không tìm thấy đơn hàng cần xóa",
-                    Data = order
-                }
-            };
+            return ServiceResultFactory.NotFound("Không tìm thấy đơn hàng cần xóa");
 
         }
 
@@ -164,7 +146,7 @@ namespace NhaSachDaiThang_BE_API.Services
             return ServiceResultFactory.NotFound("Không tìm thấy đơn hàng nào");
         }
 
-        public async Task<ServiceResult> Update(OrderDto model)
+        public async Task<ServiceResult> UpdateAsync(OrderDto model)
         {
             var order = await _unitOfWork.OrderRepository.GetByIdAsync(model.OrderId);
             if (order == null) return ServiceResultFactory.NotFound();

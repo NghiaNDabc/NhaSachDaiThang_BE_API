@@ -11,8 +11,8 @@ namespace NhaSachDaiThang_BE_API.Services.IServices
         Task<ServiceResult> Delete(int id);
         Task<ServiceResult> GetAll(int? pageNumber = null, int? pageSize = null);
         Task<ServiceResult> GetById(int id);
-        Task<ServiceResult> GetByNameAsync(string name, int? pageNumber = null, int? pageSize = null);
-        Task<ServiceResult> SoftDelete(int id);
+        Task<ServiceResult> GetByFilterAsync(string name, bool?isDel = null, int? pageNumber = null, int? pageSize = null);
+        Task<ServiceResult> ChangeStatus(int id);
         Task<ServiceResult> Update(SupplierDto model);
     }
 }

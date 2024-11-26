@@ -8,16 +8,16 @@ namespace NhaSachDaiThang_BE_API.Services.IServices
     {
         Task<ServiceResult> AddAsync(BookDto model, List<IFormFile> imageFiles);
         Task<ServiceResult> AddAsync(BookDto model);
-        Task<ServiceResult> Delete(int id);
-        Task<ServiceResult> GetAll(int? pageNumber = null, int? pageSize = null);
+        Task<ServiceResult> DeleteAsync(int id);
+        Task<ServiceResult> GetAllAsync(int? pageNumber = null, int? pageSize = null);
         Task<ServiceResult> GetAllActiveAsync(int? pageNumber = null, int? pageSize = null);
-        Task<ServiceResult> GetById(int id);
-        Task<ServiceResult> SoftDelete(int id);
-        Task<ServiceResult> Update(BookDto model);
-        Task<ServiceResult> Update(BookDto model, List<IFormFile> imageFiles);
-        Task<ServiceResult> Count();
-        Task<ServiceResult> GetActiveById(int id);
-        Task<ServiceResult> GetByNameAndCategoryIdAsync(int? categoryId = null, string? name = null, int? pageNumber = null, int? pageSize = null);
-        Task<ServiceResult> GetActiveByNameAndCategoryIdAsync(int? categoryId = null, string? name = null, int? pageNumber = null, int? pageSize = null);
+        Task<ServiceResult> GetByIdAsync(int id);
+        Task<ServiceResult> ChangStatusAsync(int id);
+        Task<ServiceResult> UpdateAsync(BookDto model);
+        Task<ServiceResult> UpdateAync(BookDto model, List<IFormFile> imageFiles);
+        Task<ServiceResult> CountAsync();
+        Task<ServiceResult> GetActiveByIdAsync(int id);
+        Task<ServiceResult> GetByFilterAsync(int? categoryid = null, string? categoryName = null, decimal? minPrice = null, decimal? maxPrice = null, string? bookName = null, int? minQuality = null, int? maxQuanlity = null, bool? isPromotion = null, int? languageId = null, int? bookCoverTypeId = null, int? pageNumber = null, int? pageSize = null);
+        Task<ServiceResult> GetActiveByFilterAsync(int? categoryid = null, string? categoryName = null, decimal? minPrice = null, decimal? maxPrice = null, string? bookName = null, int? minQuality = null, int? maxQuanlity = null, bool? isPromotion = null, int? languageId = null, int? bookCoverTypeId = null, int? pageNumber = null, int? pageSize = null);
     }
 }

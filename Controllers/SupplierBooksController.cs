@@ -12,7 +12,7 @@ using NhaSachDaiThang_BE_API.Services.IServices;
 
 namespace NhaSachDaiThang_BE_API.Controllers
 {
-    [Route("api/[controller]")]
+    [Route("api/v1/[controller]")]
     [ApiController]
     public class SupplierBooksController : ControllerBase
     {
@@ -25,14 +25,17 @@ namespace NhaSachDaiThang_BE_API.Controllers
 
         // GET: api/SupplierBooks
         [HttpGet]
-        public async Task<ActionResult> GetSupplierBook(int? supplierId = null, int? bookId = null, string? supplierName = null, string? bookname = null, int? pageNumber = null, int? pageSize = null)
+        public async Task<ActionResult> GetSupplierBook(int?supplierBookId=null,int? supplierId = null,  string? supplierName = null, string? bookname = null, DateTime? minSupplyDate = null, DateTime? maxSupplyDate = null, int? pageNumber = null, int? pageSize = null)
         {
             ServiceResult serviceResult;
-            if (supplierId.HasValue || bookId.HasValue)
+            if (supplierId.HasValue)
             {
-                serviceResult = await _supplierBookService.GetByIdAsync(bookId.Value, supplierId.Value, pageNumber, pageSize);
+                serviceResult = await _supplierBookService.GetBySuppierIdAsync(supplierId.Value);
             }
-            else if (!string.IsNullOrEmpty(supplierName) || !string.IsNullOrEmpty(bookname) ){ serviceResult = await _supplierBookService.GetByNameAsync(bookname, supplierName, pageNumber, pageSize); }
+            else if (!string.IsNullOrEmpty(supplierName) || !string.IsNullOrEmpty(bookname))
+            {
+                serviceResult = await _supplierBookService.GetByFilterAsync(supplierId, null, bookname, supplierName, minSupplyDate, maxSupplyDate, pageNumber, pageSize);
+            }
             else
                 serviceResult = await _supplierBookService.GetAll(pageNumber, pageSize);
             return StatusCode(serviceResult.StatusCode, serviceResult.ApiResult);
@@ -40,19 +43,19 @@ namespace NhaSachDaiThang_BE_API.Controllers
 
 
 
-        [HttpPut]
-        public async Task<IActionResult> PutSupplierBook( SupplierBookDto supplierBook)
-        {
-            var rs = await _supplierBookService.Update(supplierBook);
-            return StatusCode(rs.StatusCode, rs.ApiResult); 
-        }
+        //[HttpPut]
+        //public async Task<IActionResult> PutSupplierBook(SupplierBookDto supplierBook)
+        //{
+        //    var rs = await _supplierBookService.Update(supplierBook);
+        //    return StatusCode(rs.StatusCode, rs.ApiResult);
+        //}
 
         // POST: api/SupplierBooks
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPost]
-        public async Task<ActionResult<SupplierBook>> PostSupplierBook(SupplierBookDto supplierBook)
+        public async Task<ActionResult<SupplierBook>> PostSupplierBook(IEnumerable<SupplierBookDto> supplierBook)
         {
-            var rs = await _supplierBookService.Add(supplierBook);
+            var rs = await _supplierBookService.AddRangeAsync(supplierBook);
             return StatusCode(rs.StatusCode, rs.ApiResult);
         }
 

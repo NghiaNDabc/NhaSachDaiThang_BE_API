@@ -43,13 +43,15 @@ namespace NhaSachDaiThang_BE_API.Repositories
             return rs;
         }
 
-        public async Task<IEnumerable<Supplier>> GetByNameAsync(string name, int? pageNumber = null, int? pageSize = null)
+        public async Task<IEnumerable<Supplier>> GetByFilterAsync(string? name = null,bool? isDel=null, int? pageNumber = null, int? pageSize = null)
         {
-            var query =  _supplierSet.Where(x => x.Name.Contains(name));
+            IQueryable<Supplier> query = _supplierSet;
+            if(!string.IsNullOrEmpty(name)) query =  query.Where(x => x.Name.Contains(name));
+            if (isDel.HasValue) query = query.Where(x =>(bool) x.IsDel.Value == (bool) isDel.Value);
             return await PaginationHelper.PaginateAsync(query, pageNumber, pageSize);
         }
 
-        public async Task SoftDelete(int id)
+        public async Task ChangeStatusAsync(int id)
         {
             var rs = await _supplierSet.FirstOrDefaultAsync(x => x.SupplierId == id);
             if (rs != null) {

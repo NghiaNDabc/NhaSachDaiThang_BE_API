@@ -7,10 +7,11 @@ namespace NhaSachDaiThang_BE_API.Repositories.IRepositories
     {
         Task AddAsync(SupplierBook entity);
         Task DeleteAsync(int id);
-        Task<IEnumerable<SupplierBook>> GetByIdAsync(int? supplierid = null, int? bookid = null);
-        Task<IEnumerable<SupplierBook>> GetAllAsync(int? pageNumber = null, int? pageSize = null);
-        Task<IEnumerable<SupplierBook>> GetByNameAsync(string bookName = null, string supplierName = null, int? pageNumber = null, int? pageSize = null);
+        Task<IEnumerable<SupplierBook>> GetByIdAsync(int supplierbookid);
+        Task<IEnumerable<SupplierBook>> GetAllAsync();
+        Task<IEnumerable<SupplierBook>> GetByFilterAsync(int?bookId=null, int?supplierId=null,string? bookName = null, string? supplierName = null, DateTime? minDate = null, DateTime? maxDate = null);
         Task UpdateAsync(SupplierBook entity);
+        Task<int> GetNextSupplierBookIdAsync();
 
 
     }

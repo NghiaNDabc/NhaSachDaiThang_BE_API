@@ -6,7 +6,7 @@ using NhaSachDaiThang_BE_API.Services.IServices;
 
 namespace NhaSachDaiThang_BE_API.Controllers
 {
-    [Route("api/[controller]")]
+    [Route("api/v1/[controller]")]
     [ApiController]
     public class SuppliersController : ControllerBase
     {
@@ -19,16 +19,16 @@ namespace NhaSachDaiThang_BE_API.Controllers
 
         // GET: api/Suppliers
         [HttpGet]
-        public async Task<ActionResult> GetSupplier(int? id = null, string? name = null, int? pageNumber = null, int? pageSize = null)
+        public async Task<ActionResult> Get(int? id = null, string? name = null,bool? isDel =null, int? pageNumber = null, int? pageSize = null)
         {
             ServiceResult result;
             if (id.HasValue)
             {
                 result = await _supplierService.GetById(id.Value);
             }
-            else if (!string.IsNullOrEmpty(name))
+            else if (!string.IsNullOrEmpty(name) || isDel.HasValue)
             {
-                result = await _supplierService.GetByNameAsync(name);
+                result = await _supplierService.GetByFilterAsync(name, isDel);
             }
             else result = await _supplierService.GetAll(pageNumber, pageSize);
             return StatusCode(result.StatusCode, result.ApiResult);
@@ -36,15 +36,15 @@ namespace NhaSachDaiThang_BE_API.Controllers
 
 
         [HttpPut]
-        public async Task<IActionResult> PutSupplier(SupplierDto supplier)
+        public async Task<IActionResult> Put(SupplierDto supplier)
         {
             var result = await _supplierService.Update(supplier);
             return StatusCode(result.StatusCode, result.ApiResult);
         }
-        [HttpPut("deactivate")]
-        public async Task<IActionResult> DeactivateUser(int id)
+        [HttpPut("changestatus")]
+        public async Task<IActionResult> ChangeStatus(int id)
         {
-            var rs = await _supplierService.SoftDelete(id);
+            var rs = await _supplierService.ChangeStatus(id);
 
             return StatusCode(rs.StatusCode, rs.ApiResult);
         }
@@ -57,17 +57,12 @@ namespace NhaSachDaiThang_BE_API.Controllers
         }
 
         // DELETE: api/Suppliers?id=1
-        [HttpDelete]
+        [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteSupplier(int id)
         {
             var rs = await _supplierService.Delete(id);
 
             return StatusCode(rs.StatusCode, rs.ApiResult);
         }
-
-        //private bool SupplierExists(int id)
-        //{
-        //    return _context.Supplier.Any(e => e.SupplierId == id);
-        //}
     }
 }

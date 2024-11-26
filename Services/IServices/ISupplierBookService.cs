@@ -6,12 +6,12 @@ namespace NhaSachDaiThang_BE_API.Services.IServices
 {
     public interface ISupplierBookService
     {
-        Task<ServiceResult> Add(SupplierBookDto model);
+        Task<ServiceResult> AddRangeAsync(IEnumerable<SupplierBookDto> models);
         Task<ServiceResult> Delete(int id);
         Task<ServiceResult> GetAll(int? pageNumber = null, int? pageSize = null);
-        Task<ServiceResult> GetByIdAsync(int? bookId = null, int? supplierId = null, int? pageNumber = null, int? pageSize = null);
-        Task<ServiceResult> GetByNameAsync(string bookName = null, string supplierName = null, int? pageNumber = null, int? pageSize = null);
-        Task<ServiceResult> Update(SupplierBookDto model);
+        Task<ServiceResult> GetBySuppierIdAsync(int supplierBookId, int? pageNumber = null, int? pageSize = null);
+        Task<ServiceResult> GetByFilterAsync(int? supplierId = null, int? bookId = null, string? bookName = null, string? supplierName = null, DateTime? minDate = null, DateTime? maxDate = null, int? pageNumber = null, int? pageSize = null);
+        //Task<ServiceResult> Update(SupplierBookDto model);
     }
 
 }

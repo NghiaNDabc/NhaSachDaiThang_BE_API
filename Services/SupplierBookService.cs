@@ -4,6 +4,9 @@ using NhaSachDaiThang_BE_API.Models.Dtos;
 using NhaSachDaiThang_BE_API.Models.Entities;
 using NhaSachDaiThang_BE_API.Services.IServices;
 using NhaSachDaiThang_BE_API.UnitOfWork;
+using System.Drawing.Printing;
+using System.Net;
+using System.Text;
 
 namespace NhaSachDaiThang_BE_API.Services
 {
@@ -17,62 +20,87 @@ namespace NhaSachDaiThang_BE_API.Services
             _unitOfWork = unitOfWork;
             _mapper = mapper;
         }
-
-        public async Task<ServiceResult> Add(SupplierBookDto model)
+        public string Validate(SupplierBookDto model)
         {
+            StringBuilder errorMessages = new StringBuilder();
+
            
-            var supplier = _mapper.Map<SupplierBook>(model);
-            await _unitOfWork.SupplierBookRepository.AddAsync(supplier);
-            var book =  await _unitOfWork.BookRepository.GetByIdAsync(supplier.BookId);
-            book.Quantity += supplier.Quanlity;
-            await _unitOfWork.BookRepository.UpdateAsync(book);
-            await _unitOfWork.SaveChangeAsync();
-            return new ServiceResult
+            if (model.SupplierId <= 0)
             {
-                StatusCode = 200,
-                ApiResult = new ApiResult
+                errorMessages.AppendLine("SupplierId phải là số dương.");
+            }
+
+            if (model.BookId <= 0)
+            {
+                errorMessages.AppendLine("BookId phải là số dương.");
+            }
+
+            if (model.Quantity < 0)
+            {
+                errorMessages.AppendLine("Số lượng không được nhỏ hơn 0.");
+            }
+            return errorMessages.ToString().Trim();
+        }
+        public async Task<ServiceResult> AddRangeAsync(IEnumerable<SupplierBookDto> models)
+        {
+            foreach (var model in models)
+            {
+                string errmes = Validate(model);
+                if (!string.IsNullOrEmpty(errmes))
+                    return ServiceResultFactory.BadRequest(errmes);
+            }
+            using (var transaction = await _unitOfWork.BeginTransactionAsync())
+            {
+                int nextid = await _unitOfWork.SupplierBookRepository.GetNextSupplierBookIdAsync();
+                try
                 {
-                    Success = true,
-                    Message = "Nhập hàng mới thành công!"
+                    foreach (var model in models)
+                    {
+                        var supplierbook = _mapper.Map<SupplierBook>(model);
+                        supplierbook.SupplierBookId = nextid;
+                        await _unitOfWork.SupplierBookRepository.AddAsync(supplierbook);
+                        var book = await _unitOfWork.BookRepository.GetByIdAsync(supplierbook.BookId);
+                        book.Quantity = (book.Quantity ?? 0) + supplierbook.Quantity;
+                        await _unitOfWork.BookRepository.UpdateAsync(book);
+                    }
+
+                    await _unitOfWork.SaveChangeAsync();
+                    await transaction.CommitAsync();
+                    return ServiceResultFactory.Created("Nhập hàng mới thành công!");
                 }
-            };
+                catch (Exception ex)
+                {
+                    await transaction.RollbackAsync();
+                    return ServiceResultFactory.BadRequest();
+                }
+            }
         }
 
         public async Task<ServiceResult> Delete(int id)
         {
-            var item = (await _unitOfWork.SupplierBookRepository.GetByIdAsync(id)).FirstOrDefault();
-            if (item == null)
+            var item = (await _unitOfWork.SupplierBookRepository.GetByIdAsync(id));
+            if (item == null || item.Count() == 0)
             {
-                return new ServiceResult
-                {
-                    StatusCode = 404,
-                    ApiResult = new ApiResult
-                    {
-                        Success = false,
-                        ErrMessage = "Không đơn nhập hàng cấp cần xóa"
-                    }
-                };
+                ServiceResultFactory.NotFound("Không đơn nhập hàng cấp cần xóa");
             }
-            using (var transaction =await _unitOfWork.BeginTransactionAsync()) {
+            using (var transaction = await _unitOfWork.BeginTransactionAsync())
+            {
                 try
                 {
                     await _unitOfWork.SupplierRepository.DeleteAsync(id);
-                    var book = await _unitOfWork.BookRepository.GetByIdAsync(item.BookId);
-                    book.Quantity -= item.Quanlity;
-                    await _unitOfWork.BookRepository.UpdateAsync(book);
+                    foreach (var suply in item)
+                    {
+                        var book = await _unitOfWork.BookRepository.GetByIdAsync(suply.BookId);
+                        book.Quantity -= suply.Quantity;
+                        if (book.Quantity < 0) throw new Exception();
+                        await _unitOfWork.BookRepository.UpdateAsync(book);
+                    }
                     await _unitOfWork.SaveChangeAsync();
                     await transaction.CommitAsync();
-                    return new ServiceResult
-                    {
-                        StatusCode = 200,
-                        ApiResult = new ApiResult
-                        {
-                            Success = true,
-                            Message = "Xóa nhà cung cấp thành công!"
-                        }
-                    };
+                    return ServiceResultFactory.Ok("Xóa nhà cung cấp thành công!");
                 }
-                catch (Exception ex) {
+                catch (Exception ex)
+                {
                     await transaction.RollbackAsync();
                     return new ServiceResult
                     {
@@ -89,156 +117,161 @@ namespace NhaSachDaiThang_BE_API.Services
 
         public async Task<ServiceResult> GetAll(int? pageNumber = null, int? pageSize = null)
         {
-            var supplierBooks = await _unitOfWork.SupplierBookRepository.GetAllAsync(pageNumber, pageSize);
+            var supplierBooks = await _unitOfWork.SupplierBookRepository.GetAllAsync();
 
             if (supplierBooks == null || !supplierBooks.Any())
             {
                 return new ServiceResult
                 {
-                    StatusCode = 404,
+                    StatusCode = 204,
                     ApiResult = new ApiResult { Success = false, ErrMessage = "Không tim thấy đơn nhập hàng nào" }
                 };
             }
 
-            // Chuyển đổi dữ liệu sách sang DTO
-            var supplierBooksDto = _mapper.Map<SupplierBookDto>(supplierBooks);
+            var supplierBookDtos = _mapper.Map<IEnumerable<SupplierBookDto>>(supplierBooks);
 
-            return new ServiceResult
-            {
-                StatusCode = 200,
-                ApiResult = new ApiResult
+            var groupData = supplierBookDtos.GroupBy(sb => new { sb.SupplierBookId, sb.SupplierName,sb.SupplyDate }).Select(
+
+                g => new
                 {
-                    Success = true,
-                    Data = supplierBooksDto
-                }
-            };
-        }
-
-        public async Task<ServiceResult> GetByIdAsync(int? bookId = null, int? supplierid = null, int? pageNumber = null, int? pageSize = null)
-        {
-            IEnumerable<SupplierBook> query = await _unitOfWork.SupplierBookRepository.GetAllAsync();
-            if (bookId.HasValue)
-            {
-                query = query.Where(x => x.BookId==bookId);
-            }
-
-            if (supplierid.HasValue)
-            {
-                query = query.Where(x => x.SupplierId == supplierid);
-            }
-            if (query == null || !query.Any())
-            {
-                return new ServiceResult
-                {
-                    StatusCode = 404,
-                    ApiResult = new ApiResult { Success = false, ErrMessage = "Không tìm thấy đơn nhập hàng nào" }
-                };
-            }
-            if (pageNumber == null || pageNumber <= 0 || pageSize == null || pageSize <= 0)
-            {
-            }
-            else
-            {
-                int defaultPageSize = 10;
-                int pageNum = pageNumber ?? 1;
-                int size = pageSize ?? defaultPageSize;
-
-                int skip = (pageNum - 1) * size;
-                query = query.Skip(skip).Take(size);
-            }
-            // Chuyển đổi dữ liệu SupplierBook sang DTO
-            var supplierBookDtos = _mapper.Map<IEnumerable<SupplierBookDto>>(query);
-
-            return new ServiceResult
-            {
-                StatusCode = 200,
-                ApiResult = new ApiResult
-                {
-                    Success = true,
-                    Data = supplierBookDtos
-                }
-            };
-        }
-        public async Task<ServiceResult> GetByNameAsync(string bookName = null, string supplierName = null, int? pageNumber = null, int? pageSize = null)
-        {
-            IEnumerable<SupplierBook> query = await _unitOfWork.SupplierBookRepository.GetAllAsync();
-            if (!string.IsNullOrEmpty(bookName))
-            {
-                query = query.Where(x => x.Book.Title.Contains(bookName));
-            }
-
-            if (!string.IsNullOrEmpty(supplierName))
-            {
-                query = query.Where(x => x.Supplier.Name.Contains(supplierName));
-            }
-            if (query == null || !query.Any())
-            {
-                return new ServiceResult
-                {
-                    StatusCode = 404,
-                    ApiResult = new ApiResult { Success = false, ErrMessage = "Không tìm thấy đơn nhập hàng nào" }
-                };
-            }
-            if (pageNumber == null || pageNumber <= 0 || pageSize == null || pageSize <= 0)
-            {
-            }
-            else
-            {
-                int defaultPageSize = 10;
-                int pageNum = pageNumber ?? 1;
-                int size = pageSize ?? defaultPageSize;
-
-                int skip = (pageNum - 1) * size;
-                query =  query.Skip(skip).Take(size);
-            }
-            // Chuyển đổi dữ liệu SupplierBook sang DTO
-            var supplierBookDtos = _mapper.Map<IEnumerable<SupplierBookDto>>(query);
-
-            return new ServiceResult
-            {
-                StatusCode = 200,
-                ApiResult = new ApiResult
-                {
-                    Success = true,
-                    Data = supplierBookDtos
-                }
-            };
-        }
-
-        public async Task<ServiceResult> Update(SupplierBookDto model)
-        {
-            var supplier = (await _unitOfWork.SupplierBookRepository.GetByIdAsync(model.SupplierId, model.BookId)).FirstOrDefault();
-            if (supplier == null)
-            {
-                return new ServiceResult
-                {
-                    StatusCode = 400,
-                    ApiResult = new ApiResult
+                    g.Key.SupplierBookId,
+                    g.Key.SupplierName,
+                    g.Key.SupplyDate,
+                    Books = g.Select(x => new
                     {
-                        Success = false,
-                        ErrMessage = "Không tìm thấy nhà cung cấp cần update"
-                    }
+                        x.BookId,
+                        x.Quantity,
+                        
+                        x.SupplyPrice
+                    }).ToList()
+                });
+            var paged = PaginationHelper.Paginate(groupData, pageNumber, pageSize);
+            return new ServiceResult
+            {
+                StatusCode = 200,
+                ApiResult = new ApiResult
+                {
+                    Success=true,
+                    Count = groupData.Count(),
+                    Data = paged
+                }
+            };
+        }
+
+        public async Task<ServiceResult> GetBySuppierIdAsync(int supplierBookId,int? pageNumber = null, int? pageSize = null)
+        {
+            var supplierBooks = await _unitOfWork.SupplierBookRepository.GetByIdAsync(supplierBookId);
+            if (supplierBooks == null)
+            {
+                return new ServiceResult
+                {
+                    StatusCode = 404,
+                    ApiResult = new ApiResult { Success = false, ErrMessage = "Không tìm thấy đơn nhập hàng nào" }
                 };
             }
-            int preQuality = supplier.Quanlity;
-            int afterQuality = model.Quanlity;
-            var book = await _unitOfWork.BookRepository.GetByIdAsync(supplier.BookId);
-            book.Quantity-= (preQuality - afterQuality);
-            UpdateSupplierBookFromDto(supplier, model);
-            await _unitOfWork.SupplierBookRepository.UpdateAsync(supplier);
-            await _unitOfWork.BookRepository.UpdateAsync(book);
-            await _unitOfWork.SaveChangeAsync();
+            // Chuyển đổi dữ liệu SupplierBook sang DTO
+            //var supplierBookDtos = _mapper.Map<SupplierBookDto>(query);
+
+            //return new ServiceResult
+            //{
+            //    StatusCode = 200,
+            //    ApiResult = new ApiResult
+            //    {
+            //        Success = true,
+            //        Data = supplierBookDtos
+            //    }
+            //};
+            var supplierBookDtos = _mapper.Map<IEnumerable<SupplierBookDto>>(supplierBooks);
+
+            var groupData = supplierBookDtos.GroupBy(sb => new { sb.SupplierBookId, sb.SupplierName, sb.SupplyDate }).Select(
+
+                g => new
+                {
+                    g.Key.SupplierBookId,
+                    g.Key.SupplierName,
+                    g.Key.SupplyDate,
+                    Books = g.Select(x => new
+                    {
+                        x.BookId,
+                        x.Quantity,
+
+                        x.SupplyPrice
+                    }).ToList()
+                });
+            var paged = PaginationHelper.Paginate(groupData, pageNumber, pageSize);
             return new ServiceResult
             {
                 StatusCode = 200,
                 ApiResult = new ApiResult
                 {
                     Success = true,
-                    Message = "Update nhà cung cấp thành công!",
-                    Data = model
+                    Count = groupData.Count(),
+                    Data = paged
                 }
             };
         }
+        public async Task<ServiceResult> GetByFilterAsync(int? supplierId = null, int? bookid = null, string? bookName = null, string? supplierName = null, DateTime? minDate = null, DateTime? maxDate = null, int? pageNumber = null, int? pageSize = null)
+        {
+            IEnumerable<SupplierBook> supplierBook = await _unitOfWork.SupplierBookRepository.GetByFilterAsync(supplierId, bookid, bookName, supplierName, minDate, maxDate);
+            // Chuyển đổi dữ liệu SupplierBook sang DTO
+            if (!supplierBook.Any())
+                return ServiceResultFactory.NoContent();
+            
+            var supplierBookDtos = _mapper.Map<IEnumerable<SupplierBookDto>>(supplierBook);
+
+            var groupData = supplierBookDtos.GroupBy(sb => new { sb.SupplierBookId, sb.SupplierName }).Select(
+
+                g => new
+                {
+                    g.Key.SupplierBookId,
+                    g.Key.SupplierName,
+                    Books = g.Select(x => new
+                    {
+                        x.BookId,
+                        x.Quantity,
+                        x.SupplyDate,
+                        x.SupplyPrice
+                    }).ToList()
+                });
+            var paged = PaginationHelper.Paginate(groupData, pageNumber, pageSize);
+            return new ServiceResult
+            {
+                StatusCode = 200,
+                ApiResult = new ApiResult
+                {
+                    Count = groupData.Count(),
+                    Data = paged,
+                    Success=true
+                }
+            };
+        }
+
+        //public async Task<ServiceResult> Update(SupplierBookDto model)
+        //{
+        //    var supplier = (await _unitOfWork.SupplierBookRepository.GetByIdAsync(model.SupplierBookId));
+        //    if (supplier == null)
+        //    {
+        //        return ServiceResultFactory.NotFound("Không tìm thấy nhà cung cấp cần update");
+        //    }
+        //    int preQuality = supplier.Quantity;
+        //    int afterQuality = model.Quantity;
+        //    var book = await _unitOfWork.BookRepository.GetByIdAsync(supplier.BookId);
+        //    book.Quantity -= (preQuality - afterQuality);
+        //    UpdateSupplierBookFromDto(supplier, model);
+        //    await _unitOfWork.SupplierBookRepository.UpdateAsync(supplier);
+        //    await _unitOfWork.BookRepository.UpdateAsync(book);
+        //    await _unitOfWork.SaveChangeAsync();
+        //    return new ServiceResult
+        //    {
+        //        StatusCode = 200,
+        //        ApiResult = new ApiResult
+        //        {
+        //            Success = true,
+        //            Message = "Update nhà cung cấp thành công!",
+        //            Data = model
+        //        }
+        //    };
+        //}
         void UpdateSupplierBookFromDto(SupplierBook supplierbook, SupplierBookDto supplierbookDto)
         {
             var properties = typeof(SupplierBookDto).GetProperties();
@@ -256,5 +289,7 @@ namespace NhaSachDaiThang_BE_API.Services
                 }
             }
         }
+
+
     }
 }

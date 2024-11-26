@@ -7,9 +7,9 @@ namespace NhaSachDaiThang_BE_API.Services.IServices
 {
     public interface IUserService :ICrudService<UserDTO>, IGetByNameService, IActiveService
     {
-        Task<ServiceResult> Add(UserDTO model, IFormFile formFile);
-        Task<ServiceResult> Update(UserDTO model, IFormFile imageFiles);
-        Task<ServiceResult> GetAll(AccountType accountType, int? pageNumber = null, int? pageSize = null);
+        Task<ServiceResult> AddAsync(UserDTO model, IFormFile formFile);
+        Task<ServiceResult> UpdateAsync(UserDTO model, IFormFile imageFiles);
+        Task<ServiceResult> GetAllAsync(AccountType accountType, int? pageNumber = null, int? pageSize = null);
         Task<ServiceResult> GetByNameAsync(string name, AccountType accountType, int? pageNumber = null, int? pageSize = null);
     }
 }

@@ -39,6 +39,8 @@ builder.Services.AddScoped<IUploadFile, UploadFile>();
 builder.Services.AddScoped<ISupplierService, SupplierService>();
 builder.Services.AddScoped<ISupplierBookService, SupplierBookService>();
 builder.Services.AddScoped<IOrderService, OrderService>();
+builder.Services.AddScoped<IBookCoverTypeService, BookCoverTypeService>();
+builder.Services.AddScoped<ILanguageService, LanguageService>();
 //builder.Services.AddScoped<ISupplierBookService, SupplierBookService>();
 //repository
 builder.Services.AddScoped<IUserRepository, UserRepository>();
@@ -48,6 +50,8 @@ builder.Services.AddScoped<ISupplierRepository, SupplierRepository>();
 builder.Services.AddScoped<ISupplierBookRepository, SupplierBookRepository>();
 builder.Services.AddScoped<IOrderRepository, OrderRepository>();
 builder.Services.AddScoped<IOrderDetailRepository, OrderDetailRepository>();
+builder.Services.AddScoped<ILanguageRepository, LanguageRepository>();
+builder.Services.AddScoped<IBookCoverTypeRepository, BookCoverTypeRepository>();
 
 //unit of work
 builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();

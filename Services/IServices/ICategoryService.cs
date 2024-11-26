@@ -16,5 +16,6 @@ namespace NhaSachDaiThang_BE_API.Services.IServices
         Task<ServiceResult> GetByNameAsync(string name, int? pageNumber = null, int? pageSize = null);
         Task<ServiceResult> SoftDelete(int id);
         Task<ServiceResult> Update(CategoryDto model);
+        Task<ServiceResult> Count();
     }
 }

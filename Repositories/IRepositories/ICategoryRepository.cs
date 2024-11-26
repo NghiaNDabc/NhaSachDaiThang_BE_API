@@ -20,6 +20,9 @@ namespace NhaSachDaiThang_BE_API.Repositories.IRepositories
         Task<bool> AnyAsync(Expression<Func<Category, bool>> predicate);
         Task<Category> GetActiveByIdAsync(int id);
         Task<IEnumerable<Category>> GetActiveByNameAsync(string name, int? pageNumber = null, int? pageSize = null);
+        public Task<int> CountActive();
+
+        public Task<int> CountDeactive();
 
     }
 }

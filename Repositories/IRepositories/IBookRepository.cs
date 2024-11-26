@@ -10,14 +10,14 @@ namespace NhaSachDaiThang_BE_API.Repositories.IRepositories
         Task DeleteAsync(int id);
         Task <int> CountActive();
         Task <int> CountDeactive();
-
+        Task<int> CountByFillterAsync(int? categoryid = null, string? categoryName = null, decimal? minPrice = null, decimal? maxPrice = null, string? bookName = null, int? minQuality = null, int? maxQuanlity = null, bool? isPromotion = null, int? languageId = null, int? bookCoverTypeId = null, bool? IsDel = null);
         Task<IEnumerable<Book>> GetAllActiveAsync(int? pageNumber = null, int? pageSize = null);
         Task<Book> GetActiveByIdAsync(int id);
         Task<IEnumerable<Book>> GetAllAsync(int? pageNumber = null, int? pageSize = null);
         Task<Book> GetByIdAsync(int id);
-        Task SoftDelete(int id);
+        Task SoftDeleteAsync(int id);
         Task UpdateAsync(Book entity);
-        Task<IEnumerable<Book>> GetByNameAndCategoryIdAsync(int? categoryid = null, string? name = null, int? pageNumber = null, int? pageSize = null);
-        Task<IEnumerable<Book>> GetActiveByNameAndCategoryIdAsync(int? categoryid = null, string? name = null, int? pageNumber = null, int? pageSize = null);
+        Task<IEnumerable<Book>> GetByFilterAsync(int? categoryid = null,string?categoryName =null,decimal? minPrice=null, decimal? maxPrice=null, string? bookName = null,int?minQuality=null, int? maxQuanlity = null,bool? isPromotion = null,int ?languageId=null,int? bookCoverTypeId=null, int? pageNumber = null, int? pageSize = null);
+        Task<IEnumerable<Book>> GetActiveByFilterAsync(int? categoryid = null, string? categoryName = null, decimal? minPrice = null, decimal? maxPrice = null, string? bookName = null, int? minQuality = null, int? maxQuanlity = null, bool? isPromotion = null, int? languageId = null, int? bookCoverTypeId = null, int? pageNumber = null, int? pageSize = null);
     }
 }

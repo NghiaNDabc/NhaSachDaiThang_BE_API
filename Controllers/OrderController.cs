@@ -32,7 +32,7 @@ namespace NhaSachDaiThang_BE_API.Controllers
         [HttpPut]
         public async Task<IActionResult> Put(OrderDto orderdto)
         {
-            var rs = await _orderService.Update(orderdto);
+            var rs = await _orderService.UpdateAsync(orderdto);
             return StatusCode(rs.StatusCode, rs.ApiResult);
         }
 

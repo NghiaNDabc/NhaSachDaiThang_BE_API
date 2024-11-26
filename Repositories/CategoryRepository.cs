@@ -40,7 +40,7 @@ namespace NhaSachDaiThang_BE_API.Repositories
             var category = await _categories.FirstOrDefaultAsync(e => e.CategoryId == id);
             if (category != null)
             {
-                category.IsDel = true;
+                category.IsDel = !category.IsDel;
             }
         }
 
@@ -132,6 +132,15 @@ namespace NhaSachDaiThang_BE_API.Repositories
         {
             var query =  _categories.Where(b => b.Name.Contains(name) && b.IsDel == false);
             return await PaginationHelper.PaginateAsync(query, pageNumber, pageSize);
+        }
+        public Task<int> CountActive()
+        {
+            return _categories.CountAsync(x => x.IsDel == false);
+        }
+
+        public Task<int> CountDeactive()
+        {
+            return _categories.CountAsync(x => x.IsDel == true);
         }
     }
 }

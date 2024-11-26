@@ -20,7 +20,25 @@
             int size = pageSize ?? defaultPageSize;
 
             int skip = (pageNum - 1) * size;
-            return await query.Skip(skip).Take(size).ToListAsync();
+            var rs = await query.Skip(skip).Take(size).ToListAsync();
+            return rs;
+        }
+        public static  IEnumerable<T> Paginate<T>(IEnumerable<T> query, int? pageNumber = null, int? pageSize = null)
+        {
+            if (pageNumber == null || pageNumber <= 0 || pageSize == null || pageSize <= 0)
+            {
+                return  query.ToList();
+            }
+
+
+            int defaultPageSize = 10;
+            int pageNum = pageNumber ?? 1;
+            int size = pageSize ?? defaultPageSize;
+
+            int skip = (pageNum - 1) * size;
+            var rs =  query.Skip(skip).Take(size).ToList();
+            return rs;
+           
         }
     }
 

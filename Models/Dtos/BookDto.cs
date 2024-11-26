@@ -10,7 +10,7 @@
 
         public string? Publisher { get; set; }
 
-        public DateOnly? PublishDate { get; set; }
+        public int? PublishYear { get; set; }
         public int? PageCount { get; set; }
         public string? Size { get; set; }
         public decimal? Weight { get; set; }
@@ -20,7 +20,10 @@
 
         public int? CategoryId { get; set; }
         public string? CategoryName { get; set; }
-
+        public int? BookCoverTypeId { get; set; }
+        public string? BookCoverTypeName{ get; set; }
+        public int? LanguageId { get; set; }
+        public string? LanguageName { get; set; }
         public string? Description { get; set; }
         public string? Promotion { get; set; }
         public DateTime? PromotionEndDate { get; set; }

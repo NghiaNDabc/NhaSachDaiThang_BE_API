@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using Microsoft.AspNetCore.Http;
+using NhaSachDaiThang_BE_API.Helper;
 using NhaSachDaiThang_BE_API.Helper.Enum;
 using NhaSachDaiThang_BE_API.Helper.GlobalVar;
 using NhaSachDaiThang_BE_API.Models.Dtos;
@@ -28,7 +29,7 @@ namespace NhaSachDaiThang_BE_API.Services
             throw new NotImplementedException();
         }
 
-        public async Task<ServiceResult> Add(UserDTO model, IFormFile formFile)
+        public async Task<ServiceResult> AddAsync(UserDTO model, IFormFile formFile)
         {
             var user = _mapper.Map<User>(model);
 
@@ -38,10 +39,10 @@ namespace NhaSachDaiThang_BE_API.Services
             }
             else
             {
-                var rs = await _uploadFile.UploadImage(formFile, GlobalConst.UserImagePhysicalPath);
+                var rs = await _uploadFile.UploadImageAsync(formFile, GlobalConst.UserImagePhysicalPath);
                 user.Image = rs.ApiResult.Data.ToString();
             }
-
+            user.PasswordHash = BCrypt.Net.BCrypt.HashPassword(model.PassWord);
             await _unitOfWork.UserRepository.AddAsync(user);
             await _unitOfWork.SaveChangeAsync();
             return new ServiceResult
@@ -123,36 +124,38 @@ namespace NhaSachDaiThang_BE_API.Services
         //}
         public async Task<ServiceResult> GetAll(int? pageNumber = null, int? pageSize = null)
         {
-            var users = await _unitOfWork.UserRepository.GetAllAsync(pageNumber, pageSize);
-
+            var users = await _unitOfWork.UserRepository.GetAllAsync();
+            var count = users.Count();
+            var userPagin = PaginationHelper.Paginate(users, pageNumber, pageSize);
             if (users == null || !users.Any())
             {
                 return new ServiceResult
                 {
-                    StatusCode = 404,
+                    StatusCode = 204,
                     ApiResult = new ApiResult { Success = false, Message = "No user found." }
                 };
             }
 
             // Chuyển đổi dữ liệu sách sang DTO
-            var userDtos = MapList(users);
+            var userDtos = MapList(userPagin);
 
             return new ServiceResult
             {
                 StatusCode = 200,
                 ApiResult = new ApiResult
                 {
+                    Count = count,
                     Success = true,
                     Data = userDtos
                 }
             };
         }
-        public async Task<ServiceResult> GetAll(AccountType accountType, int? pageNumber = null, int? pageSize = null)
+        public async Task<ServiceResult> GetAllAsync(AccountType accountType, int? pageNumber = null, int? pageSize = null)
         {
             IEnumerable<User> users;
-                users =  await _unitOfWork.UserRepository.GetAllAsync(accountType, pageNumber, pageSize);
-           
-
+            users = await _unitOfWork.UserRepository.GetAllAsync(accountType);
+            var count = users.Count();
+            var userPagin = PaginationHelper.Paginate(users, pageNumber, pageSize);
             if (users == null || !users.Any())
             {
                 return new ServiceResult
@@ -163,13 +166,14 @@ namespace NhaSachDaiThang_BE_API.Services
             }
 
             // Chuyển đổi dữ liệu sách sang DTO
-            var userDtos = MapList(users);
+            var userDtos = MapList(userPagin);
 
             return new ServiceResult
             {
                 StatusCode = 200,
                 ApiResult = new ApiResult
                 {
+                    Count = count,
                     Success = true,
                     Data = userDtos
                 }
@@ -184,7 +188,7 @@ namespace NhaSachDaiThang_BE_API.Services
         public async Task<ServiceResult> GetById(int id)
         {
             var user = await _unitOfWork.UserRepository.GetByIdAsync(id);
-            if (user == null )
+            if (user == null)
             {
                 return new ServiceResult
                 {
@@ -225,32 +229,34 @@ namespace NhaSachDaiThang_BE_API.Services
 
         UserDTO MapOne(User user)
         {
-            var userDto = _mapper.Map<UserDTO>(user );
+            var userDto = _mapper.Map<UserDTO>(user);
             var request = _httpContextAccessor.HttpContext?.Request;
             var baseUrl = $"{request.Scheme}://{request.Host}";
             userDto.Image = $"{baseUrl}/{GlobalConst.UserImageRelativePath}/{userDto.Image}";
-            return userDto; 
+            return userDto;
         }
         public async Task<ServiceResult> GetByNameAsync(string name, int? pageNumber = null, int? pageSize = null)
         {
-            var users = await _unitOfWork.UserRepository.GetByNameAsync(name, pageNumber, pageSize);
+            var users = await _unitOfWork.UserRepository.GetByNameAsync(name);
             if (users == null || !users.Any())
             {
                 return new ServiceResult
                 {
-                    StatusCode = 404,
+                    StatusCode = 204,
                     ApiResult = new ApiResult { Success = false, Message = "No user found." }
                 };
             }
 
             // Chuyển đổi dữ liệu sách sang DTO
-            var userDtos = MapList(users);
+            var userPagin = PaginationHelper.Paginate(users);
+            var userDtos = MapList(userPagin);
 
             return new ServiceResult
             {
                 StatusCode = 200,
                 ApiResult = new ApiResult
                 {
+                    Count = users.Count(),
                     Success = true,
                     Data = userDtos
                 }
@@ -258,17 +264,18 @@ namespace NhaSachDaiThang_BE_API.Services
         }
         public async Task<ServiceResult> GetByNameAsync(string name, AccountType accountType, int? pageNumber = null, int? pageSize = null)
         {
-            var users = await _unitOfWork.UserRepository.GetByName(name,accountType, pageNumber, pageSize);
+            var users = await _unitOfWork.UserRepository.GetByNameAsync(name, accountType);
             if (users == null || !users.Any())
             {
                 return new ServiceResult
                 {
-                    StatusCode = 404,
+                    StatusCode = 204,
                     ApiResult = new ApiResult { Success = false, Message = "No user found." }
                 };
             }
 
             // Chuyển đổi dữ liệu sách sang DTO
+            var userPagin = PaginationHelper.Paginate(users);
             var userDtos = MapList(users);
 
             return new ServiceResult
@@ -276,29 +283,32 @@ namespace NhaSachDaiThang_BE_API.Services
                 StatusCode = 200,
                 ApiResult = new ApiResult
                 {
+                    Count = users.Count(),
                     Success = true,
                     Data = userDtos
                 }
             };
         }
 
-        public Task<ServiceResult> SoftDelete(int id)
+        public async Task<ServiceResult> ChangStatus(int id)
         {
-            throw new NotImplementedException();
+            await _unitOfWork.UserRepository.ChangStautsAsync(id);
+            await _unitOfWork.SaveChangeAsync();
+            return ServiceResultFactory.Ok("Thay đổi trạng thái người dùng thành công");
         }
         public async Task<ServiceResult> Update(UserDTO model)
         {
             throw new NotImplementedException();
         }
-        public async Task<ServiceResult> Update(UserDTO model, IFormFile formFile)
+        public async Task<ServiceResult> UpdateAsync(UserDTO model, IFormFile formFile)
         {
-            var exisitngUser = await _unitOfWork.UserRepository.GetByIdAsync(model.Id);
+            var exisitngUser = await _unitOfWork.UserRepository.GetByIdAsync(model.UserId);
 
             if (exisitngUser == null)
             {
                 return new ServiceResult
                 {
-                    StatusCode = 404,
+                    StatusCode = 204,
                     ApiResult = new ApiResult
                     {
                         Success = false,
@@ -313,12 +323,12 @@ namespace NhaSachDaiThang_BE_API.Services
             }
             else
             {
-                var uploadImageRs = await _uploadFile.UploadImage(formFile, GlobalConst.UserImagePhysicalPath);
+                var uploadImageRs = await _uploadFile.UploadImageAsync(formFile, GlobalConst.UserImagePhysicalPath);
                 if (uploadImageRs.ApiResult.Success == false) { return uploadImageRs; }
 
                 model.Image = uploadImageRs.ApiResult.Data.ToString();
             }
-            UpdateUserFromDto(exisitngUser,model);
+            UpdateUserFromDto(exisitngUser, model);
             await _unitOfWork.UserRepository.UpdateAsync(exisitngUser);
             await _unitOfWork.SaveChangeAsync();
             return new ServiceResult
@@ -342,10 +352,10 @@ namespace NhaSachDaiThang_BE_API.Services
             {
                 if (property.Name == "UserId") continue;
                 var value = property.GetValue(userDTO);
-                if ((value!=null))
+                if ((value != null))
                 {
                     property.SetValue(user, value);
-                    
+
                 }
             }
         }

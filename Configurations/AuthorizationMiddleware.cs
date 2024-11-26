@@ -14,21 +14,32 @@ namespace NhaSachDaiThang_BE_API.Configurations
         public async Task Invoke(HttpContext context)
         {
             var endpoint = context.GetEndpoint();
-            if (endpoint?.Metadata.GetMetadata<Microsoft.AspNetCore.Authorization.AuthorizeAttribute>() != null && !context.Request.Headers.ContainsKey("Authorization")){
+            if (endpoint?.Metadata.GetMetadata<Microsoft.AspNetCore.Authorization.AuthorizeAttribute>() != null
+                && !context.Request.Headers.ContainsKey("Authorization")
+                ){
                 context.Response.StatusCode = StatusCodes.Status401Unauthorized;
-                await context.Response.WriteAsJsonAsync(new { ErrMessage = "Authorization token is missing." });
+
+                var unauthorization = new
+                {
+                    ErrMessage = "Authorization token is missing."
+
+                };
+                context.Response.ContentType = "application/json";
+                await context.Response.WriteAsJsonAsync(unauthorization);
                 return;
             }
-            try
-            {
+            //try
+            //{
                 await _next(context);
-            }
-            catch (Exception ex) {
-                _logger.LogError(ex, "An error occurred in Authorization Middleware.");
+            //}
+            //catch (Exception ex) {
+            //    _logger.LogError(ex, "An error occurred in Authorization Middleware.");
 
-                context.Response.StatusCode = StatusCodes.Status500InternalServerError;
-                await context.Response.WriteAsJsonAsync(new { ErrMessage = "An error occurred while processing your request." });
-            }
+            //    context.Response.StatusCode = StatusCodes.Status500InternalServerError;
+            //    await context.Response.WriteAsJsonAsync(new { 
+            //        Exception = ex.ToString(),
+            //        ErrMessage = "An error occurred while processing your request." });
+            //}
         }
 
     }

@@ -75,7 +75,7 @@ public partial class BookStoreContext : DbContext
                 .HasMaxLength(50)
                 .IsRequired(false);
             entity.Property(e => e.Weight)
-                .HasColumnType("decimal(5, 2)")
+                .HasColumnType("decimal(18, 2)")
                 .IsRequired(false);
             entity.Property(e => e.IsDel).HasDefaultValue(false);
             entity.Property(e => e.MainImage).HasMaxLength(255);
@@ -97,18 +97,18 @@ public partial class BookStoreContext : DbContext
         modelBuilder.Entity<SupplierBook>(
             entity =>
             {
-                entity.HasKey(sb => sb.SupplierBookId).HasName("PK__SupplierBook");
+                entity.HasKey(sb => new { sb.SupplierBookId, sb.SupplierId, sb.BookId }).HasName("PK_SupplierBook");
 
                 // Cấu hình các thuộc tính
-                entity.Property(e => e.SupplierBookId).HasColumnName("SupplierBookID").ValueGeneratedOnAdd();
-
+                entity.Property(e => e.SupplierBookId).HasColumnName("SupplierBookID").ValueGeneratedNever();
                 entity.Property(e => e.BookId).HasColumnName("BookID");
                 entity.Property(e => e.SupplyDate).HasColumnType("datetime").IsRequired(false);
                 entity.Property(e => e.SupplyPrice).HasColumnType("decimal(18, 2)").IsRequired(false);
-                entity.Property(e => e.Quanlity).HasColumnName("Quantity");
+                entity.Property(e => e.Quantity).HasColumnName("Quantity");
                 entity.Property(e => e.Note).HasColumnName("Note").HasColumnType("nvarchar(max)");
                 entity.Property(e => e.ModifyBy).HasMaxLength(100);
                 entity.Property(e => e.ModifyDate).HasColumnType("datetime");
+               // entity.Property(e => e.DiscountAmount).HasColumnType("decimal(18,2)");
                 entity.Property(e => e.CreatedBy).HasMaxLength(100);
                 entity.Property(e => e.CreatedDate)
                     .HasDefaultValueSql("(getdate())")

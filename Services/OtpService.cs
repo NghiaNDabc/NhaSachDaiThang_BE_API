@@ -114,7 +114,7 @@ namespace NhaSachDaiThang_BE_API.Services
             if (check.StatusCode == 400) return check;
 
             var user = _unitOfWork.UserRepository.GetByEmail(email);
-            if (user != null)
+            if (user == null)
             {
                 return new ServiceResult
                 {

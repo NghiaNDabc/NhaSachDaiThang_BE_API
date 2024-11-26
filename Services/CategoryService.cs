@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using NhaSachDaiThang_BE_API.Helper;
 using NhaSachDaiThang_BE_API.Models.Dtos;
 using NhaSachDaiThang_BE_API.Models.Entities;
 using NhaSachDaiThang_BE_API.Services.IServices;
@@ -17,64 +18,33 @@ namespace NhaSachDaiThang_BE_API.Services
         }
         public async Task<ServiceResult> Add(CategoryDto model)
         {
-            if ( await _unitOfWork.CategoryRepository.GetByNameAsync(model.Name) != null)
+            var item = await _unitOfWork.CategoryRepository.GetByNameAsync(model.Name);
+            if (item!=null && item.Count()>0)
             {
-               
-                return new ServiceResult
-                {
-                    StatusCode = 400,
-                    ApiResult = new ApiResult
-                    {
-                        Success = false,
-                        ErrMessage = model.Name + " đã tồn tại"
-                    }
-                };
+
+                return ServiceResultFactory.BadRequest(model.Name + " đã tồn tại");
             }
             var category = _mapper.Map<Category>(model);
             await _unitOfWork.CategoryRepository.AddAsync(category);
             await _unitOfWork.SaveChangeAsync();
-            return new ServiceResult
-            {
-                StatusCode = 200,
-                ApiResult = new ApiResult
-                {
-                    Success = true,
-                    Message = "Thêm danh mục mới thành công!"
-                }
-            };
+            return ServiceResultFactory.Created("Thêm danh mục mới thành công!");
 
         }
 
         public async Task<ServiceResult> Delete(int id)
         {
-            if (await _unitOfWork.CategoryRepository.GetByIdAsync(id) != null)
+            if (await _unitOfWork.CategoryRepository.GetByIdAsync(id) == null)
             {
-                return new ServiceResult
-                {
-                    StatusCode = 400,
-                    ApiResult = new ApiResult
-                    {
-                        Success = false,
-                        ErrMessage =  "Không tìm thấy danh mục cần xóa"
-                    }
-                };
+                return ServiceResultFactory.NotFound("Không tìm thấy danh mục cần xóa");
             }
             await _unitOfWork.CategoryRepository.DeleteAsync(id);
             await _unitOfWork.SaveChangeAsync();
-            return new ServiceResult
-            {
-                StatusCode = 200,
-                ApiResult = new ApiResult
-                {
-                    Success = true,
-                    Message = "Xóa danh mục thành công!"
-                }
-            };
+            return ServiceResultFactory.Ok("Xóa danh mục thành công!");
         }
 
         public async Task<ServiceResult> GetActiveById(int id)
         {
-            var categorie = await _unitOfWork.CategoryRepository.GetActiveByIdAsync(id);
+            var categorie = await _unitOfWork.CategoryRepository.GetCategoriesByLevel(id);
             int statusCode = 200;
             bool success = true;
             if (categorie == null)
@@ -114,24 +84,16 @@ namespace NhaSachDaiThang_BE_API.Services
             };
         }
 
-        public async Task<ServiceResult> GetAll(int? pageNumber = null, int? pageSize=null)
+        public async Task<ServiceResult> GetAll(int? pageNumber = null, int? pageSize = null)
         {
-            var  categories = await _unitOfWork.CategoryRepository.GetCategoriesByLevel();
+            var categories = await _unitOfWork.CategoryRepository.GetCategoriesByLevel();
 
-            return new ServiceResult
-            {
-                StatusCode = 200,
-                ApiResult = new ApiResult
-                {
-                    Success = true,
-                    Data = categories
-                }
-            };
+            return ServiceResultFactory.Ok(data: categories);
         }
 
         public async Task<ServiceResult> GetAllActive(int? pageNumber = null, int? pageSize = null)
         {
-            var categories =  await _unitOfWork.CategoryRepository.GetCategoriesByLevelActive();
+            var categories = await _unitOfWork.CategoryRepository.GetCategoriesByLevelActive();
 
             return new ServiceResult
             {
@@ -148,8 +110,8 @@ namespace NhaSachDaiThang_BE_API.Services
         {
             var categorie = await _unitOfWork.CategoryRepository.GetByIdAsync(id);
             int statusCode = 200;
-            bool success  = true;
-            if(categorie == null)
+            bool success = true;
+            if (categorie == null)
             {
                 statusCode = 404;
                 success = false;
@@ -165,7 +127,7 @@ namespace NhaSachDaiThang_BE_API.Services
             };
         }
 
-        public  async Task<ServiceResult> GetByNameAsync(string name, int? pageNumber = null, int? pageSize = null)
+        public async Task<ServiceResult> GetByNameAsync(string name, int? pageNumber = null, int? pageSize = null)
         {
             var cates = await _unitOfWork.CategoryRepository.GetByNameAsync(name, pageNumber, pageSize);
 
@@ -179,44 +141,20 @@ namespace NhaSachDaiThang_BE_API.Services
             }
 
             // Chuyển đổi dữ liệu sách sang DTO
-            var catesDtos = cates.Select(x=> _mapper.Map<CategoryDto>(x)).ToList();
+            var catesDtos = cates.Select(x => _mapper.Map<CategoryDto>(x)).ToList();
 
-            return new ServiceResult
-            {
-                StatusCode = 200,
-                ApiResult = new ApiResult
-                {
-                    Success = true,
-                    Data = catesDtos
-                }
-            };
+            return ServiceResultFactory.Ok(data: catesDtos);
         }
 
         public async Task<ServiceResult> SoftDelete(int id)
         {
             if (await _unitOfWork.CategoryRepository.GetByIdAsync(id) != null)
             {
-                return new ServiceResult
-                {
-                    StatusCode = 400,
-                    ApiResult = new ApiResult
-                    {
-                        Success = false,
-                        ErrMessage = "Không tìm thấy danh mục cần xóa"
-                    }
-                };
+                return ServiceResultFactory.NotFound("Không tìm thấy danh mục cần xóa");
             }
             await _unitOfWork.CategoryRepository.SoftDelete(id);
             await _unitOfWork.SaveChangeAsync();
-            return new ServiceResult
-            {
-                StatusCode = 200,
-                ApiResult = new ApiResult
-                {
-                    Success = true,
-                    Message = "Xóa danh mục thành công!"
-                }
-            };
+            return ServiceResultFactory.Ok("Thay đổi trạng thái thành công!");
         }
 
         public async Task<ServiceResult> Update(CategoryDto model)
@@ -238,6 +176,8 @@ namespace NhaSachDaiThang_BE_API.Services
             cate.ModifyBy = model.ModifyBy;
             cate.ModifyDate = DateTime.Now;
             cate.Description = model.Description;
+            
+            cate.ParentCategoryID = model.ParentCategoryID;
             await _unitOfWork.CategoryRepository.UpdateAsync(cate);
             await _unitOfWork.SaveChangeAsync();
             return new ServiceResult
@@ -246,8 +186,25 @@ namespace NhaSachDaiThang_BE_API.Services
                 ApiResult = new ApiResult
                 {
                     Success = true,
-                    Message = "Update danh mục thành công!",
-                    Data = cate
+                    Message = "Update danh mục thành công!"
+                }
+            };
+        }
+        public async Task<ServiceResult> Count()
+        {
+            var activeCat = await _unitOfWork.CategoryRepository.CountActive();
+            var deactiveCat = await _unitOfWork.CategoryRepository.CountDeactive();
+
+            return new ServiceResult
+            {
+                StatusCode = 200,
+                ApiResult = new ApiResult
+                {
+                    Data = new
+                    {
+                        ActiveBoo = activeCat,
+                        DeactiveBook = deactiveCat
+                    }
                 }
             };
         }

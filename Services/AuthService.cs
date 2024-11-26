@@ -1,5 +1,7 @@
 ﻿using AutoMapper;
 using NhaSachDaiThang_BE_API.Data;
+using NhaSachDaiThang_BE_API.Helper;
+using NhaSachDaiThang_BE_API.Helper.GlobalVar;
 using NhaSachDaiThang_BE_API.Models.Dtos;
 using NhaSachDaiThang_BE_API.Models.Entities;
 using NhaSachDaiThang_BE_API.Repositories.IRepositories;
@@ -15,12 +17,14 @@ namespace NhaSachDaiThang_BE_API.Services
         private readonly JwtHelper _jwtHelper;
         private readonly IOtpService _otpService;
         private readonly IMapper _mapper;
-        public AuthService(IUnitOfWork unitOfWork, JwtHelper jwtHelper, IOtpService otpService, IMapper mapper)
+        private readonly IHttpContextAccessor _httpContextAccessor;
+        public AuthService(IUnitOfWork unitOfWork, JwtHelper jwtHelper, IOtpService otpService, IMapper mapper, IHttpContextAccessor httpContextAccessor)
         {
             _unitOfWork = unitOfWork;
             _jwtHelper = jwtHelper;
             _otpService = otpService;
             _mapper = mapper;
+            _httpContextAccessor = httpContextAccessor;
         }
 
         public async Task<ServiceResult> SendOtp(string email)
@@ -39,15 +43,7 @@ namespace NhaSachDaiThang_BE_API.Services
 
             if (user == null || !BCrypt.Net.BCrypt.Verify(model.Password, user.PasswordHash) || user.RoleId != 3)
             {
-                return new ServiceResult
-                {
-                    StatusCode = 400,
-                    ApiResult = new ApiResult
-                    {
-                        Success = false,
-                        ErrMessage = "Tên đăng nhập hoặc mật khẩu không đúng"
-                    }
-                };
+                return ServiceResultFactory.BadRequest("Tên đăng nhập hoặc mật khẩu không đúng");
             }
             var token = _jwtHelper.GenerateJwtToken(user);
             var refreshToken = _jwtHelper.GenerateRefreshToken();
@@ -76,39 +72,27 @@ namespace NhaSachDaiThang_BE_API.Services
         {
             var user = await _unitOfWork.UserRepository.GetByEmail(model.UserName);
 
-            if (user == null || !BCrypt.Net.BCrypt.Verify(model.Password, user.PasswordHash) )
+            if (user == null || !BCrypt.Net.BCrypt.Verify(model.Password, user.PasswordHash))
             {
-                return new ServiceResult
-                {
-                    StatusCode = 400,
-                    ApiResult = new ApiResult
-                    {
-                        Success = false,
-                        ErrMessage = "Tên đăng nhập hoặc mật khẩu không đúng"
-                    }
-                };
+                return ServiceResultFactory.BadRequest("Tên đăng nhập hoặc mật khẩu không đúng");
             }
-
             var token = _jwtHelper.GenerateJwtToken(user);
             var refreshToken = _jwtHelper.GenerateRefreshToken();
             user.RefreshToken = refreshToken;
             user.RefreshTokenExpiryTime = DateTime.Now.AddDays(7);
+            var userDto = _mapper.Map<UserDTO>(user);
+            var request = _httpContextAccessor.HttpContext?.Request;
+            var baseUrl = $"{request?.Scheme}://{request?.Host}";
+            userDto.Image = $"{baseUrl}/{GlobalConst.UserImageRelativePath}/{userDto.Image}";
             await _unitOfWork.UserRepository.UpdateAsync(user);
             await _unitOfWork.SaveChangeAsync();
-            return new ServiceResult
+            var Data = new
             {
-                StatusCode = 200,
-                ApiResult = new ApiResult
-                {
-                    Success = true,
-                    Data = new
-                    {
-                        User = _mapper.Map<UserDTO>(user),
-                        Token = token,
-                        RefreshToken = refreshToken
-                    }
-                }
+                User = userDto,
+                Token = token,
+                RefreshToken = refreshToken
             };
+            return ServiceResultFactory.Ok(data: Data);
         }
 
         public Task<User> GetCustomerByLoginModel(LoginModel model)
@@ -182,7 +166,8 @@ namespace NhaSachDaiThang_BE_API.Services
                     Success = true,
                     Data = new
                     {
-                        Token = newToken
+                        Token = newToken,
+                        User = _mapper.Map<UserDTO>(user)
                     }
                 }
             };

@@ -1,11 +1,12 @@
-﻿using NhaSachDaiThang_BE_API.Models.Dtos;
+﻿using NhaSachDaiThang_BE_API.Helper;
+using NhaSachDaiThang_BE_API.Models.Dtos;
 using NhaSachDaiThang_BE_API.Services.IServices;
 
 namespace NhaSachDaiThang_BE_API.Services
 {
     public class UploadFile : IUploadFile
     {
-        public async Task<ServiceResult> UploadImage(IFormFile file, string path)
+        public async Task<ServiceResult> UploadImageAsync(IFormFile file, string path)
         {
             if (file == null || file.Length == 0)
             {
@@ -44,5 +45,22 @@ namespace NhaSachDaiThang_BE_API.Services
                 }
             };
         }
+
+        public ServiceResult DeleteFile(string fileName, string path)
+        {
+            var filePath = Path.Combine(Directory.GetCurrentDirectory(), path, fileName);
+
+            if (!File.Exists(filePath))
+            {
+                return ServiceResultFactory.NotFound(("File không tồn tại."));
+            }
+
+            File.Delete(filePath);
+
+            return ServiceResultFactory.Ok("File đã được xóa thành công.");
+
+
+        }
+
     }
 }

@@ -46,7 +46,7 @@ namespace NhaSachDaiThang_BE_API.Controllers
             {
                 result = await _userService.GetByNameAsync(name, AccountType.Customer, pageNumber, pageSize);
             }
-            else result = await _userService.GetAll(AccountType.Customer,pageNumber, pageSize);
+            else result = await _userService.GetAllAsync(AccountType.Customer,pageNumber, pageSize);
             return StatusCode(result.StatusCode, result.ApiResult);
         }
         [HttpGet("Employee")]
@@ -61,7 +61,7 @@ namespace NhaSachDaiThang_BE_API.Controllers
             {
                 result = await _userService.GetByNameAsync(name, AccountType.Employee, pageNumber, pageSize);
             }
-            else result = await _userService.GetAll(AccountType.Employee, pageNumber, pageSize);
+            else result = await _userService.GetAllAsync(AccountType.Employee, pageNumber, pageSize);
             return StatusCode(result.StatusCode, result.ApiResult);
         }
         [HttpGet("Admin")]
@@ -76,20 +76,35 @@ namespace NhaSachDaiThang_BE_API.Controllers
             {
                 result = await _userService.GetByNameAsync(name, AccountType.Admin, pageNumber, pageSize);
             }
-            else result = await _userService.GetAll(AccountType.Admin, pageNumber, pageSize);
+            else result = await _userService.GetAllAsync(AccountType.Admin, pageNumber, pageSize);
             return StatusCode(result.StatusCode, result.ApiResult);
         }
         [HttpPost]
-        public async Task<IActionResult> PostUser([FromForm]UserDTO userDTO, [FromForm]  List<IFormFile> formFiles)
+        public async Task<IActionResult> PostUser([FromForm]UserDTO userDTO, [FromForm]  List<IFormFile> imageFiles)
         {
-            var rs = await _userService.Add(userDTO, formFiles[0]);
+            ServiceResult rs;
+            if (imageFiles == null || imageFiles.Count == 0)
+            {
+                rs = await _userService.AddAsync(userDTO, null);
+            }
+            else
+            {
+                rs = await _userService.AddAsync(userDTO, imageFiles[0]);
+            }
 
             return StatusCode(rs.StatusCode, rs.ApiResult);
         }
         [HttpPut]
-        public async Task<IActionResult> PutUser([FromForm] UserDTO userDTO, [FromForm] List<IFormFile> formFiles)
+        public async Task<IActionResult> PutUser([FromForm] UserDTO userDTO, [FromForm] List<IFormFile> imageFiles)
         {
-            var rs = await _userService.Update(userDTO, formFiles[0]);
+            ServiceResult rs;
+            if (imageFiles == null || imageFiles.Count == 0) {
+                 rs = await _userService.UpdateAsync(userDTO, null);
+            }
+            else
+            {
+                rs = await _userService.UpdateAsync(userDTO, imageFiles[0]);
+            }
             return StatusCode(rs.StatusCode, rs.ApiResult);
         }
         [HttpDelete]
@@ -100,10 +115,10 @@ namespace NhaSachDaiThang_BE_API.Controllers
             return StatusCode(rs.StatusCode, rs.ApiResult);
         }
 
-        [HttpPut("deactivate")]
-        public async Task<IActionResult> DeactivateUser(int id)
+        [HttpPut("changestatus/{id}")]
+        public async Task<IActionResult> ChangStatus(int id)
         {
-            var rs = await _userService.SoftDelete(id); 
+            var rs = await _userService.ChangStatus(id); 
 
             return StatusCode(rs.StatusCode, rs.ApiResult);
         }

@@ -34,9 +34,9 @@ namespace NhaSachDaiThang_BE_API.Repositories
             }
         }
 
-        public async Task<IEnumerable<User>> GetAllAsync(int? pageNumber = null, int? pageSize = null)
+        public async Task<IEnumerable<User>> GetAllAsync()
         {
-            return await PaginationHelper.PaginateAsync(_users, pageNumber, pageSize);
+            return await _users.ToListAsync();
         }
         public async Task<IEnumerable<User>> GetAllAsync(AccountType accountType,int? pageNumber = null, int? pageSize = null)
         {
@@ -76,13 +76,13 @@ namespace NhaSachDaiThang_BE_API.Repositories
             return await _users.FirstOrDefaultAsync(u => u.RefreshToken == refreshToken && u.RefreshTokenExpiryTime > DateTime.Now);
         }
 
-        public async Task<IEnumerable<User>> GetByNameAsync(string name, int? pageNumber = null, int? pageSize = null)
+        public async Task<IEnumerable<User>> GetByNameAsync(string name)
         {
             var query = _users.Where(b => (b.FirstName + " " + b.LastName).Contains(name));
-            return await PaginationHelper.PaginateAsync(query, pageNumber, pageSize);
+            return query.ToList();
         }
 
-        public async Task<IEnumerable<User>> GetByName(string name, AccountType? accountType=null, int? pageNumber = null, int?pageSzie = null)
+        public async Task<IEnumerable<User>> GetByNameAsync(string name, AccountType? accountType=null)
         {
             IQueryable<User> users =_users.Where(b => (b.FirstName + " " + b.LastName).Contains(name));
             switch (accountType) {
@@ -91,6 +91,15 @@ namespace NhaSachDaiThang_BE_API.Repositories
                 case AccountType.Employee: users= users.Where(x => x.RoleId == 2); break;
             }
             return await users.ToListAsync();
+        }
+
+        public async Task ChangStautsAsync(int id)
+        {
+            var user =await _users.FindAsync(id);
+            if (user != null)
+            {
+                user.IsDel = !user.IsDel;  
+            }
         }
     }
 }

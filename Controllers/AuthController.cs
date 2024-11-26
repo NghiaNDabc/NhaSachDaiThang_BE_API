@@ -28,7 +28,7 @@ namespace NhaSachDaiThang_BE_API.Controllers
         }
         [SwaggerOperation(Summary = "Gửi OTP đăng ký")]
         [HttpPost("otp")]
-        public async Task<IActionResult> Otp(string email)
+        public async Task<IActionResult> Otp([FromBody] string email)
         {
             var result = await _accountService.SendOtp(email);
             return StatusCode(result.StatusCode, result.ApiResult);
@@ -38,6 +38,14 @@ namespace NhaSachDaiThang_BE_API.Controllers
         public async Task<IActionResult> Login(LoginModel model)
         {
             var result = await _accountService.Login(model);
+
+            return StatusCode(result.StatusCode, result.ApiResult);
+        }
+        [SwaggerOperation(Summary = "Đăng nhập")]
+        [HttpPost("logout")]
+        public async Task<IActionResult> Logout([FromBody]string refreshToken)
+        {
+            var result = await _accountService.Logout(refreshToken);
 
             return StatusCode(result.StatusCode, result.ApiResult);
         }

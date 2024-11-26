@@ -12,6 +12,8 @@ namespace NhaSachDaiThang_BE_API.UnitOfWork
         ISupplierBookRepository SupplierBookRepository { get; }
         IOrderRepository OrderRepository { get; }
         IOrderDetailRepository OrderDetailRepository { get; }
+        IBookCoverTypeRepository BookCoverTypeRepository { get; }
+        ILanguageRepository LanguageRepository { get; }
         Task<IDbContextTransaction> BeginTransactionAsync();
         Task<int> SaveChangeAsync();
     }

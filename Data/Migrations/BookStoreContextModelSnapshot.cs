@@ -112,7 +112,7 @@ namespace NhaSachDaiThang_BE_API.Migrations
                         .HasColumnType("nvarchar(200)");
 
                     b.Property<decimal?>("Weight")
-                        .HasColumnType("decimal(5, 2)");
+                        .HasColumnType("decimal(18, 2)");
 
                     b.HasKey("BookId")
                         .HasName("PK__Books__3DE0C227509BC471");
@@ -483,11 +483,11 @@ namespace NhaSachDaiThang_BE_API.Migrations
             modelBuilder.Entity("NhaSachDaiThang_BE_API.Models.Entities.SupplierBook", b =>
                 {
                     b.Property<int>("SupplierBookId")
-                        .ValueGeneratedOnAdd()
                         .HasColumnType("int")
                         .HasColumnName("SupplierBookID");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("SupplierBookId"));
+                    b.Property<int>("SupplierId")
+                        .HasColumnType("int");
 
                     b.Property<int>("BookId")
                         .HasColumnType("int")
@@ -501,6 +501,9 @@ namespace NhaSachDaiThang_BE_API.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("datetime")
                         .HasDefaultValueSql("(getdate())");
+
+                    b.Property<decimal?>("DiscountAmount")
+                        .HasColumnType("decimal(18,2)");
 
                     b.Property<string>("ModifyBy")
                         .HasMaxLength(100)
@@ -517,17 +520,14 @@ namespace NhaSachDaiThang_BE_API.Migrations
                         .HasColumnType("int")
                         .HasColumnName("Quantity");
 
-                    b.Property<int>("SupplierId")
-                        .HasColumnType("int");
-
                     b.Property<DateTime?>("SupplyDate")
                         .HasColumnType("datetime");
 
                     b.Property<decimal?>("SupplyPrice")
                         .HasColumnType("decimal(18, 2)");
 
-                    b.HasKey("SupplierBookId")
-                        .HasName("PK__SupplierBook");
+                    b.HasKey("SupplierBookId", "SupplierId", "BookId")
+                        .HasName("PK_SupplierBook");
 
                     b.HasIndex("BookId");
 

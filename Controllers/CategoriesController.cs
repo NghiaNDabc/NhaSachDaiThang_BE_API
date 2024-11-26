@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using NhaSachDaiThang_BE_API.Models.Dtos;
 using NhaSachDaiThang_BE_API.Models.Entities;
+using NhaSachDaiThang_BE_API.Services;
 using NhaSachDaiThang_BE_API.Services.IServices;
 using Swashbuckle.AspNetCore.Annotations;
 
@@ -95,8 +96,8 @@ namespace NhaSachDaiThang_BE_API.Controllers
         // DELETE: api/Categories/5
         [SwaggerOperation(Summary = "Xóa mềm danh mục", Tags = new[] { "Categories" })]
         [Authorize(Roles = "Admin,Employee")]
-        [HttpPut("deactivate")]
-        public async Task<IActionResult> DeactiveCategory(int id)
+        [HttpPut("changeStatus")]
+        public async Task<IActionResult> ChangeStatus(int id)
         {
             var rs = await _categoryService.SoftDelete(id);
             return StatusCode(rs.StatusCode, rs.ApiResult);
@@ -109,7 +110,12 @@ namespace NhaSachDaiThang_BE_API.Controllers
             var rs = await _categoryService.Delete(id);
             return StatusCode(rs.StatusCode, rs.ApiResult);
         }
-
+        [HttpGet("count")]
+        public async Task<IActionResult> Sum()
+        {
+            ServiceResult result = await _categoryService.Count();
+            return StatusCode(result.StatusCode, result.ApiResult);
+        }
         //private bool CategoryExists(int id)
         //{
         //    return _context.Categories.Any(e => e.CategoryId == id);

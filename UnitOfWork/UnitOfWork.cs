@@ -15,10 +15,12 @@ namespace NhaSachDaiThang_BE_API.UnitOfWork
         public ICategoryRepository CategoryRepository { get; }
         public IBookRepository BookRepository { get; }
 
-        public ISupplierRepository SupplierRepository {  get; }
+        public ISupplierRepository SupplierRepository { get; }
         public ISupplierBookRepository SupplierBookRepository { get; }
         public IOrderRepository OrderRepository { get; }
         public IOrderDetailRepository OrderDetailRepository { get; }
+        public IBookCoverTypeRepository BookCoverTypeRepository { get; }
+        public ILanguageRepository LanguageRepository { get; }
         public UnitOfWork(BookStoreContext bookStoreContext, IMapper mapper)
         {
             _mapper = mapper;
@@ -26,12 +28,14 @@ namespace NhaSachDaiThang_BE_API.UnitOfWork
             UserRepository = new UserRepository(_bookStoreContext);
             CategoryRepository = new CategoryRepository(_bookStoreContext, _mapper);
             BookRepository = new BookRepository(_bookStoreContext);
-            SupplierRepository =  new SupplierRepository(_bookStoreContext);
+            SupplierRepository = new SupplierRepository(_bookStoreContext);
             SupplierBookRepository = new SupplierBookRepository(_bookStoreContext);
             OrderRepository = new OrderRepository(_bookStoreContext);
-            OrderDetailRepository =  new OrderDetailRepository(_bookStoreContext);
+            OrderDetailRepository = new OrderDetailRepository(_bookStoreContext);
+            BookCoverTypeRepository = new BookCoverTypeRepository(_bookStoreContext);
+            LanguageRepository = new LanguageRepository(_bookStoreContext);
         }
-       public async Task<IDbContextTransaction> BeginTransactionAsync()
+        public async Task<IDbContextTransaction> BeginTransactionAsync()
         {
             return await _bookStoreContext.Database.BeginTransactionAsync();
         }
