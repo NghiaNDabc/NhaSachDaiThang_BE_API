@@ -21,10 +21,10 @@ namespace NhaSachDaiThang_BE_API.Repositories
         }
 
         public async Task DeleteAsync(int id)
-        { var item = await _supplierBooks.FindAsync(id);
+        { var item =  _supplierBooks.Where(s=>s.SupplierBookId==id);
             if (item != null)
             {
-                _supplierBooks.Remove(item);
+                _supplierBooks.RemoveRange(item);
             }
         }
         public async Task<IEnumerable<SupplierBook>> GetByIdAsync(int supplierId)

@@ -32,7 +32,7 @@ public partial class Order
 
     public virtual ICollection<OrderDetail> OrderDetails { get; set; } = new List<OrderDetail>();
 
-    public virtual ICollection<Payment> Payments { get; set; } = new List<Payment>();
+    //public virtual ICollection<Payment> Payments { get; set; } = new List<Payment>();
 
-    public virtual ICollection<Voucher> Vouchers { get; set; } = new List<Voucher>();
+    //public virtual ICollection<Voucher> Vouchers { get; set; } = new List<Voucher>();
 }

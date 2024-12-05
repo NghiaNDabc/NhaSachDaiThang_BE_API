@@ -144,7 +144,7 @@ namespace NhaSachDaiThang_BE_API.Repositories
             }
             if (isPromotion.HasValue && isPromotion.Value == true)
             {
-                query = query.Where(b => b.PromotionEndDate < DateTime.Now);
+                query = query.Where(b => b.PromotionEndDate > DateTime.Now);
             }
             if (languageId.HasValue) { query = query.Where(b => b.LanguageId.HasValue && b.LanguageId.Value == languageId.Value); }
             return await query.CountAsync();
@@ -216,7 +216,7 @@ namespace NhaSachDaiThang_BE_API.Repositories
             }
             if (isPromotion.HasValue && isPromotion.Value == true)
             {
-                query = query.Where(b => b.PromotionEndDate < DateTime.Now);
+                query = query.Where(b => b.PromotionEndDate > DateTime.Now);
             }
             if (languageId.HasValue) { query = query.Where(b => b.LanguageId.HasValue && b.LanguageId.Value == languageId.Value); }
             if (bookCoverTypeId.HasValue) { query = query.Where(b => b.BookCoverTypeId.HasValue && b.BookCoverTypeId.Value == bookCoverTypeId.Value); }
@@ -304,6 +304,9 @@ namespace NhaSachDaiThang_BE_API.Repositories
             return _books.CountAsync(x => x.IsDel == true);
         }
 
-
+        public async Task<IEnumerable<Book>> Get8NewBooks()
+        {
+            return await  _books.OrderByDescending(b=> b.BookId).Take(10).ToListAsync();
+        }
     }
 }

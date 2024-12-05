@@ -21,7 +21,7 @@ namespace NhaSachDaiThang_BE_API.Controllers
         }
         [SwaggerOperation(Summary = "Đăng ký")]
         [HttpPost("register")]
-        public async Task<IActionResult> Register(RegisterModel model)
+        public async Task<IActionResult> Register(RegisterDto model)
         {
             var result = await _accountService.Register(model);
             return StatusCode(result.StatusCode, result.ApiResult);

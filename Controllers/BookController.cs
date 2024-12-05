@@ -75,7 +75,19 @@ namespace NhaSachDaiThang_BE_API.Controllers
             return StatusCode(result.StatusCode, result.ApiResult);
         }
         [HttpGet("active")]
-        public async Task<IActionResult> GetAllActive(int? id = null, int? categoryId = null, string? categoryName = null, decimal? minPrice = null, decimal? maxPrice = null, string? bookName = null, int? pageNumber = null, int? pageSize = null)
+        public async Task<IActionResult> GetAllActive(
+            int? id = null,
+            int? categoryId = null,
+            string? categoryName = null,
+            decimal? minPrice = null,
+            decimal? maxPrice = null,
+            string? bookName = null,
+            int? minQuatity = null,
+            int? maxQuanlity = null,
+            bool? isPromotion = null,
+            int? languageId = null,
+            int? bookCoverTypeId = null,
+            int? pageNumber = null, int? pageSize = null)
         {
             ServiceResult result;
             if (id.HasValue)
@@ -86,10 +98,29 @@ namespace NhaSachDaiThang_BE_API.Controllers
                maxPrice.HasValue ||
                !string.IsNullOrEmpty(bookName))
             {
-                result = await _bookService.GetActiveByFilterAsync(categoryId, categoryName, minPrice, maxPrice, bookName, pageNumber, pageSize);
+                result = await _bookService.GetActiveByFilterAsync(
+                    categoryId,
+                                                            categoryName,
+                                                            minPrice,
+                                                            maxPrice,
+                                                            bookName,
+                                                            minQuatity,
+                                                            maxQuanlity,
+                                                            isPromotion,
+                                                            languageId,
+                                                            bookCoverTypeId,
+                                                            pageNumber,
+                                                            pageSize);
             }
             else
                 result = await _bookService.GetAllActiveAsync();
+            return StatusCode(result.StatusCode, result.ApiResult);
+        }
+        [HttpGet("newBook")]
+        public async Task<IActionResult> GetNewBook()
+        {
+            ServiceResult result;
+            result = await _bookService.GetNewBooks();
             return StatusCode(result.StatusCode, result.ApiResult);
         }
 
@@ -100,7 +131,7 @@ namespace NhaSachDaiThang_BE_API.Controllers
             var result = await _bookService.AddAsync(bookDto, imageFiles);
             return StatusCode(result.StatusCode, result.ApiResult);
         }
-                   
+
         [HttpPut("changeStatus/{id}")]
         [Authorize(Roles = "Admin,Employee")]
         public async Task<IActionResult> DeactiveCategory(int id)

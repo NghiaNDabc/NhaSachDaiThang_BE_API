@@ -154,7 +154,7 @@ namespace NhaSachDaiThang_BE_API.Services
 
         public async Task<ServiceResult> ChangeStatus(int id)
         {
-            if (await _unitOfWork.SupplierRepository.GetByIdAsync(id) != null)
+            if (await _unitOfWork.SupplierRepository.GetByIdAsync(id) == null)
             {
                 return new ServiceResult
                 {

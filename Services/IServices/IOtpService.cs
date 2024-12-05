@@ -7,6 +7,6 @@ namespace NhaSachDaiThang_BE_API.Services.IServices
         Task<ServiceResult> SendPasswordResetOtpAsync(string email);
         Task<ServiceResult> SendRegistrationOtpAsync(string email);
         Task<ServiceResult> VerifyPasswordResetOtpAsync(string email, string otpCode, string newPass);
-        Task<ServiceResult> VerifySendRegistrationOtpAsycn(RegisterModel model);
+        Task<ServiceResult> VerifySendRegistrationOtpAsycn(RegisterDto model);
     }
 }

@@ -58,8 +58,7 @@ namespace NhaSachDaiThang_BE_API.Migrations
                         .HasDefaultValueSql("(getdate())");
 
                     b.Property<string>("Description")
-                        .HasMaxLength(500)
-                        .HasColumnType("nvarchar(500)");
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<bool?>("IsDel")
                         .ValueGeneratedOnAdd()
@@ -320,95 +319,6 @@ namespace NhaSachDaiThang_BE_API.Migrations
                     b.ToTable("OrderDetail");
                 });
 
-            modelBuilder.Entity("NhaSachDaiThang_BE_API.Models.Entities.Payment", b =>
-                {
-                    b.Property<int>("PaymentId")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int")
-                        .HasColumnName("PaymentID");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("PaymentId"));
-
-                    b.Property<decimal>("Amount")
-                        .HasColumnType("decimal(18, 2)");
-
-                    b.Property<string>("CreatedBy")
-                        .HasMaxLength(100)
-                        .HasColumnType("nvarchar(100)");
-
-                    b.Property<DateTime>("CreatedDate")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("datetime")
-                        .HasDefaultValueSql("(getdate())");
-
-                    b.Property<string>("ModifyBy")
-                        .HasMaxLength(100)
-                        .HasColumnType("nvarchar(100)");
-
-                    b.Property<DateTime?>("ModifyDate")
-                        .HasColumnType("datetime");
-
-                    b.Property<int?>("OrderId")
-                        .HasColumnType("int")
-                        .HasColumnName("OrderID");
-
-                    b.Property<DateTime>("PaymentDate")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("datetime")
-                        .HasDefaultValueSql("(getdate())");
-
-                    b.Property<string>("PaymentMethod")
-                        .HasMaxLength(50)
-                        .HasColumnType("nvarchar(50)");
-
-                    b.HasKey("PaymentId")
-                        .HasName("PK__Payments__9B556A588C4AA9B9");
-
-                    b.HasIndex("OrderId");
-
-                    b.ToTable("Payment");
-                });
-
-            modelBuilder.Entity("NhaSachDaiThang_BE_API.Models.Entities.Review", b =>
-                {
-                    b.Property<int>("ReviewId")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int")
-                        .HasColumnName("ReviewID");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("ReviewId"));
-
-                    b.Property<int?>("BookId")
-                        .HasColumnType("int")
-                        .HasColumnName("BookID");
-
-                    b.Property<string>("Comment")
-                        .HasMaxLength(500)
-                        .HasColumnType("nvarchar(500)");
-
-                    b.Property<DateTime>("CreatedDate")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("datetime")
-                        .HasDefaultValueSql("(getdate())");
-
-                    b.Property<DateTime?>("ModifyDate")
-                        .HasColumnType("datetime");
-
-                    b.Property<int?>("Rating")
-                        .HasColumnType("int");
-
-                    b.Property<int?>("UserId")
-                        .HasColumnType("int")
-                        .HasColumnName("UserId");
-
-                    b.HasKey("ReviewId")
-                        .HasName("PK__Reviews__74BC79AEC46D3806");
-
-                    b.HasIndex("BookId");
-
-                    b.ToTable("Review");
-                });
-
             modelBuilder.Entity("NhaSachDaiThang_BE_API.Models.Entities.Role", b =>
                 {
                     b.Property<int>("RoleId")
@@ -502,9 +412,6 @@ namespace NhaSachDaiThang_BE_API.Migrations
                         .HasColumnType("datetime")
                         .HasDefaultValueSql("(getdate())");
 
-                    b.Property<decimal?>("DiscountAmount")
-                        .HasColumnType("decimal(18,2)");
-
                     b.Property<string>("ModifyBy")
                         .HasMaxLength(100)
                         .HasColumnType("nvarchar(100)");
@@ -516,7 +423,7 @@ namespace NhaSachDaiThang_BE_API.Migrations
                         .HasColumnType("nvarchar(max)")
                         .HasColumnName("Note");
 
-                    b.Property<int>("Quanlity")
+                    b.Property<int>("Quantity")
                         .HasColumnType("int")
                         .HasColumnName("Quantity");
 
@@ -624,72 +531,6 @@ namespace NhaSachDaiThang_BE_API.Migrations
                     b.ToTable("User");
                 });
 
-            modelBuilder.Entity("NhaSachDaiThang_BE_API.Models.Entities.Voucher", b =>
-                {
-                    b.Property<int>("VoucherId")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int")
-                        .HasColumnName("VoucherID");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("VoucherId"));
-
-                    b.Property<string>("Code")
-                        .HasMaxLength(50)
-                        .HasColumnType("nvarchar(50)");
-
-                    b.Property<string>("CreatedBy")
-                        .HasMaxLength(100)
-                        .HasColumnType("nvarchar(100)");
-
-                    b.Property<DateTime?>("CreatedDate")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("datetime")
-                        .HasDefaultValueSql("(getdate())");
-
-                    b.Property<decimal?>("Discount")
-                        .HasColumnType("decimal(5, 2)");
-
-                    b.Property<DateOnly?>("ExpirationDate")
-                        .HasColumnType("date");
-
-                    b.Property<decimal?>("MinOrderValue")
-                        .HasColumnType("decimal(18, 2)");
-
-                    b.Property<string>("ModifyBy")
-                        .HasMaxLength(100)
-                        .HasColumnType("nvarchar(100)");
-
-                    b.Property<DateTime?>("ModifyDate")
-                        .HasColumnType("datetime");
-
-                    b.HasKey("VoucherId")
-                        .HasName("PK__Vouchers__3AEE79C132561A24");
-
-                    b.HasIndex(new[] { "Code" }, "UQ__Vouchers__A25C5AA76011FE50")
-                        .IsUnique()
-                        .HasFilter("[Code] IS NOT NULL");
-
-                    b.ToTable("Voucher");
-                });
-
-            modelBuilder.Entity("OrderVoucher", b =>
-                {
-                    b.Property<int>("OrderId")
-                        .HasColumnType("int")
-                        .HasColumnName("OrderID");
-
-                    b.Property<int>("VoucherId")
-                        .HasColumnType("int")
-                        .HasColumnName("VoucherID");
-
-                    b.HasKey("OrderId", "VoucherId")
-                        .HasName("PK__OrderVou__C03EBC33F9DC2251");
-
-                    b.HasIndex("VoucherId");
-
-                    b.ToTable("OrderVouchers", (string)null);
-                });
-
             modelBuilder.Entity("NhaSachDaiThang_BE_API.Models.Entities.Book", b =>
                 {
                     b.HasOne("NhaSachDaiThang_BE_API.Models.Entities.BookCoverType", "BookCoverType")
@@ -752,26 +593,6 @@ namespace NhaSachDaiThang_BE_API.Migrations
                     b.Navigation("Order");
                 });
 
-            modelBuilder.Entity("NhaSachDaiThang_BE_API.Models.Entities.Payment", b =>
-                {
-                    b.HasOne("NhaSachDaiThang_BE_API.Models.Entities.Order", "Order")
-                        .WithMany("Payments")
-                        .HasForeignKey("OrderId")
-                        .HasConstraintName("FK__Payments__OrderI__6B24EA82");
-
-                    b.Navigation("Order");
-                });
-
-            modelBuilder.Entity("NhaSachDaiThang_BE_API.Models.Entities.Review", b =>
-                {
-                    b.HasOne("NhaSachDaiThang_BE_API.Models.Entities.Book", "Book")
-                        .WithMany("Reviews")
-                        .HasForeignKey("BookId")
-                        .HasConstraintName("FK__Reviews__BookID__71D1E811");
-
-                    b.Navigation("Book");
-                });
-
             modelBuilder.Entity("NhaSachDaiThang_BE_API.Models.Entities.SupplierBook", b =>
                 {
                     b.HasOne("NhaSachDaiThang_BE_API.Models.Entities.Book", "Book")
@@ -801,26 +622,9 @@ namespace NhaSachDaiThang_BE_API.Migrations
                     b.Navigation("Role");
                 });
 
-            modelBuilder.Entity("OrderVoucher", b =>
-                {
-                    b.HasOne("NhaSachDaiThang_BE_API.Models.Entities.Order", null)
-                        .WithMany()
-                        .HasForeignKey("OrderId")
-                        .IsRequired()
-                        .HasConstraintName("FK__OrderVouc__Order__6477ECF3");
-
-                    b.HasOne("NhaSachDaiThang_BE_API.Models.Entities.Voucher", null)
-                        .WithMany()
-                        .HasForeignKey("VoucherId")
-                        .IsRequired()
-                        .HasConstraintName("FK__OrderVouc__Vouch__656C112C");
-                });
-
             modelBuilder.Entity("NhaSachDaiThang_BE_API.Models.Entities.Book", b =>
                 {
                     b.Navigation("OrderDetails");
-
-                    b.Navigation("Reviews");
 
                     b.Navigation("SupplierBooks");
                 });
@@ -845,8 +649,6 @@ namespace NhaSachDaiThang_BE_API.Migrations
             modelBuilder.Entity("NhaSachDaiThang_BE_API.Models.Entities.Order", b =>
                 {
                     b.Navigation("OrderDetails");
-
-                    b.Navigation("Payments");
                 });
 
             modelBuilder.Entity("NhaSachDaiThang_BE_API.Models.Entities.Role", b =>

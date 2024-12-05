@@ -5,7 +5,7 @@ namespace NhaSachDaiThang_BE_API.Services.IServices
 {
     public interface IAuthService
     {
-        Task<ServiceResult> Register(RegisterModel model);
+        Task<ServiceResult> Register(RegisterDto model);
         Task<ServiceResult> Login(LoginModel model);
         Task<ServiceResult> AdminLogin(LoginModel model);
         Task<ServiceResult> SendOtp(string email);

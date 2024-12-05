@@ -28,13 +28,13 @@ public partial class BookStoreContext : DbContext
     public virtual DbSet<OrderDetail> OrderDetail { get; set; }
     public virtual DbSet<Supplier> Supplier { get; set; }
     public virtual DbSet<SupplierBook> SupplierBook { get; set; }
-    public virtual DbSet<Payment> Payment { get; set; }
+    //public virtual DbSet<Payment> Payment { get; set; }
 
-    public virtual DbSet<Review> Review { get; set; }
+    //public virtual DbSet<Review> Review { get; set; }
 
     public virtual DbSet<Role> Role { get; set; }
 
-    public virtual DbSet<Voucher> Voucher { get; set; }
+    //public virtual DbSet<Voucher> Voucher { get; set; }
     public DbSet<BookCoverType> BookCoverType { get; set; }
     public DbSet<Language> Language { get; set; }
 
@@ -66,7 +66,7 @@ public partial class BookStoreContext : DbContext
                 .HasColumnType("datetime");
             entity.Property(e => e.PromotionEndDate)
                 .HasColumnType("datetime");
-            entity.Property(e => e.Description).HasMaxLength(500);
+            entity.Property(e => e.Description).HasColumnType("nvarchar(max)");
             entity.Property(e => e.PageCount)
               .IsRequired(false);
             entity.Property(e => e.Promotion).HasMaxLength(30)
@@ -220,24 +220,24 @@ public partial class BookStoreContext : DbContext
                 .HasForeignKey(d => d.UserId)
                 .HasConstraintName("FK__Orders__Customer__5DCAEF64");
 
-            entity.HasMany(d => d.Vouchers).WithMany(p => p.Orders)
-                .UsingEntity<Dictionary<string, object>>(
-                    "OrderVoucher",
-                    r => r.HasOne<Voucher>().WithMany()
-                        .HasForeignKey("VoucherId")
-                        .OnDelete(DeleteBehavior.ClientSetNull)
-                        .HasConstraintName("FK__OrderVouc__Vouch__656C112C"),
-                    l => l.HasOne<Order>().WithMany()
-                        .HasForeignKey("OrderId")
-                        .OnDelete(DeleteBehavior.ClientSetNull)
-                        .HasConstraintName("FK__OrderVouc__Order__6477ECF3"),
-                    j =>
-                    {
-                        j.HasKey("OrderId", "VoucherId").HasName("PK__OrderVou__C03EBC33F9DC2251");
-                        j.ToTable("OrderVouchers");
-                        j.IndexerProperty<int>("OrderId").HasColumnName("OrderID");
-                        j.IndexerProperty<int>("VoucherId").HasColumnName("VoucherID");
-                    });
+            //entity.HasMany(d => d.Vouchers).WithMany(p => p.Orders)
+            //    .UsingEntity<Dictionary<string, object>>(
+            //        "OrderVoucher",
+            //        r => r.HasOne<Voucher>().WithMany()
+            //            .HasForeignKey("VoucherId")
+            //            .OnDelete(DeleteBehavior.ClientSetNull)
+            //            .HasConstraintName("FK__OrderVouc__Vouch__656C112C"),
+            //        l => l.HasOne<Order>().WithMany()
+            //            .HasForeignKey("OrderId")
+            //            .OnDelete(DeleteBehavior.ClientSetNull)
+            //            .HasConstraintName("FK__OrderVouc__Order__6477ECF3"),
+            //        j =>
+            //        {
+            //            j.HasKey("OrderId", "VoucherId").HasName("PK__OrderVou__C03EBC33F9DC2251");
+            //            j.ToTable("OrderVouchers");
+            //            j.IndexerProperty<int>("OrderId").HasColumnName("OrderID");
+            //            j.IndexerProperty<int>("VoucherId").HasColumnName("VoucherID");
+            //        });
         });
 
         modelBuilder.Entity<OrderDetail>(entity =>
@@ -259,31 +259,31 @@ public partial class BookStoreContext : DbContext
                 .HasConstraintName("FK__OrderDeta__Order__60A75C0F");
         });
 
-        modelBuilder.Entity<Payment>(entity =>
-        {
-            entity.HasKey(e => e.PaymentId).HasName("PK__Payments__9B556A588C4AA9B9");
+        //modelBuilder.Entity<Payment>(entity =>
+        //{
+        //    entity.HasKey(e => e.PaymentId).HasName("PK__Payments__9B556A588C4AA9B9");
 
-            entity.Property(e => e.PaymentId).HasColumnName("PaymentID");
-            entity.Property(e => e.Amount).HasColumnType("decimal(18, 2)");
-            entity.Property(e => e.CreatedBy).HasMaxLength(100);
-            entity.Property(e => e.CreatedDate)
-                .HasDefaultValueSql("(getdate())")
-                .HasColumnType("datetime");
-            entity.Property(e => e.ModifyBy).HasMaxLength(100);
-            entity.Property(e => e.ModifyDate).HasColumnType("datetime");
-            entity.Property(e => e.OrderId).HasColumnName("OrderID");
-            entity.Property(e => e.PaymentDate)
-                .HasDefaultValueSql("(getdate())")
-                .HasColumnType("datetime");
-            entity.Property(e => e.PaymentMethod).HasMaxLength(50);
+        //    entity.Property(e => e.PaymentId).HasColumnName("PaymentID");
+        //    entity.Property(e => e.Amount).HasColumnType("decimal(18, 2)");
+        //    entity.Property(e => e.CreatedBy).HasMaxLength(100);
+        //    entity.Property(e => e.CreatedDate)
+        //        .HasDefaultValueSql("(getdate())")
+        //        .HasColumnType("datetime");
+        //    entity.Property(e => e.ModifyBy).HasMaxLength(100);
+        //    entity.Property(e => e.ModifyDate).HasColumnType("datetime");
+        //    entity.Property(e => e.OrderId).HasColumnName("OrderID");
+        //    entity.Property(e => e.PaymentDate)
+        //        .HasDefaultValueSql("(getdate())")
+        //        .HasColumnType("datetime");
+        //    entity.Property(e => e.PaymentMethod).HasMaxLength(50);
 
-            entity.HasOne(d => d.Order).WithMany(p => p.Payments)
-                .HasForeignKey(d => d.OrderId)
-                .HasConstraintName("FK__Payments__OrderI__6B24EA82");
-        });
+        //    entity.HasOne(d => d.Order).WithMany(p => p.Payments)
+        //        .HasForeignKey(d => d.OrderId)
+        //        .HasConstraintName("FK__Payments__OrderI__6B24EA82");
+        //});
 
 
-        modelBuilder.Entity<Review>(entity =>
+       /* modelBuilder.Entity<Review>(entity =>
         {
             entity.HasKey(e => e.ReviewId).HasName("PK__Reviews__74BC79AEC46D3806");
 
@@ -308,7 +308,7 @@ public partial class BookStoreContext : DbContext
             //entity.HasOne(d => d.Customer).WithMany(p => p.Reviews)
             //    .HasForeignKey(d => d.UserId)
             //    .HasConstraintName("FK__Reviews__Custome__70DDC3D8");
-        });
+        });*/
 
         modelBuilder.Entity<Role>(entity =>
         {
@@ -318,23 +318,23 @@ public partial class BookStoreContext : DbContext
             entity.Property(e => e.RoleName).HasMaxLength(50);
         });
 
-        modelBuilder.Entity<Voucher>(entity =>
-        {
-            entity.HasKey(e => e.VoucherId).HasName("PK__Vouchers__3AEE79C132561A24");
+        //modelBuilder.Entity<Voucher>(entity =>
+        //{
+        //    entity.HasKey(e => e.VoucherId).HasName("PK__Vouchers__3AEE79C132561A24");
 
-            entity.HasIndex(e => e.Code, "UQ__Vouchers__A25C5AA76011FE50").IsUnique();
+        //    entity.HasIndex(e => e.Code, "UQ__Vouchers__A25C5AA76011FE50").IsUnique();
 
-            entity.Property(e => e.VoucherId).HasColumnName("VoucherID");
-            entity.Property(e => e.Code).HasMaxLength(50);
-            entity.Property(e => e.CreatedBy).HasMaxLength(100);
-            entity.Property(e => e.CreatedDate)
-                .HasDefaultValueSql("(getdate())")
-                .HasColumnType("datetime");
-            entity.Property(e => e.Discount).HasColumnType("decimal(5, 2)");
-            entity.Property(e => e.MinOrderValue).HasColumnType("decimal(18, 2)");
-            entity.Property(e => e.ModifyBy).HasMaxLength(100);
-            entity.Property(e => e.ModifyDate).HasColumnType("datetime");
-        });
+        //    entity.Property(e => e.VoucherId).HasColumnName("VoucherID");
+        //    entity.Property(e => e.Code).HasMaxLength(50);
+        //    entity.Property(e => e.CreatedBy).HasMaxLength(100);
+        //    entity.Property(e => e.CreatedDate)
+        //        .HasDefaultValueSql("(getdate())")
+        //        .HasColumnType("datetime");
+        //    entity.Property(e => e.Discount).HasColumnType("decimal(5, 2)");
+        //    entity.Property(e => e.MinOrderValue).HasColumnType("decimal(18, 2)");
+        //    entity.Property(e => e.ModifyBy).HasMaxLength(100);
+        //    entity.Property(e => e.ModifyDate).HasColumnType("datetime");
+        //});
         modelBuilder.Entity<BookCoverType>(entity =>
         {
             entity.HasKey(e => e.BookCoverTypeId).HasName("PK_BookCoverType");

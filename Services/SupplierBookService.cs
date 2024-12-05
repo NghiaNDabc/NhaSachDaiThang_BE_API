@@ -20,11 +20,31 @@ namespace NhaSachDaiThang_BE_API.Services
             _unitOfWork = unitOfWork;
             _mapper = mapper;
         }
+
+        IEnumerable<object> GroupSuppierBook(IEnumerable<SupplierBookDto> suppliersBook)
+        {
+            return suppliersBook.GroupBy(sb => new { sb.SupplierBookId, sb.SupplierId, sb.SupplierName, sb.SupplyDate }).Select(
+
+                g => new
+                {
+                    g.Key.SupplierBookId,
+                    g.Key.SupplierId,
+                    g.Key.SupplierName,
+                    g.Key.SupplyDate,
+                    Books = g.Select(x => new
+                    {
+                        x.BookId,
+                        x.Quantity,
+
+                        x.SupplyPrice
+                    }).ToList()
+                });
+        }
         public string Validate(SupplierBookDto model)
         {
             StringBuilder errorMessages = new StringBuilder();
 
-           
+
             if (model.SupplierId <= 0)
             {
                 errorMessages.AppendLine("SupplierId phải là số dương.");
@@ -87,7 +107,7 @@ namespace NhaSachDaiThang_BE_API.Services
             {
                 try
                 {
-                    await _unitOfWork.SupplierRepository.DeleteAsync(id);
+                    
                     foreach (var suply in item)
                     {
                         var book = await _unitOfWork.BookRepository.GetByIdAsync(suply.BookId);
@@ -95,9 +115,10 @@ namespace NhaSachDaiThang_BE_API.Services
                         if (book.Quantity < 0) throw new Exception();
                         await _unitOfWork.BookRepository.UpdateAsync(book);
                     }
+                    await _unitOfWork.SupplierBookRepository.DeleteAsync(id);
                     await _unitOfWork.SaveChangeAsync();
                     await transaction.CommitAsync();
-                    return ServiceResultFactory.Ok("Xóa nhà cung cấp thành công!");
+                    return ServiceResultFactory.Ok("Xóa đơn nhập hàng!");
                 }
                 catch (Exception ex)
                 {
@@ -130,18 +151,19 @@ namespace NhaSachDaiThang_BE_API.Services
 
             var supplierBookDtos = _mapper.Map<IEnumerable<SupplierBookDto>>(supplierBooks);
 
-            var groupData = supplierBookDtos.GroupBy(sb => new { sb.SupplierBookId, sb.SupplierName,sb.SupplyDate }).Select(
+            var groupData = supplierBookDtos.GroupBy(sb => new { sb.SupplierBookId, sb.SupplierId, sb.SupplierName, sb.SupplyDate }).Select(
 
                 g => new
                 {
                     g.Key.SupplierBookId,
+                    g.Key.SupplierId,
                     g.Key.SupplierName,
                     g.Key.SupplyDate,
                     Books = g.Select(x => new
                     {
                         x.BookId,
                         x.Quantity,
-                        
+
                         x.SupplyPrice
                     }).ToList()
                 });
@@ -151,14 +173,14 @@ namespace NhaSachDaiThang_BE_API.Services
                 StatusCode = 200,
                 ApiResult = new ApiResult
                 {
-                    Success=true,
+                    Success = true,
                     Count = groupData.Count(),
                     Data = paged
                 }
             };
         }
 
-        public async Task<ServiceResult> GetBySuppierIdAsync(int supplierBookId,int? pageNumber = null, int? pageSize = null)
+        public async Task<ServiceResult> GetBySuppierIdAsync(int supplierBookId, int? pageNumber = null, int? pageSize = null)
         {
             var supplierBooks = await _unitOfWork.SupplierBookRepository.GetByIdAsync(supplierBookId);
             if (supplierBooks == null)
@@ -183,11 +205,12 @@ namespace NhaSachDaiThang_BE_API.Services
             //};
             var supplierBookDtos = _mapper.Map<IEnumerable<SupplierBookDto>>(supplierBooks);
 
-            var groupData = supplierBookDtos.GroupBy(sb => new { sb.SupplierBookId, sb.SupplierName, sb.SupplyDate }).Select(
+            var groupData = supplierBookDtos.GroupBy(sb => new { sb.SupplierBookId, sb.SupplierId, sb.SupplierName, sb.SupplyDate }).Select(
 
                 g => new
                 {
                     g.Key.SupplierBookId,
+                    g.Key.SupplierId,
                     g.Key.SupplierName,
                     g.Key.SupplyDate,
                     Books = g.Select(x => new
@@ -216,23 +239,10 @@ namespace NhaSachDaiThang_BE_API.Services
             // Chuyển đổi dữ liệu SupplierBook sang DTO
             if (!supplierBook.Any())
                 return ServiceResultFactory.NoContent();
-            
+
             var supplierBookDtos = _mapper.Map<IEnumerable<SupplierBookDto>>(supplierBook);
 
-            var groupData = supplierBookDtos.GroupBy(sb => new { sb.SupplierBookId, sb.SupplierName }).Select(
-
-                g => new
-                {
-                    g.Key.SupplierBookId,
-                    g.Key.SupplierName,
-                    Books = g.Select(x => new
-                    {
-                        x.BookId,
-                        x.Quantity,
-                        x.SupplyDate,
-                        x.SupplyPrice
-                    }).ToList()
-                });
+            var groupData = GroupSuppierBook(supplierBookDtos);
             var paged = PaginationHelper.Paginate(groupData, pageNumber, pageSize);
             return new ServiceResult
             {
@@ -241,7 +251,7 @@ namespace NhaSachDaiThang_BE_API.Services
                 {
                     Count = groupData.Count(),
                     Data = paged,
-                    Success=true
+                    Success = true
                 }
             };
         }

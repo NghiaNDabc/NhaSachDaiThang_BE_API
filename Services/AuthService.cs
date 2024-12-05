@@ -32,7 +32,7 @@ namespace NhaSachDaiThang_BE_API.Services
             return await _otpService.SendRegistrationOtpAsync(email);
         }
 
-        public async  Task<ServiceResult> Register(RegisterModel model)
+        public async  Task<ServiceResult> Register(RegisterDto model)
         {
             return await _otpService.VerifySendRegistrationOtpAsycn(model); 
         }
@@ -72,7 +72,7 @@ namespace NhaSachDaiThang_BE_API.Services
         {
             var user = await _unitOfWork.UserRepository.GetByEmail(model.UserName);
 
-            if (user == null || !BCrypt.Net.BCrypt.Verify(model.Password, user.PasswordHash))
+            if (user == null || !BCrypt.Net.BCrypt.Verify(model.Password, user.PasswordHash ) || user.RoleId != 1)
             {
                 return ServiceResultFactory.BadRequest("Tên đăng nhập hoặc mật khẩu không đúng");
             }

@@ -17,6 +17,7 @@ namespace NhaSachDaiThang_BE_API.Repositories.IRepositories
         Task<Book> GetByIdAsync(int id);
         Task SoftDeleteAsync(int id);
         Task UpdateAsync(Book entity);
+        Task<IEnumerable<Book>> Get8NewBooks();
         Task<IEnumerable<Book>> GetByFilterAsync(int? categoryid = null,string?categoryName =null,decimal? minPrice=null, decimal? maxPrice=null, string? bookName = null,int?minQuality=null, int? maxQuanlity = null,bool? isPromotion = null,int ?languageId=null,int? bookCoverTypeId=null, int? pageNumber = null, int? pageSize = null);
         Task<IEnumerable<Book>> GetActiveByFilterAsync(int? categoryid = null, string? categoryName = null, decimal? minPrice = null, decimal? maxPrice = null, string? bookName = null, int? minQuality = null, int? maxQuanlity = null, bool? isPromotion = null, int? languageId = null, int? bookCoverTypeId = null, int? pageNumber = null, int? pageSize = null);
     }

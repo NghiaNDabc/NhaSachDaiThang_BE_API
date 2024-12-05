@@ -11,6 +11,7 @@ using System.Text.RegularExpressions;
 
 namespace NhaSachDaiThang_BE_API.Services
 {
+
     public class BookService : IBookService
     {
         private readonly IUnitOfWork _unitOfWork;
@@ -545,7 +546,7 @@ namespace NhaSachDaiThang_BE_API.Services
             int? pageNumber = null,
             int? pageSize = null)
         {
-            var book = await _unitOfWork.BookRepository.GetActiveByFilterAsync(categoryid, categoryName, minPrice, maxPrice, bookName, minQuality, maxQuanlity, isPromotion, languageId, bookCoverTypeId, pageNumber, pageSize);
+                var book = await _unitOfWork.BookRepository.GetActiveByFilterAsync(categoryid, categoryName, minPrice, maxPrice, bookName, minQuality, maxQuanlity, isPromotion, languageId, bookCoverTypeId, pageNumber, pageSize);
             var count = await _unitOfWork.BookRepository.CountByFillterAsync(categoryid, categoryName, minPrice, maxPrice, bookName, minQuality, maxQuanlity, isPromotion, languageId, bookCoverTypeId);
             if (book == null || book.Count() <= 0)
                 return new ServiceResult
@@ -588,6 +589,21 @@ namespace NhaSachDaiThang_BE_API.Services
 
                     },
                     Count = activebook + deactivebook
+                }
+            };
+        }
+
+        public async Task<ServiceResult> GetNewBooks()
+        {
+            var books = await _unitOfWork.BookRepository.Get8NewBooks();
+            return new ServiceResult
+            {
+                StatusCode = 200,
+                ApiResult = new ApiResult
+                {
+                    Success = true,
+                    Data = MapList(books),
+                   
                 }
             };
         }

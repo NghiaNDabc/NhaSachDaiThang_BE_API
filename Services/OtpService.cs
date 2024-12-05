@@ -201,7 +201,7 @@ namespace NhaSachDaiThang_BE_API.Services
             };
 
         }
-        public async Task<ServiceResult> VerifySendRegistrationOtpAsycn(RegisterModel model)
+        public async Task<ServiceResult> VerifySendRegistrationOtpAsycn(RegisterDto model)
         {
             if (string.IsNullOrWhiteSpace(model.Email))
             {
@@ -255,7 +255,7 @@ namespace NhaSachDaiThang_BE_API.Services
                 PasswordHash = passwordHash,
                 Phone = model.Phone,
                 Address = model.Address,
-                RoleId = model.RoleID
+                RoleId = 3
             };
             await _unitOfWork.UserRepository.AddAsync(customer);
             await _unitOfWork.SaveChangeAsync();

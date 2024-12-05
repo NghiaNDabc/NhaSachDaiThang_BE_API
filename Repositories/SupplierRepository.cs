@@ -19,6 +19,7 @@ namespace NhaSachDaiThang_BE_API.Repositories
 
         public async Task AddAsync(Supplier entity)
         {
+            if(entity.IsDel ==null) {entity.IsDel = false;}
             await _supplierSet.AddAsync(entity);
         }
 
@@ -55,7 +56,7 @@ namespace NhaSachDaiThang_BE_API.Repositories
         {
             var rs = await _supplierSet.FirstOrDefaultAsync(x => x.SupplierId == id);
             if (rs != null) {
-                rs.IsDel = true;
+                rs.IsDel = !rs.IsDel;
             }
         }
 

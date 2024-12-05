@@ -25,14 +25,14 @@ namespace NhaSachDaiThang_BE_API.Controllers
 
         // GET: api/SupplierBooks
         [HttpGet]
-        public async Task<ActionResult> GetSupplierBook(int?supplierBookId=null,int? supplierId = null,  string? supplierName = null, string? bookname = null, DateTime? minSupplyDate = null, DateTime? maxSupplyDate = null, int? pageNumber = null, int? pageSize = null)
+        public async Task<ActionResult> GetSupplierBook(int? supplierBookId = null, int? supplierId = null, string? supplierName = null, string? bookname = null, DateTime? minSupplyDate = null, DateTime? maxSupplyDate = null, int? pageNumber = null, int? pageSize = null)
         {
             ServiceResult serviceResult;
             if (supplierId.HasValue)
             {
                 serviceResult = await _supplierBookService.GetBySuppierIdAsync(supplierId.Value);
             }
-            else if (!string.IsNullOrEmpty(supplierName) || !string.IsNullOrEmpty(bookname))
+            else if (!string.IsNullOrEmpty(supplierName) || !string.IsNullOrEmpty(bookname) || supplierBookId.HasValue || supplierId.HasValue || minSupplyDate != null || maxSupplyDate!=null)
             {
                 serviceResult = await _supplierBookService.GetByFilterAsync(supplierId, null, bookname, supplierName, minSupplyDate, maxSupplyDate, pageNumber, pageSize);
             }

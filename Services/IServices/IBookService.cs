@@ -17,6 +17,7 @@ namespace NhaSachDaiThang_BE_API.Services.IServices
         Task<ServiceResult> UpdateAync(BookDto model, List<IFormFile> imageFiles);
         Task<ServiceResult> CountAsync();
         Task<ServiceResult> GetActiveByIdAsync(int id);
+        Task<ServiceResult> GetNewBooks();
         Task<ServiceResult> GetByFilterAsync(int? categoryid = null, string? categoryName = null, decimal? minPrice = null, decimal? maxPrice = null, string? bookName = null, int? minQuality = null, int? maxQuanlity = null, bool? isPromotion = null, int? languageId = null, int? bookCoverTypeId = null, int? pageNumber = null, int? pageSize = null);
         Task<ServiceResult> GetActiveByFilterAsync(int? categoryid = null, string? categoryName = null, decimal? minPrice = null, decimal? maxPrice = null, string? bookName = null, int? minQuality = null, int? maxQuanlity = null, bool? isPromotion = null, int? languageId = null, int? bookCoverTypeId = null, int? pageNumber = null, int? pageSize = null);
     }
