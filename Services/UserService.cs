@@ -329,6 +329,9 @@ namespace NhaSachDaiThang_BE_API.Services
                 model.Image = uploadImageRs.ApiResult.Data.ToString();
             }
             UpdateUserFromDto(exisitngUser, model);
+            if (model.PassWord!= null) {
+                exisitngUser.PasswordHash = BCrypt.Net.BCrypt.HashPassword(model.PassWord);
+            }
             await _unitOfWork.UserRepository.UpdateAsync(exisitngUser);
             await _unitOfWork.SaveChangeAsync();
             return new ServiceResult
@@ -358,6 +361,57 @@ namespace NhaSachDaiThang_BE_API.Services
 
                 }
             }
+        }
+
+        public async Task<ServiceResult> ClientUpdateAsync(UserDTO model)
+        {
+            var exisitngUser = await _unitOfWork.UserRepository.GetByIdAsync(model.UserId);
+
+            if (exisitngUser == null)
+            {
+                return new ServiceResult
+                {
+                    StatusCode = 404,
+                    ApiResult = new ApiResult
+                    {
+                        Success = false,
+                        ErrMessage = "Không tìm thấy User cần cập nhật"
+                    }
+                };
+            }
+            UpdateUserFromDto(exisitngUser, model);
+            await _unitOfWork.UserRepository.UpdateAsync(exisitngUser);
+            await _unitOfWork.SaveChangeAsync();
+            return new ServiceResult
+            {
+                StatusCode = 200,
+                ApiResult = new ApiResult
+                {
+                    Success = true,
+                    Message = "Cập nhật user thành công",
+                    Data = model
+                }
+            };
+        }
+
+        public async Task<ServiceResult> ClientChangePassAsync(ChangePassDto model)
+        {
+            var exisitngUser = await _unitOfWork.UserRepository.GetByEmail(model.Email);
+
+            if (exisitngUser == null)
+            {
+                return ServiceResultFactory.BadRequest("Không tìm thấy User cần cập nhật");
+                
+            }
+            if(BCrypt.Net.BCrypt.Verify(model.Password, exisitngUser.PasswordHash))
+            {
+                return ServiceResultFactory.BadRequest("Mật khẩu cũ không đúng");
+            }
+            exisitngUser.PasswordHash = BCrypt.Net.BCrypt.HashPassword(model.Password);
+            await _unitOfWork.UserRepository.UpdateAsync(exisitngUser);
+            await _unitOfWork.SaveChangeAsync();
+            return  ServiceResultFactory.Ok("Cập nhật mật khẩu thành công");
+            
         }
     }
 }

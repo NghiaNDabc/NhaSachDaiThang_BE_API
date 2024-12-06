@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using NhaSachDaiThang_BE_API.Data;
 using NhaSachDaiThang_BE_API.Helper;
 using NhaSachDaiThang_BE_API.Helper.GlobalVar;
 using NhaSachDaiThang_BE_API.Models.Dtos;
@@ -56,7 +57,11 @@ namespace NhaSachDaiThang_BE_API.Services
                     }
                     await _unitOfWork.SaveChangeAsync();
                     await transaction.CommitAsync();
-                    return ServiceResultFactory.Create(statusCode: 201, message: "Thêm đơn hàng thành công", success: true);
+                    var data = new
+                    {
+                        orderId = id
+                    };
+                    return ServiceResultFactory.Create(statusCode: 201, message: "Thêm đơn hàng thành công", success: true, data:data);
 
                 }
                 catch (Exception ex)
@@ -126,13 +131,13 @@ namespace NhaSachDaiThang_BE_API.Services
             };
         }
 
-        public async Task<ServiceResult> GetFilteredAsync(DateTime? orderDate = null, DateTime? deliverdDate = null, string? customerName = null, string? status = null, int? pageNumber = null, int? pageSize = null)
+        public async Task<ServiceResult> GetFilteredAsync(DateTime? orderDate = null, DateTime? deliverdDate = null, string? customerName = null, string? status = null, int? userId = null, string? phoneNumber = null, int? pageNumber = null, int? pageSize = null)
         {
-            var rs = _unitOfWork.OrderRepository.GetFilteredAsync(orderDate, deliverdDate, customerName, status, pageNumber, pageSize);
+            var rs = await _unitOfWork.OrderRepository.GetFilteredAsync(orderDate, deliverdDate, customerName, status,userId,phoneNumber, pageNumber, pageSize);
 
             if (rs != null)
             {
-                var mapped = _mapper.Map<OrderDto>(rs);
+                var mapped = _mapper.Map<IEnumerable<OrderDto>>(rs);
                 return new ServiceResult
                 {
                     StatusCode = 200,
@@ -160,7 +165,7 @@ namespace NhaSachDaiThang_BE_API.Services
                     UpdateOrderFromDto(order, model);
                     _unitOfWork.OrderRepository.Update(order);
                     await _unitOfWork.SaveChangeAsync();
-                    if (order.Status == OrderStatus.Cancelled)
+                    if (order.Status.ToLower() == OrderStatus.Cancelled.ToLower() || order.Status.ToLower() == OrderStatus.Returned.ToLower())
                     {
                         var orderdetail = order.OrderDetails;
                         foreach (var detail in orderdetail)
@@ -177,6 +182,58 @@ namespace NhaSachDaiThang_BE_API.Services
                         }
                     }
                     await _unitOfWork.SaveChangeAsync();
+                    await transaction.CommitAsync();
+                    return ServiceResultFactory.Ok("Cập nhất thông tin đơn hàng thành công", order);
+                }
+                catch (Exception ex)
+                {
+                    await transaction.RollbackAsync();
+                    return new ServiceResult
+                    {
+                        StatusCode = 500,
+                        ApiResult = new ApiResult
+                        {
+                            Success = false,
+                            ErrMessage = "Lỗi khi thêm đơn hàng: " + ex.Message
+                        }
+                    };
+                }
+
+            }
+
+        }
+        public async Task<ServiceResult> UpdateStauaAsync(int id, string status)
+        {
+            BookStoreContext db = new BookStoreContext();   
+            var order = await db.Order.FindAsync(id);
+            if (order == null) return ServiceResultFactory.NotFound();
+
+
+            using (var transaction = await db.Database.BeginTransactionAsync())
+            {
+                try
+                {
+
+                   order.Status = status;
+                    db.Update(order);
+                   
+                    if (order.Status.ToLower() == OrderStatus.Cancelled.ToLower() || order.Status.ToLower() == OrderStatus.Returned.ToLower())
+                    {
+                        var orderdetail = order.OrderDetails;
+                        foreach (var detail in orderdetail)
+                        {
+                            var book = await db.Book.FindAsync(detail.BookId.Value);
+                            if (book != null)
+                            {
+                                book.Quantity += detail.Quantity;
+                            }
+                            else
+                            {
+                                throw new Exception("Lỗi server");
+                            }
+                        }
+                    }
+                    await db.SaveChangesAsync();
                     await transaction.CommitAsync();
                     return ServiceResultFactory.Ok("Cập nhất thông tin đơn hàng thành công", order);
                 }

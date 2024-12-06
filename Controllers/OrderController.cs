@@ -16,7 +16,7 @@ namespace NhaSachDaiThang_BE_API.Controllers
             _orderService = orderService;
         }
         [HttpGet]
-        public async Task<IActionResult> Get(int? orderId = null, DateTime? orderDate = null, DateTime? deliverdDate = null, string? customerName = null, string? status = null, int? pageNumber = null, int? pageSize = null)
+        public async Task<IActionResult> Get(int? orderId = null, DateTime? orderDate = null, DateTime? deliverdDate = null, string? customerName = null, string? status = null, int? userId = null, string? phoneNumber = null, int? pageNumber = null, int? pageSize = null)
         {
             ServiceResult rs;
             if (orderId.HasValue)
@@ -25,7 +25,7 @@ namespace NhaSachDaiThang_BE_API.Controllers
             }
             else
             {
-                rs = await _orderService.GetFilteredAsync(orderDate, deliverdDate, customerName, status, pageNumber, pageSize);
+                rs = await _orderService.GetFilteredAsync(orderDate, deliverdDate, customerName, status,userId,phoneNumber, pageNumber, pageSize);
             }
             return StatusCode(rs.StatusCode, rs.ApiResult);
         }
@@ -33,6 +33,12 @@ namespace NhaSachDaiThang_BE_API.Controllers
         public async Task<IActionResult> Put(OrderDto orderdto)
         {
             var rs = await _orderService.UpdateAsync(orderdto);
+            return StatusCode(rs.StatusCode, rs.ApiResult);
+        }
+        [HttpPut("changstatus")]
+        public async Task<IActionResult> ChangStatus(int orderId, string status)
+        {
+            var rs = await _orderService.UpdateStauaAsync(orderId,status);
             return StatusCode(rs.StatusCode, rs.ApiResult);
         }
 

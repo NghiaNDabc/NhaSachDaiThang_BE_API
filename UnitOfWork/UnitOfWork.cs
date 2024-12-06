@@ -39,11 +39,6 @@ namespace NhaSachDaiThang_BE_API.UnitOfWork
         {
             return await _bookStoreContext.Database.BeginTransactionAsync();
         }
-        public void Dispose()
-        {
-            _bookStoreContext.Dispose();
-            GC.SuppressFinalize(this);
-        }
 
         public async Task<int> SaveChangeAsync()
         {

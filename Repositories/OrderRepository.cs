@@ -29,15 +29,15 @@ namespace NhaSachDaiThang_BE_API.Repositories
 
         public async Task<Order> GetByIdAsync(int id)
         {
-            return await _orders.FindAsync(id);
+            return await _orders.Where(x=>x.OrderId==id).FirstOrDefaultAsync();
         }
 
-        public async Task<IEnumerable<Order>> GetFilteredAsync(DateTime? orderDate = null, DateTime? deliverdDate = null, string? customerName = null, string? status = null, int? pageNumber = null, int? pageSize = null)
+        public async Task<IEnumerable<Order>> GetFilteredAsync(DateTime? orderDate = null, DateTime? deliverdDate = null, string? customerName = null, string? status = null,int? userId=null, string? phoneNumber=null, int? pageNumber = null, int? pageSize = null)
         {
             IQueryable<Order> query = _orders;
             if(orderDate != null)
             {
-                query = query.Where(o=> o.OrderDate == orderDate); 
+                query = query.Where(o=> o.CreatedDate == orderDate); 
             }
             if (deliverdDate != null)
             {
@@ -51,8 +51,15 @@ namespace NhaSachDaiThang_BE_API.Repositories
             {
                 query = query.Where(o => o.Status == status);
             }
-
-            return await PaginationHelper.PaginateAsync(query);
+            if (userId != null)
+            {
+                query = query.Where(o => o.UserId == userId);
+            }
+            if (phoneNumber != null)
+            {
+                query = query.Where(o => o.Phone == phoneNumber);
+            }
+            return await PaginationHelper.PaginateAsync(query,pageNumber,pageSize);
         }
 
         public void Update(Order entity)

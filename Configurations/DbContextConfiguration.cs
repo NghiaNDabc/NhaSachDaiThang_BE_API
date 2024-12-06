@@ -9,7 +9,9 @@ namespace NhaSachDaiThang_BE_API.Configurations
         public static void AddDbContextConfiguration(this IServiceCollection services, IConfiguration configuration)
         {
             services.AddDbContext<BookStoreContext>(options =>
-                options.UseLazyLoadingProxies().UseSqlServer(configuration.GetConnectionString("BookStoreDb")));
+    options.UseLazyLoadingProxies()
+           .UseSqlServer(configuration.GetConnectionString("BookStoreDb")),
+    ServiceLifetime.Scoped);
         }
     }
 }

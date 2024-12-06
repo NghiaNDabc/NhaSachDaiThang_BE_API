@@ -41,6 +41,7 @@ builder.Services.AddScoped<ISupplierBookService, SupplierBookService>();
 builder.Services.AddScoped<IOrderService, OrderService>();
 builder.Services.AddScoped<IBookCoverTypeService, BookCoverTypeService>();
 builder.Services.AddScoped<ILanguageService, LanguageService>();
+builder.Services.AddScoped<IVnPayService, VnPayService>();
 //builder.Services.AddScoped<ISupplierBookService, SupplierBookService>();
 //repository
 builder.Services.AddScoped<IUserRepository, UserRepository>();
