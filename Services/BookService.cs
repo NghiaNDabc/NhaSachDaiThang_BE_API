@@ -52,7 +52,7 @@ namespace NhaSachDaiThang_BE_API.Services
             // Tạo thực thể Book từ DTO và lưu tạm để lấy ID
             var book = _mapper.Map<Book>(model);
             book.CreatedDate = DateTime.Now;
-
+            book.Quantity = 0;
             await _unitOfWork.BookRepository.AddAsync(book);
             await _unitOfWork.SaveChangeAsync();
 
@@ -96,7 +96,7 @@ namespace NhaSachDaiThang_BE_API.Services
             // Cập nhật lại thông tin ảnh của sách vào cơ sở dữ liệu
             book.MainImage = model.MainImage;
             book.AdditionalImages = model.AdditionalImages;
-           await _unitOfWork.BookRepository.UpdateAsync(book);
+            await _unitOfWork.BookRepository.UpdateAsync(book);
             await _unitOfWork.SaveChangeAsync();
 
             return ServiceResultFactory.Created("Sách đã được thêm thành công.");
@@ -200,7 +200,7 @@ namespace NhaSachDaiThang_BE_API.Services
                     ApiResult = new ApiResult { Success = false, Message = "No books found." }
                 };
             }
-          
+
 
             // Chuyển đổi dữ liệu sách sang DTO
             var bookDtos = MapList(books);
@@ -501,12 +501,13 @@ namespace NhaSachDaiThang_BE_API.Services
             int? minQuality = null,
             int? maxQuanlity = null,
             bool? isPromotion = null,
+            bool? isActive = null,
             int? languageId = null,
             int? bookCoverTypeId = null,
             int? pageNumber = null,
             int? pageSize = null)
         {
-            var book = await _unitOfWork.BookRepository.GetByFilterAsync(categoryid, categoryName, minPrice, maxPrice, bookName, minQuality, maxQuanlity, isPromotion, languageId, bookCoverTypeId, pageNumber, pageSize);
+            var book = await _unitOfWork.BookRepository.GetByFilterAsync(categoryid, categoryName, minPrice, maxPrice, bookName, minQuality, maxQuanlity, isPromotion, isActive, languageId, bookCoverTypeId, pageNumber, pageSize);
             if (book == null || book.Count() <= 0)
                 return new ServiceResult
                 {
@@ -518,7 +519,17 @@ namespace NhaSachDaiThang_BE_API.Services
 
                     }
                 };
-            var count = await _unitOfWork.BookRepository.CountByFillterAsync(categoryid, categoryName, minPrice, maxPrice, bookName, minQuality, maxQuanlity, isPromotion, languageId, bookCoverTypeId);
+            var count = await _unitOfWork.BookRepository.CountByFillterAsync(
+                categoryid,
+                categoryName,
+                minPrice, maxPrice,
+                bookName,
+                minQuality,
+                maxQuanlity,
+                isPromotion,
+                isActive,
+                languageId,
+                bookCoverTypeId);
             var bookDto = MapList(book);
             return new ServiceResult
             {
@@ -528,7 +539,7 @@ namespace NhaSachDaiThang_BE_API.Services
                     Success = true,
                     Count = count,
                     Data = bookDto
-                
+
                 }
             };
         }
@@ -546,8 +557,8 @@ namespace NhaSachDaiThang_BE_API.Services
             int? pageNumber = null,
             int? pageSize = null)
         {
-                var book = await _unitOfWork.BookRepository.GetActiveByFilterAsync(categoryid, categoryName, minPrice, maxPrice, bookName, minQuality, maxQuanlity, isPromotion, languageId, bookCoverTypeId, pageNumber, pageSize);
-            var count = await _unitOfWork.BookRepository.CountByFillterAsync(categoryid, categoryName, minPrice, maxPrice, bookName, minQuality, maxQuanlity, isPromotion, languageId, bookCoverTypeId);
+            var book = await _unitOfWork.BookRepository.GetActiveByFilterAsync(categoryid, categoryName, minPrice, maxPrice, bookName, minQuality, maxQuanlity, isPromotion, languageId, bookCoverTypeId, pageNumber, pageSize);
+            var count = await _unitOfWork.BookRepository.CountByFillterAsync(categoryid, categoryName, minPrice, maxPrice, bookName, minQuality, maxQuanlity, isPromotion, true,languageId, bookCoverTypeId);
             if (book == null || book.Count() <= 0)
                 return new ServiceResult
                 {
@@ -603,7 +614,7 @@ namespace NhaSachDaiThang_BE_API.Services
                 {
                     Success = true,
                     Data = MapList(books),
-                   
+
                 }
             };
         }

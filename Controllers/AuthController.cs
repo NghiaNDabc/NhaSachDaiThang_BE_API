@@ -5,6 +5,7 @@ using NhaSachDaiThang_BE_API.Models.Entities;
 using NhaSachDaiThang_BE_API.Services;
 using NhaSachDaiThang_BE_API.Services.IServices;
 using Swashbuckle.AspNetCore.Annotations;
+using System.Security.Claims;
 
 
 namespace NhaSachDaiThang_BE_API.Controllers
@@ -14,10 +15,11 @@ namespace NhaSachDaiThang_BE_API.Controllers
     public class AuthController : ControllerBase
     {
         private readonly IAuthService _accountService;
-
-        public AuthController(IAuthService accountService)
+        private readonly IUserService _userService;
+        public AuthController(IAuthService accountService, IUserService a)
         {
             _accountService = accountService;
+            _userService = a;
         }
         [SwaggerOperation(Summary = "Đăng ký")]
         [HttpPost("register")]
@@ -62,6 +64,17 @@ namespace NhaSachDaiThang_BE_API.Controllers
         public async Task<IActionResult> RefreshToken([FromBody] string refreshToken)
         {
             var result = await _accountService.GetTokenByRefreshToken(refreshToken);
+            return StatusCode(result.StatusCode, result.ApiResult);
+        }
+        [SwaggerOperation(Summary = "Lấy thông tin")]
+        [Authorize]
+        [HttpGet("infor")]
+        public async Task<IActionResult> GetInfor()
+        {
+            var userIdClaim = HttpContext.User.FindFirst(ClaimTypes.NameIdentifier);
+            var userId = int.Parse(userIdClaim.Value);
+            var result = await _userService.GetById(userId);
+
             return StatusCode(result.StatusCode, result.ApiResult);
         }
 

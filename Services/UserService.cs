@@ -31,6 +31,7 @@ namespace NhaSachDaiThang_BE_API.Services
 
         public async Task<ServiceResult> AddAsync(UserDTO model, IFormFile formFile)
         {
+            if( await _unitOfWork.UserRepository.GetByEmail(model.Email)!=null) return ServiceResultFactory.BadRequest("Email đã tồn tại");
             var user = _mapper.Map<User>(model);
 
             if (formFile == null)
@@ -51,7 +52,9 @@ namespace NhaSachDaiThang_BE_API.Services
                 ApiResult = new ApiResult
                 {
                     Success = true,
-                    Data = model
+                    Data = model,
+                    Message = "Thêm mới người dùng thành công"
+                    
                 }
             };
 
@@ -76,6 +79,7 @@ namespace NhaSachDaiThang_BE_API.Services
             }
 
             await _unitOfWork.UserRepository.DeleteAsync(id);
+            await _unitOfWork.SaveChangeAsync();
             return new ServiceResult
             {
                 StatusCode = 201,
@@ -357,7 +361,12 @@ namespace NhaSachDaiThang_BE_API.Services
                 var value = property.GetValue(userDTO);
                 if ((value != null))
                 {
-                    property.SetValue(user, value);
+                    var userProperty = typeof(User).GetProperty(property.Name);
+                    if (userProperty != null)
+                    {
+                        userProperty.SetValue(user, value);
+                    }
+                    //property.SetValue(user, value);
 
                 }
             }
@@ -403,11 +412,11 @@ namespace NhaSachDaiThang_BE_API.Services
                 return ServiceResultFactory.BadRequest("Không tìm thấy User cần cập nhật");
                 
             }
-            if(BCrypt.Net.BCrypt.Verify(model.Password, exisitngUser.PasswordHash))
+            if(!BCrypt.Net.BCrypt.Verify(model.Password, exisitngUser.PasswordHash))
             {
                 return ServiceResultFactory.BadRequest("Mật khẩu cũ không đúng");
             }
-            exisitngUser.PasswordHash = BCrypt.Net.BCrypt.HashPassword(model.Password);
+            exisitngUser.PasswordHash = BCrypt.Net.BCrypt.HashPassword(model.NewPassword);
             await _unitOfWork.UserRepository.UpdateAsync(exisitngUser);
             await _unitOfWork.SaveChangeAsync();
             return  ServiceResultFactory.Ok("Cập nhật mật khẩu thành công");

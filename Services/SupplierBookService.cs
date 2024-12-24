@@ -33,9 +33,10 @@ namespace NhaSachDaiThang_BE_API.Services
                     g.Key.SupplyDate,
                     Books = g.Select(x => new
                     {
+                        x.MainImage,
+                        x.Title,
                         x.BookId,
                         x.Quantity,
-
                         x.SupplyPrice
                     }).ToList()
                 });
@@ -55,9 +56,9 @@ namespace NhaSachDaiThang_BE_API.Services
                 errorMessages.AppendLine("BookId phải là số dương.");
             }
 
-            if (model.Quantity < 0)
+            if (model.Quantity <= 0)
             {
-                errorMessages.AppendLine("Số lượng không được nhỏ hơn 0.");
+                errorMessages.AppendLine("Số lượng lớn hơn 0.");
             }
             return errorMessages.ToString().Trim();
         }
@@ -161,9 +162,10 @@ namespace NhaSachDaiThang_BE_API.Services
                     g.Key.SupplyDate,
                     Books = g.Select(x => new
                     {
+                        x.Title,
                         x.BookId,
                         x.Quantity,
-
+                        x.MainImage,
                         x.SupplyPrice
                     }).ToList()
                 });
@@ -217,7 +219,8 @@ namespace NhaSachDaiThang_BE_API.Services
                     {
                         x.BookId,
                         x.Quantity,
-
+                        x.MainImage,
+                        x.Title,
                         x.SupplyPrice
                     }).ToList()
                 });

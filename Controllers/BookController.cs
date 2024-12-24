@@ -20,7 +20,7 @@ namespace NhaSachDaiThang_BE_API.Controllers
         }
 
         [HttpGet()]
-        //[Authorize(Roles = "Admin,Employee")]
+        [Authorize(Roles = "Admin")]
 
         public async Task<IActionResult> GetBook(int? id = null,
             int? categoryId = null,
@@ -30,6 +30,7 @@ namespace NhaSachDaiThang_BE_API.Controllers
             string? bookName = null,
             int? minQuatity = null,
             int? maxQuanlity = null,
+            bool? active = null,
             bool? isPromotion = null,
             int? languageId = null,
             int? bookCoverTypeId = null,
@@ -46,6 +47,7 @@ namespace NhaSachDaiThang_BE_API.Controllers
               minQuatity.HasValue ||
               maxQuanlity.HasValue ||
               isPromotion.HasValue ||
+              active.HasValue ||
               languageId.HasValue ||
               bookCoverTypeId.HasValue ||
               !string.IsNullOrEmpty(bookName))
@@ -59,6 +61,7 @@ namespace NhaSachDaiThang_BE_API.Controllers
                                                             minQuatity,
                                                             maxQuanlity,
                                                             isPromotion,
+                                                            active,
                                                             languageId,
                                                             bookCoverTypeId,
                                                             pageNumber,
@@ -125,7 +128,7 @@ namespace NhaSachDaiThang_BE_API.Controllers
         }
 
         [HttpPost]
-        [Authorize(Roles = "Admin,Employee")]
+        [Authorize(Roles = "Admin")]
         public async Task<ActionResult<ServiceResult>> PostBook([FromForm] BookDto bookDto, [FromForm] List<IFormFile> imageFiles)
         {
             var result = await _bookService.AddAsync(bookDto, imageFiles);
@@ -133,7 +136,7 @@ namespace NhaSachDaiThang_BE_API.Controllers
         }
 
         [HttpPut("changeStatus/{id}")]
-        [Authorize(Roles = "Admin,Employee")]
+        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> DeactiveCategory(int id)
         {
             var rs = await _bookService.ChangStatusAsync(id);
@@ -141,7 +144,7 @@ namespace NhaSachDaiThang_BE_API.Controllers
         }
 
         [HttpDelete("{id}")]
-        [Authorize(Roles = "Admin,Employee")]
+        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> HardDeleteCategory(int id)
         {
             var rs = await _bookService.DeleteAsync(id);
@@ -149,7 +152,7 @@ namespace NhaSachDaiThang_BE_API.Controllers
         }
 
         [HttpPut]
-        [Authorize(Roles = "Admin,Employee")]
+        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> PutBook([FromForm] BookDto book, [FromForm] List<IFormFile> imageFiles)
         {
             var rs = await _bookService.UpdateAync(book, imageFiles);

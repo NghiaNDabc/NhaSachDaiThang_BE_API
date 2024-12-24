@@ -18,7 +18,7 @@ builder.Services.AddCors(options =>
 {
     options.AddPolicy("NhaSachDaiThang", builder =>
     {
-        builder.WithOrigins("http://localhost:3000")
+        builder.WithOrigins("http://localhost:3000", "http://192.168.41.103:3000")
         .AllowCredentials()
                .AllowAnyMethod()
                .AllowAnyHeader();
@@ -62,6 +62,7 @@ builder.Services.AddAutoMapper(typeof(AutoMapperProfile));
 //helper
 builder.Services.AddScoped<JwtHelper>();
 builder.Services.AddScoped<EmailHelper>();
+builder.Services.AddScoped<UrlHelper>();
 builder.Services.AddMemoryCache();
 // Add services to the container.
 
@@ -107,5 +108,5 @@ app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapControllers();
-
+app.Urls.Add("http://*:5000");
 app.Run();

@@ -7,7 +7,7 @@ namespace NhaSachDaiThang_BE_API.Repositories.IRepositories
     {
         Task<object> AddAsync(Order entity);
         Task DeleteAsync(int id);
-        Task<IEnumerable<Order>> GetFilteredAsync(DateTime? orderDate=null, DateTime? deliverdDate=null,string? customerName=null, string?status = null, int? userId = null, string? phoneNumber = null,int ? pageNumber = null, int? pageSize = null);
+        Task<IEnumerable<Order>> GetFilteredAsync(DateTime? minorderDate = null, DateTime? maxorderDate = null, DateTime? deliverdDate=null,string? customerName=null, string?status = null, int? userId = null, string? phoneNumber = null);
         Task<Order> GetByIdAsync(int id);
         void Update(Order entity);
     }

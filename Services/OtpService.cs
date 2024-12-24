@@ -114,7 +114,7 @@ namespace NhaSachDaiThang_BE_API.Services
             if (check.StatusCode == 400) return check;
 
             var user = _unitOfWork.UserRepository.GetByEmail(email);
-            if (user == null)
+            if (user != null)
             {
                 return new ServiceResult
                 {
@@ -122,7 +122,7 @@ namespace NhaSachDaiThang_BE_API.Services
                     ApiResult = new ApiResult
                     {
                         Success = false,
-                        ErrMessage = "Email không được để trống!!"
+                        ErrMessage = "Email đã tồn tại!"
                     }
                 };
           

@@ -72,7 +72,7 @@ namespace NhaSachDaiThang_BE_API.Repositories
                 _books.Update(entity);
         }
 
-        public async Task<int> CountByFillterAsync(int? categoryid = null, string? categoryName = null, decimal? minPrice = null, decimal? maxPrice = null, string? bookName = null, int? minQuality = null, int? maxQuanlity = null, bool? isPromotion = null, int? languageId = null, int? bookCoverTypeId = null, bool? IsDel = null)
+        public async Task<int> CountByFillterAsync(int? categoryid = null, string? categoryName = null, decimal? minPrice = null, decimal? maxPrice = null, string? bookName = null, int? minQuality = null, int? maxQuanlity = null, bool? isPromotion = null, bool? isactive = null, int? languageId = null, int? bookCoverTypeId = null, bool? IsDel = null)
         {
 
             IQueryable<Book> query = _books;
@@ -146,10 +146,14 @@ namespace NhaSachDaiThang_BE_API.Repositories
             {
                 query = query.Where(b => b.PromotionEndDate > DateTime.Now);
             }
+            if (isactive.HasValue)
+            {
+                query = query.Where(b => b.IsDel == !isactive.Value);
+            }
             if (languageId.HasValue) { query = query.Where(b => b.LanguageId.HasValue && b.LanguageId.Value == languageId.Value); }
             return await query.CountAsync();
         }
-        public async Task<IEnumerable<Book>> GetByFilterAsync(int? categoryid = null, string? categoryName = null, decimal? minPrice = null, decimal? maxPrice = null, string? bookName = null, int? minQuality = null, int? maxQuanlity = null, bool? isPromotion = null, int? languageId = null, int? bookCoverTypeId = null, int? pageNumber = null, int? pageSize = null)
+        public async Task<IEnumerable<Book>> GetByFilterAsync(int? categoryid = null, string? categoryName = null, decimal? minPrice = null, decimal? maxPrice = null, string? bookName = null, int? minQuality = null, int? maxQuanlity = null, bool? isPromotion = null, bool? isActive = null, int? languageId = null, int? bookCoverTypeId = null, int? pageNumber = null, int? pageSize = null)
         {
             IQueryable<Book> query = _books;
 
@@ -218,6 +222,10 @@ namespace NhaSachDaiThang_BE_API.Repositories
             {
                 query = query.Where(b => b.PromotionEndDate > DateTime.Now);
             }
+            if (isActive.HasValue )
+            {
+                query = query.Where(b => b.IsDel == !isActive.Value);
+            }
             if (languageId.HasValue) { query = query.Where(b => b.LanguageId.HasValue && b.LanguageId.Value == languageId.Value); }
             if (bookCoverTypeId.HasValue) { query = query.Where(b => b.BookCoverTypeId.HasValue && b.BookCoverTypeId.Value == bookCoverTypeId.Value); }
             return await PaginationHelper.PaginateAsync(query, pageNumber, pageSize);
@@ -244,7 +252,7 @@ namespace NhaSachDaiThang_BE_API.Repositories
                 }
                 query = query.Where(b => listcategoryId.Contains(b.CategoryId.Value));
             }
-            else if (string.IsNullOrEmpty(categoryName))
+            else if (!string.IsNullOrEmpty(categoryName))
             {
                 List<int> listcategoryId = new List<int>();
                 var parentCategory = _categories.Where(b => b.Name.Contains(categoryName));

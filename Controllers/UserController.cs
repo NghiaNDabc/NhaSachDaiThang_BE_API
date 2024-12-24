@@ -129,7 +129,7 @@ namespace NhaSachDaiThang_BE_API.Controllers
             return StatusCode(rs.StatusCode, rs.ApiResult);
         }
         [Authorize(Roles = "Admin")]
-        [HttpDelete]
+        [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteUser(int id)
         {
             var rs = await _userService.Delete(id);

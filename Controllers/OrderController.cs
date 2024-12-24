@@ -1,7 +1,9 @@
-﻿using Microsoft.AspNetCore.Http;
+﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using NhaSachDaiThang_BE_API.Helper.GlobalVar;
 using NhaSachDaiThang_BE_API.Models.Dtos;
 using NhaSachDaiThang_BE_API.Services.IServices;
+using System.Security.Claims;
 
 namespace NhaSachDaiThang_BE_API.Controllers
 {
@@ -16,7 +18,7 @@ namespace NhaSachDaiThang_BE_API.Controllers
             _orderService = orderService;
         }
         [HttpGet]
-        public async Task<IActionResult> Get(int? orderId = null, DateTime? orderDate = null, DateTime? deliverdDate = null, string? customerName = null, string? status = null, int? userId = null, string? phoneNumber = null, int? pageNumber = null, int? pageSize = null)
+        public async Task<IActionResult> Get(int? orderId = null, DateTime? minOrderDate = null, DateTime? maxOrderDate = null, DateTime? deliverdDate = null, string? customerName = null, string? status = null, int? userId = null, string? phoneNumber = null, int? pageNumber = null, int? pageSize = null)
         {
             ServiceResult rs;
             if (orderId.HasValue)
@@ -25,7 +27,7 @@ namespace NhaSachDaiThang_BE_API.Controllers
             }
             else
             {
-                rs = await _orderService.GetFilteredAsync(orderDate, deliverdDate, customerName, status,userId,phoneNumber, pageNumber, pageSize);
+                rs = await _orderService.GetFilteredAsync(minOrderDate, maxOrderDate, deliverdDate, customerName, status, userId, phoneNumber, pageNumber, pageSize);
             }
             return StatusCode(rs.StatusCode, rs.ApiResult);
         }
@@ -35,13 +37,24 @@ namespace NhaSachDaiThang_BE_API.Controllers
             var rs = await _orderService.UpdateAsync(orderdto);
             return StatusCode(rs.StatusCode, rs.ApiResult);
         }
-        [HttpPut("changstatus")]
+
+        [Authorize(Roles ="Admin")]
+        [HttpPut("changestatus")]
         public async Task<IActionResult> ChangStatus(int orderId, string status)
         {
-            var rs = await _orderService.UpdateStauaAsync(orderId,status);
+            var rs = await _orderService.UpdateStauaAsync(null,orderId, status);
             return StatusCode(rs.StatusCode, rs.ApiResult);
         }
+        [Authorize]
+        [HttpPut("cancel/{orderId}")]
+        public async Task<IActionResult> Cancel(int orderId)
+        {
 
+            var userIdClaim = HttpContext.User.FindFirst(ClaimTypes.NameIdentifier); 
+            var userId = int.Parse(userIdClaim.Value);
+            var rs = await _orderService.UpdateStauaAsync(userId, orderId, OrderStatus.Cancelled);
+            return StatusCode(rs.StatusCode);
+        }
         [HttpPost]
         public async Task<IActionResult> Post(OrderDto orderdto)
         {

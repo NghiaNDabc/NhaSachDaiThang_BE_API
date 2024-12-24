@@ -174,7 +174,7 @@ namespace NhaSachDaiThang_BE_API.Services
                 ApiResult = new ApiResult
                 {
                     Success = true,
-                    Message = "Ẩn nhà cung cấp thành công!",
+                    Message = "Thay đổi trạng thái nhà cung cấp thành công!",
 
                 }
             };

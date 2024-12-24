@@ -33,7 +33,7 @@ namespace NhaSachDaiThang_BE_API.Repositories
         }
         public async Task<IEnumerable<SupplierBook>> GetAllAsync()
         {
-            var query = _supplierBooks;
+            var query = _supplierBooks.OrderByDescending(x=>x.CreatedDate);
             return query;
         }
 

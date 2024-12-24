@@ -6,8 +6,10 @@ namespace NhaSachDaiThang_BE_API.Models.Dtos
     {
         public int SupplierBookId {get; set;}   
         public int SupplierId { get; set; }
-        public string? SupplierName { get; set;}    
+        public string? SupplierName { get; set;}
+        public string? MainImage { get; set; }
         public int BookId { get; set; }
+        public string Title { get; set; }
         public int Quantity { get; set; }
         public decimal? DiscountAmount { get; set; }
         public DateTime? SupplyDate { get; set; } // Ngày cung cấp

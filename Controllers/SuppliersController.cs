@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using NhaSachDaiThang_BE_API.Models.Dtos;
 using NhaSachDaiThang_BE_API.Models.Entities;
 using NhaSachDaiThang_BE_API.Services;
@@ -8,6 +9,7 @@ namespace NhaSachDaiThang_BE_API.Controllers
 {
     [Route("api/v1/[controller]")]
     [ApiController]
+    [Authorize(Roles = "Admin")]
     public class SuppliersController : ControllerBase
     {
         private readonly ISupplierService _supplierService;

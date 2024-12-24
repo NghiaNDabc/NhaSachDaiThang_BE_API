@@ -148,7 +148,7 @@ namespace NhaSachDaiThang_BE_API.Services
 
         public async Task<ServiceResult> SoftDelete(int id)
         {
-            if (await _unitOfWork.CategoryRepository.GetByIdAsync(id) != null)
+            if (await _unitOfWork.CategoryRepository.GetByIdAsync(id) == null)
             {
                 return ServiceResultFactory.NotFound("Không tìm thấy danh mục cần xóa");
             }

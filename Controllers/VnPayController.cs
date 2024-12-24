@@ -68,7 +68,7 @@ namespace NhaSachDaiThang_BE_API.Controllers
             }
             else
             {
-                _orderService.UpdateStauaAsync(int.Parse(response.OrderId), OrderStatus.Pending);
+              await _orderService.UpdateStauaAsync(null,int.Parse(response.OrderId), OrderStatus.Pending);
 
             }
 

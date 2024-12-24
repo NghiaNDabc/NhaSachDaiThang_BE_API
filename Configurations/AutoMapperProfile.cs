@@ -16,10 +16,14 @@ namespace NhaSachDaiThang_BE_API.Configurations
             CreateMap<SupplierDto, Supplier>();
             CreateMap<SupplierBookDto, SupplierBook>();
             CreateMap<SupplierBook, SupplierBookDto>()
-                .ForMember(dest => dest.SupplierName, opt => opt.MapFrom(src => src.Supplier.Name));
+                .ForMember(dest => dest.SupplierName, opt => opt.MapFrom(src => src.Supplier.Name))
+                .ForMember(dest => dest.MainImage, opt => opt.MapFrom(src => src.Book.MainImage))
+                .ForMember(dest => dest.Title, opt => opt.MapFrom(src => src.Book.Title));
             CreateMap<Order, OrderDto>();
             CreateMap<OrderDto, Order>();
-            CreateMap<OrderDetail, OrderDetailDto>();
+            CreateMap<OrderDetail, OrderDetailDto>()
+                .ForMember(dest => dest.MainImage, opt => opt.MapFrom(src => src.Book.MainImage))
+                .ForMember(dest => dest.Title, opt => opt.MapFrom(src => src.Book.Title)); ;
             CreateMap<OrderDetailDto, OrderDetail>();
             CreateMap<BookCoverType, BookCoverTypeDto>();
             CreateMap<BookCoverTypeDto, BookCoverType>();

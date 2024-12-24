@@ -28,5 +28,13 @@ namespace NhaSachDaiThang_BE_API.Controllers
             var rolesDto = _mapper.Map<IEnumerable<RoleDto>>(roles);
             return Ok(rolesDto);
         }
+        [HttpDelete]
+        public async Task<IActionResult> dele(int id)
+        {
+            var roles = _bookStoreContext.Role.Find(id);
+            _bookStoreContext.Role.Remove(roles);
+            _bookStoreContext.SaveChanges();
+            return Ok();
+        }
     }
 }

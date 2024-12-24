@@ -14,11 +14,12 @@ namespace NhaSachDaiThang_BE_API.Services
     {
         private readonly IUnitOfWork _unitOfWork;
         private readonly IMapper _mapper;
-
-        public OrderService(IUnitOfWork unitOfWork, IMapper mapper)
+        private readonly IHttpContextAccessor _httpContextAccessor;
+        public OrderService(IUnitOfWork unitOfWork, IMapper mapper, IHttpContextAccessor httpContextAccessor)
         {
             _unitOfWork = unitOfWork;
             _mapper = mapper;
+            _httpContextAccessor = httpContextAccessor;
         }
 
         public async Task<ServiceResult> AddAsync(OrderDto model)
@@ -37,17 +38,22 @@ namespace NhaSachDaiThang_BE_API.Services
                     var orderDetails = model.OrderDetails;
                     model.OrderDetails = new List<OrderDetailDto>();
                     var orderInsert = _mapper.Map<Order>(model);
+                    orderInsert.CreatedDate = DateTime.Now;
                     var obj = await _unitOfWork.OrderRepository.AddAsync(orderInsert);
                     await _unitOfWork.SaveChangeAsync();
                     int id = orderInsert.OrderId;
 
                     foreach (var i in orderDetails)
                     {
+                        if (i.Quantity < 0)
+                        {
+                            throw new InvalidOperationException($"Số lượng sách  không được < 0.");
+                        }
                         var book = await _unitOfWork.BookRepository.GetByIdAsync(i.BookId.Value);
                         book.Quantity -= i.Quantity;
                         if (book.Quantity < 0)
                         {
-                            throw new InvalidOperationException("Số lượng sách không đủ.");
+                            throw new InvalidOperationException($"Số lượng sách {book.Title} không đủ.");
                         }
                         var maped = _mapper.Map<OrderDetail>(i);
                         maped.OrderId = id;
@@ -61,8 +67,13 @@ namespace NhaSachDaiThang_BE_API.Services
                     {
                         orderId = id
                     };
-                    return ServiceResultFactory.Create(statusCode: 201, message: "Thêm đơn hàng thành công", success: true, data:data);
+                    return ServiceResultFactory.Create(statusCode: 201, message: "Thêm đơn hàng thành công", success: true, data: data);
 
+                }
+                catch (InvalidOperationException ex1)
+                {
+                    await transaction.RollbackAsync();
+                    return ServiceResultFactory.BadRequest(ex1.Message);
                 }
                 catch (Exception ex)
                 {
@@ -108,6 +119,13 @@ namespace NhaSachDaiThang_BE_API.Services
         public async Task<ServiceResult> GetByIdAsync(int id)
         {
             var order = await _unitOfWork.OrderRepository.GetByIdAsync(id);
+            var request = _httpContextAccessor.HttpContext?.Request;
+            var baseUrl = $"{request?.Scheme}://{request?.Host}";
+            var mappedData = _mapper.Map<OrderDto>(order);
+            foreach (var item in mappedData.OrderDetails)
+            {
+                item.MainImage = $"{baseUrl}/{GlobalConst.BookImageRelativePath}/{item.MainImage}";
+            }
             if (order != null)
             {
                 return new ServiceResult
@@ -116,7 +134,7 @@ namespace NhaSachDaiThang_BE_API.Services
                     ApiResult = new ApiResult
                     {
                         Success = true,
-                        Data = _mapper.Map<OrderDto>(order)
+                        Data = mappedData
                     }
                 };
             }
@@ -126,23 +144,35 @@ namespace NhaSachDaiThang_BE_API.Services
                 ApiResult = new ApiResult
                 {
                     Success = false,
-                    Data = order
+                    Data = mappedData
                 }
             };
         }
 
-        public async Task<ServiceResult> GetFilteredAsync(DateTime? orderDate = null, DateTime? deliverdDate = null, string? customerName = null, string? status = null, int? userId = null, string? phoneNumber = null, int? pageNumber = null, int? pageSize = null)
+        public async Task<ServiceResult> GetFilteredAsync(DateTime? minorderDate = null, DateTime? maxorderDate = null, DateTime? deliverdDate = null, string? customerName = null, string? status = null, int? userId = null, string? phoneNumber = null, int? pageNumber = null, int? pageSize = null)
         {
-            var rs = await _unitOfWork.OrderRepository.GetFilteredAsync(orderDate, deliverdDate, customerName, status,userId,phoneNumber, pageNumber, pageSize);
-
+            var rs = await _unitOfWork.OrderRepository.GetFilteredAsync(minorderDate, maxorderDate, deliverdDate, customerName, status, userId, phoneNumber);
+            var count = rs.Count();
+            var paged = PaginationHelper.Paginate(rs, pageNumber, pageSize);
+            var request = _httpContextAccessor.HttpContext?.Request;
+            var baseUrl = $"{request?.Scheme}://{request?.Host}";
             if (rs != null)
             {
-                var mapped = _mapper.Map<IEnumerable<OrderDto>>(rs);
+                var mapped = _mapper.Map<IEnumerable<OrderDto>>(paged);
+                foreach (var item in mapped)
+                {
+                    foreach (var itemDto in item.OrderDetails)
+                    {
+                        itemDto.MainImage = $"{baseUrl}/{GlobalConst.BookImageRelativePath}/{itemDto.MainImage}";
+                    }
+                }
                 return new ServiceResult
                 {
+
                     StatusCode = 200,
                     ApiResult = new ApiResult
                     {
+                        Count = count,
                         Success = true,
                         Data = mapped
                     }
@@ -155,15 +185,19 @@ namespace NhaSachDaiThang_BE_API.Services
         {
             var order = await _unitOfWork.OrderRepository.GetByIdAsync(model.OrderId);
             if (order == null) return ServiceResultFactory.NotFound();
-
-
             using (var transaction = await _unitOfWork.BeginTransactionAsync())
             {
                 try
                 {
 
-                    UpdateOrderFromDto(order, model);
-                    _unitOfWork.OrderRepository.Update(order);
+                    //UpdateOrderFromDto(order, model);
+                    order.RecipientName = model.RecipientName;
+                    order.ShippingAddress = model.ShippingAddress;
+                    order.ModifyBy = model.ModifyBy;
+                    order.ModifyDate = DateTime.Now;
+                    order.Phone = model.Phone;
+                    order.Email = model.Email;  
+                    order.Status = model.Status;
                     await _unitOfWork.SaveChangeAsync();
                     if (order.Status.ToLower() == OrderStatus.Cancelled.ToLower() || order.Status.ToLower() == OrderStatus.Returned.ToLower())
                     {
@@ -183,7 +217,7 @@ namespace NhaSachDaiThang_BE_API.Services
                     }
                     await _unitOfWork.SaveChangeAsync();
                     await transaction.CommitAsync();
-                    return ServiceResultFactory.Ok("Cập nhất thông tin đơn hàng thành công", order);
+                    return ServiceResultFactory.Ok("Cập nhất thông tin đơn hàng thành công");
                 }
                 catch (Exception ex)
                 {
@@ -202,21 +236,26 @@ namespace NhaSachDaiThang_BE_API.Services
             }
 
         }
-        public async Task<ServiceResult> UpdateStauaAsync(int id, string status)
+        public async Task<ServiceResult> UpdateStauaAsync(int? userId, int id, string status)
         {
-            BookStoreContext db = new BookStoreContext();   
+            BookStoreContext db = new BookStoreContext();
             var order = await db.Order.FindAsync(id);
             if (order == null) return ServiceResultFactory.NotFound();
-
-
+            if (userId.HasValue)
+            {
+                if (order.UserId != userId) return ServiceResultFactory.Unauthorized();
+            }
             using (var transaction = await db.Database.BeginTransactionAsync())
             {
                 try
                 {
 
-                   order.Status = status;
-                    db.Update(order);
-                   
+                    order.Status = status;
+                    if (status.ToLower() == OrderStatus.DeliveredToCustomer) {
+                        order.DeliveredDate = DateTime.Now;
+                    }
+                    db.SaveChanges();
+
                     if (order.Status.ToLower() == OrderStatus.Cancelled.ToLower() || order.Status.ToLower() == OrderStatus.Returned.ToLower())
                     {
                         var orderdetail = order.OrderDetails;

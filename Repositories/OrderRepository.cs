@@ -32,12 +32,18 @@ namespace NhaSachDaiThang_BE_API.Repositories
             return await _orders.Where(x=>x.OrderId==id).FirstOrDefaultAsync();
         }
 
-        public async Task<IEnumerable<Order>> GetFilteredAsync(DateTime? orderDate = null, DateTime? deliverdDate = null, string? customerName = null, string? status = null,int? userId=null, string? phoneNumber=null, int? pageNumber = null, int? pageSize = null)
+        public async Task<IEnumerable<Order>> GetFilteredAsync(DateTime? minorderDate = null, DateTime? maxorderDate = null, DateTime? deliverdDate = null, string? customerName = null, string? status = null,int? userId=null, string? phoneNumber=null)
         {
-            IQueryable<Order> query = _orders;
-            if(orderDate != null)
+            IQueryable<Order> query = _orders.OrderByDescending(x=>x.CreatedDate);
+            if(minorderDate != null)
             {
-                query = query.Where(o=> o.CreatedDate == orderDate); 
+                ////minorderDate = minorderDate.Value.Date.Add(minorderDate.Value.TimeOfDay);
+                query = query.Where(o=> o.CreatedDate.Value.Date >= minorderDate.Value.Date); 
+            }
+            if (maxorderDate != null)
+            {
+               // maxorderDate = maxorderDate.Value.Date.Add(maxorderDate.Value.TimeOfDay);
+                query = query.Where(o => o.CreatedDate.Value.Date <= maxorderDate.Value.Date);
             }
             if (deliverdDate != null)
             {
@@ -59,7 +65,7 @@ namespace NhaSachDaiThang_BE_API.Repositories
             {
                 query = query.Where(o => o.Phone == phoneNumber);
             }
-            return await PaginationHelper.PaginateAsync(query,pageNumber,pageSize);
+            return await query.ToListAsync();
         }
 
         public void Update(Order entity)
