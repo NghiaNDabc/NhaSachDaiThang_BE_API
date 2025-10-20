@@ -45,18 +45,21 @@ stage('Deploy to Somee') {
         $ftpUser = $env:FTP_USER
         $ftpPass = $env:FTP_PASS
 
-        $files = Get-ChildItem -Path publish -Recurse -File
+        $publishPath = Get-Item publish
+        $files = Get-ChildItem -Path $publishPath.FullName -Recurse -File
+
         foreach ($f in $files) {
-         
-            $relativePath = $f.FullName.Substring((Get-Item publish).FullName.Length + 1).Replace("\\","/")
-            $ftpUrl = "$ftpHost/$relativePath"
+          
+            $relativePath = $f.FullName.Substring($publishPath.FullName.Length + 1).Replace("\\","/")
+            $ftpUrl = $ftpHost + "/" + $relativePath 
 
             Write-Host "Uploading $($f.FullName) to $ftpUrl"
 
-            curl.exe -T "`"$($f.FullName)`"" "$ftpUrl" --user "$ftpUser:$ftpPass"
+            curl.exe -T "`"$($f.FullName)`"" $ftpUrl --user "$ftpUser:$ftpPass"
         }
         '''
     }
 }
+
     }
 }
