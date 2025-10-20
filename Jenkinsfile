@@ -42,7 +42,7 @@ pipeline {
             steps {
                 bat '''
                 cd publish
-                curl -T "*" ftp://%FTP_HOST%/wwwroot/ --user %FTP_USER%:%FTP_PASS%
+                for %%f in (*) do curl -T "%%f" ftp://%FTP_HOST%%FTP_PATH% --user %FTP_USER%:%FTP_PASS%
                 '''
             }
         }
