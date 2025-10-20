@@ -38,12 +38,22 @@ pipeline {
             }
         }
 
- stage('Deploy to Somee') {
+stage('Deploy to Somee') {
     steps {
         powershell '''
+        $ftpHost = $env:FTP_HOST
+        $ftpUser = $env:FTP_USER
+        $ftpPass = $env:FTP_PASS
+
         $files = Get-ChildItem -Path publish -Recurse -File
         foreach ($f in $files) {
-            curl.exe -T $f.FullName %FTP_HOST%/wwwroot/ --user %FTP_USER%:%FTP_PASS%
+         
+            $relativePath = $f.FullName.Substring((Get-Item publish).FullName.Length + 1).Replace("\\","/")
+            $ftpUrl = "$ftpHost/$relativePath"
+
+            Write-Host "Uploading $($f.FullName) to $ftpUrl"
+
+            curl.exe -T "`"$($f.FullName)`"" "$ftpUrl" --user "$ftpUser:$ftpPass"
         }
         '''
     }
