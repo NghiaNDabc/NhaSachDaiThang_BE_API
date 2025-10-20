@@ -38,27 +38,26 @@ pipeline {
             }
         }
 
-        stage('Deploy to Somee') {
-            steps {
-                powershell '''
-                $ftpHost = $env:FTP_HOST
-                $ftpUser = $env:FTP_USER
-                $ftpPass = $env:FTP_PASS
+stage('Deploy to Somee') {
+    steps {
+        powershell '''
+        $ftpHost = $env:FTP_HOST
+        $ftpUser = $env:FTP_USER
+        $ftpPass = $env:FTP_PASS
 
-                $publishPath = Get-Item publish
-                $files = Get-ChildItem -Path $publishPath.FullName -Recurse -File
+        $publishPath = Get-Item publish
+        $files = Get-ChildItem -Path $publishPath.FullName -Recurse -File
 
-                foreach ($f in $files) {
-                    $relativePath = $f.FullName.Substring($publishPath.FullName.Length + 1).Replace("\\","/")
-                  
-                    $ftpUrl = '$ftpHost/' + $relativePath 
+        foreach ($f in $files) {
+            $relativePath = $f.FullName.Substring($publishPath.FullName.Length + 1).Replace("\\","/")
+            $ftpUrl = "$ftpHost/$relativePath"
 
-                    Write-Host "Uploading $($f.FullName) to $ftpUrl"
+            Write-Host "Uploading $($f.FullName) to $ftpUrl"
 
-                    curl.exe -T "$($f.FullName)" "$ftpUrl" --user "$ftpUser:$ftpPass"
-                }
-                '''
-            }
+            curl.exe -T "$($f.FullName)" "$ftpUrl" --user "${ftpUser}:${ftpPass}"
         }
+        '''
+    }
+}
     }
 }
