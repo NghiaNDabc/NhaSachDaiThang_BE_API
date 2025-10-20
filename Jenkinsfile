@@ -38,13 +38,15 @@ pipeline {
             }
         }
 
-        stage('Deploy to Somee') {
-            steps {
-                bat '''
-                cd publish
-                curl -T "*" %FTP_HOST%/wwwroot/ --user %FTP_USER%:%FTP_PASS%
-                '''
-            }
+       stage('Deploy to Somee') {
+    steps {
+        powershell '''
+        $files = Get-ChildItem -Path publish -Recurse -File
+        foreach ($f in $files) {
+            curl -T $f.FullName %FTP_HOST%/wwwroot/ --user %FTP_USER%:%FTP_PASS%
         }
+        '''
+    }
+}
     }
 }
