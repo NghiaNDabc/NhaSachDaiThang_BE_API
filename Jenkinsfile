@@ -1,4 +1,4 @@
-pipeline {
+﻿pipeline {
     agent any
 
     environment {
@@ -38,13 +38,15 @@ pipeline {
             }
         }
 
-        stage('Deploy to Somee') {
-            steps {
-                bat '''
-                cd publish
-                curl -T "*"%FTP_HOST%/wwwroot/ --user %FTP_USER%:%FTP_PASS%
-                '''
-            }
-        }
+       stage('Deploy to Somee') {
+    steps {
+        bat '''
+        cd publish
+        rem Upload từng file trong folder publish
+        for %%f in (*) do curl -T "%%f" %FTP_HOST%/wwwroot/ --user %FTP_USER%:%FTP_PASS%
+        '''
+    }
+}
+
     }
 }
